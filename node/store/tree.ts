@@ -10,21 +10,31 @@ useStaticRendering(typeof window === 'undefined')
 const createRoot = (): Node => {
   const hello = create('Text', { text: 'Hello World' })
   const lorem = create('Text', { text: 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' })
-  const headline = create('H1', [
+  const headline = create('Tag', { tag: 'h1' }, [
     { node: hello }
   ])
+  const image = create('Tag', { tag: 'img', props: { src: 'https://helpx.adobe.com/content/dam/help/en/stock/how-to/visual-reverse-image-search/jcr_content/main-pars/image/visual-reverse-image-search-v2_intro.jpg' }})
   const root = create('Combine', [
     { node: headline },
-    { node: lorem }
+    { node: lorem },
+    { node: image },
   ])
-
-  console.log(root)
 
   return root
 }
 
 class Tree {
   @observable root: Node = createRoot()
+  @observable test = {
+    hallo: 'welt',
+    things: ['ich', 'gehe', 'einkaufen']
+  }
 }
 
-export default new Tree()
+const tree = new Tree()
+
+if (typeof window !== 'undefined') {
+  window['tree'] = tree
+}
+
+export default tree

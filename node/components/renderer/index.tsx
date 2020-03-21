@@ -7,11 +7,10 @@ import { renderNode } from '@engine/render'
 @observer
 class Renderer extends React.Component {
   render() {
-    const output = tree.root ? renderNode(tree.root) : null
     return <div>
       Renderer is on.
       <div>
-        {output}
+        {renderNode(tree.root)}
       </div>
     </div>
   }

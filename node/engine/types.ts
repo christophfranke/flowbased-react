@@ -1,6 +1,7 @@
 import React from 'react'
 
 export type RenderOutput = React.ReactElement | React.ReactElement[] | string | string[] | null | undefined
+export type NodeType = 'Tag' | 'Text' | 'Combine'
 
 export interface RenderProps {
   inputs: Input[]
@@ -12,7 +13,7 @@ export interface Input {
 }
 
 export interface Node {
-  type: string
+  type: NodeType
   inputs: Input[]
   params: Object
 }
