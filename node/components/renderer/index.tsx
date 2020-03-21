@@ -1,20 +1,20 @@
-import Combine from '@engine/nodes/combine'
-import H1 from '@engine/nodes/h1'
-import Text from '@engine/nodes/text'
+import React from 'react'
+import { observer } from 'mobx-react'
 
-export default () => {
-  const Root = new Combine()
-  const Headline = new H1()
-  const Hello = new Text('Hello World')
-  const Lorem = new Text('Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.')
+import tree from '@store/tree'
+import { renderNode } from '@engine/render'
 
-  Root.inputs.push({ node: Headline })
-  Headline.inputs.push({ node: Hello })
-  Root.inputs.push({ node: Lorem })
-
-  return <div>
-    {Root.output()()}
-    Rendering is ok
-    }
-  </div>
+@observer
+class Renderer extends React.Component {
+  render() {
+    const output = tree.root ? renderNode(tree.root) : null
+    return <div>
+      Renderer is on.
+      <div>
+        {output}
+      </div>
+    </div>
+  }
 }
+
+export default Renderer

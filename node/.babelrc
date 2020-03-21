@@ -8,10 +8,13 @@
           "@components": "./components",
           "@middleware": "./middleware",
           "@engine": "./engine",
+          "@store": "./store",
           "@pages": "./pages",
           "@css": "./css",
         }
       }
-    ]
+    ],
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
   ],
 }

@@ -1,17 +1,18 @@
 import React from 'react'
 
-export type Renderable = React.ReactElement | string
-export type Value = () => Renderable
+export type RenderOutput = React.ReactElement | React.ReactElement[] | string | string[] | null | undefined
+
+export interface RenderProps {
+  inputs: Input[]
+  params: Object
+}
 
 export interface Input {
-  node: Source
-  name?: string
+  node: Node
 }
 
-export interface Source {
-  output: (name?: string) => Value
-}
-
-export interface Node extends Source {
+export interface Node {
+  type: string
   inputs: Input[]
+  params: Object
 }

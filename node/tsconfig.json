@@ -7,6 +7,7 @@
       "esnext"
     ],
     "strictNullChecks":true,
+    "experimentalDecorators": true,
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -23,6 +24,7 @@
       "@components/*": ["components/*"],
       "@middleware/*": ["middleware/*"],
       "@engine/*": ["engine/*"],
+      "@store/*": ["store/*"],
       "@pages/*": ["pages/*"],
       "@css/*": ["css/*"]
     }
