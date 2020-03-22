@@ -1,6 +1,6 @@
 import { Node } from '@engine/types'
 
-export interface Vector2d {
+export interface Vector {
   x: number
   y: number
 }
@@ -9,7 +9,7 @@ export interface EditorNode {
   node: Node
   type: 'Node' | 'Output'
   name: string
-  position: Vector2d
+  position: Vector
   zIndex: number
   movable: boolean
   editable: boolean
@@ -19,15 +19,21 @@ export interface EditorNodeProps {
   node: EditorNode
 }
 
+export interface EditorConnection {
+  src: EditorNode
+  target: EditorNode
+}
+
 export interface PendingConnection {
   type: 'Outgoing' | 'Incoming'
-  node: Node
-  position: Vector2d
+  editorNode: EditorNode
+  position: Vector
 }
 
 export interface EditorGlobals {
-  sheetDimensions: Vector2d
-  mousePosition: Vector2d
+  sheetDimensions: Vector
+  mousePosition: Vector
   highZ: number
-  pendingConnections: PendingConnection[]  
+  pendingConnections: PendingConnection[]
+  establishedConnections: EditorConnection[]
 }

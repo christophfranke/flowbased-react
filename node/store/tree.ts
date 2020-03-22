@@ -40,7 +40,8 @@ class Tree {
       y: 500, // px
     },
     highZ: 0,
-    pendingConnections: []
+    pendingConnections: [],
+    establishedConnections: []
   }
 
   pxToPercentage(pixel: number): number {
@@ -57,8 +58,6 @@ class Tree {
   }
 
   constructor() {
-    this.root = createNode('Combine')
-    this.displayNodes = [createEditorNode(this.root, { type: 'Output', editable: false })]
     if (!isServer) {
       this.editor.sheetDimensions.x = window.innerWidth / 2
       window.addEventListener('resize', () => {
@@ -71,6 +70,16 @@ class Tree {
         }
       })
     }
+
+    this.root = createNode('Combine')
+    this.displayNodes = [createEditorNode(this.root, { type:
+      'Output',
+      editable: false,
+      position: {
+        x: 50,
+        y: this.editor.sheetDimensions.y
+      }
+    })]
   }
 }
 

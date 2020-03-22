@@ -62,6 +62,7 @@ class EditorOutputNodeComponent extends React.Component<EditorNodeProps, State> 
     window.removeEventListener('mouseup', this.mouseUp)
 
     tree.editor.sheetDimensions.y += this.state.transform.y
+    this.props.node.position.y = tree.editor.sheetDimensions.y
 
     this.setState({
       transform: {
