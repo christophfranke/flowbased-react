@@ -32,7 +32,7 @@ class Tree {
 
   constructor() {
     this.root = createNode('Combine')
-    this.display = [createEditorNode(this.root)]
+    this.display = [createEditorNode(this.root, { movable: false, editable: false })]
   }
 }
 

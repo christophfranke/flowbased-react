@@ -7,4 +7,6 @@ export interface EditorNode {
     x: number
     y: number
   }
+  movable: boolean
+  editable: boolean
 }

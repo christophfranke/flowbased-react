@@ -77,16 +77,26 @@ class EditorNodeComponent extends React.Component<Props, State> {
   render() {  
     const { node } = this.props
     const style = {
+      minWidth: '200px',
       left: `${node.position.x}px`,
       top: `${node.position.y}px`,
       transform: `translate(${this.state.transform.x}px, ${this.state.transform.y}px)`
     }
 
+    const mouseDown = node.movable
+      ? this.mouseDown
+      : () => {}
+
     return <div
-      onMouseDown={this.mouseDown}
-      className="absolute p-5 border select-none"
+      onMouseDown={mouseDown}
+      className={`absolute p-5 border select-none ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
-      {node.name}
+      <h2>{node.name}</h2>
+      <select className="w-full" disabled={!node.editable}>
+        <option>Combine</option>
+        <option>Tag</option>
+        <option>Text</option>
+      </select>
     </div>
   }
 }
