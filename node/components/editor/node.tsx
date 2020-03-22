@@ -3,6 +3,8 @@ import React from 'react'
 import { EditorNode } from '@editor/types'
 import { observer } from 'mobx-react'
 
+import tree from '@store/tree'
+
 interface Props {
   node: EditorNode
 }
@@ -43,6 +45,7 @@ class EditorNodeComponent extends React.Component<Props, State> {
 
     window.addEventListener('mousemove', this.mouseMove)
     window.addEventListener('mouseup', this.mouseUp)
+    this.props.node.zIndex = tree.getHighZ()
   }
 
   mouseMove(e) {
@@ -77,6 +80,7 @@ class EditorNodeComponent extends React.Component<Props, State> {
   render() {  
     const { node } = this.props
     const style = {
+      zIndex: node.zIndex,
       minWidth: '200px',
       left: `${node.position.x}px`,
       top: `${node.position.y}px`,

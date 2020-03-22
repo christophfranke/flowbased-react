@@ -6,6 +6,7 @@ export default (node, options = {}) => {
       x: 0,
       y: 0
     },
+    zIndex: 0,
     movable: true,
     editable: true,
     ...options

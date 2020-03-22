@@ -5,9 +5,10 @@ import { EditorNode } from '@editor/types'
 
 import createNode from '@engine/create-node'
 import createEditorNode from '@editor/create-node'
-// import { create } from '@editor/node'
 
-useStaticRendering(typeof window === 'undefined')
+const isServer = typeof window === 'undefined'
+
+useStaticRendering(isServer)
 
 
 // const createRoot = (): Node => {
@@ -28,11 +29,32 @@ useStaticRendering(typeof window === 'undefined')
 
 class Tree {
   @observable root: Node
-  @observable display: EditorNode[]
+  @observable displayNodes: EditorNode[]
+  @observable editor = {
+    sheetDimensions: {
+      x: 1000, // px
+      y: 1000, // px
+    },
+    highZ: 0
+  }
+
+  pxToVw(pixel: number): number {
+    return 100 * pixel / this.editor.sheetDimensions.x
+  }
+
+  getHighZ() {
+    this.editor.highZ += 1
+    return this.editor.highZ
+  }
 
   constructor() {
     this.root = createNode('Combine')
-    this.display = [createEditorNode(this.root, { movable: false, editable: false })]
+    this.displayNodes = [createEditorNode(this.root, { movable: false, editable: false })]
+    if (!isServer) {
+      window.addEventListener('resize', () => {
+        this.editor.sheetDimensions.x = window.innerWidth / 2
+      })
+    }
   }
 }
 

@@ -15,7 +15,7 @@ class Editor extends React.Component {
   addEditorNode() {
     const node = createNode('Tag')
     const displayNode = createEditorNode(node)
-    tree.display.push(displayNode)
+    tree.displayNodes.push(displayNode)
   }
 
   render() {
@@ -23,7 +23,7 @@ class Editor extends React.Component {
       <h2>I am the editor</h2>
       <button onClick={this.addEditorNode}>Create Node</button>
       <div className="min-h-screen relative">
-        {tree.display.map(node => <EditorNode node={node} />)}
+        {tree.displayNodes.map(node => <EditorNode node={node} />)}
       </div>
     </div>
   }
