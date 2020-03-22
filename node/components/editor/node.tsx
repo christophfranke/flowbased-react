@@ -65,7 +65,7 @@ class EditorNodeComponent extends React.Component<Props, State> {
     window.removeEventListener('mouseup', this.mouseUp)
 
     this.props.node.position = {
-      x: this.props.node.position.x + this.state.transform.x,
+      x: this.props.node.position.x + tree.pxToPercentage(this.state.transform.x),
       y: this.props.node.position.y + this.state.transform.y,
     }
 
@@ -82,7 +82,7 @@ class EditorNodeComponent extends React.Component<Props, State> {
     const style = {
       zIndex: node.zIndex,
       minWidth: '200px',
-      left: `${node.position.x}px`,
+      left: `${node.position.x}%`,
       top: `${node.position.y}px`,
       transform: `translate(${this.state.transform.x}px, ${this.state.transform.y}px)`
     }
