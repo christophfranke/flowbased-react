@@ -24,6 +24,11 @@ export function renderNode(node: Node): RenderOutput {
   }
 
   renderedNodes.push(node.id)
+  if (typeof window !== 'undefined') {  
+    requestAnimationFrame(() => {
+      renderedNodes = []
+    })
+  }
 
   const Component = RenderComponents[node.type]
   const props = {

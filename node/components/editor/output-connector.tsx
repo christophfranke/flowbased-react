@@ -19,7 +19,8 @@ class OutputConnector extends React.Component<Props> {
     this.handleClick = this.handleClick.bind(this)
   }
 
-  handleClick() {
+  handleClick(e) {
+    e.stopPropagation()
     // connect pending connections
     if (tree.editor.pendingConnections.some(connection => connection.type === 'Incoming')) {
       tree.editor.pendingConnections.forEach(connection => {

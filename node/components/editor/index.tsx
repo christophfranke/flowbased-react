@@ -20,6 +20,17 @@ const RenderTypes = {
 
 @observer
 class Editor extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.handleClick = this.handleClick.bind(this)
+  }
+
+  // remove all pending connectinos when clicking somewhere in the editor
+  handleClick() {
+    tree.editor.pendingConnections = []
+  }
+
   addTextNode() {
     const node = createNode('Text', { text: '' })
     const displayNode = createEditorNode(node)
@@ -41,7 +52,7 @@ class Editor extends React.Component {
       <h2>I am the editor</h2>
       <button className="p-2 px-4 bg-blue-400 hover:bg-blue-200 mr-4" onClick={this.addTextNode}>Create Text Node</button>
       <button className="p-2 px-4 bg-teal-400 hover:bg-teal-200" onClick={this.addTagNode}>Create Tag Node</button>
-      <div className="relative border" style={{ height: `${tree.editor.sheetDimensions.y}px` }}>
+      <div className="relative border" style={{ height: `${tree.editor.sheetDimensions.y}px` }} onClick={this.handleClick}>
         {tree.displayNodes.map(this.renderEditorNode)}
         <EditorLines />
       </div>
