@@ -89,9 +89,9 @@ class EditorNodeComponent extends React.Component<Props, State> {
 
     return <div
       onMouseDown={mouseDown}
-      className={`absolute p-5 border select-none ${node.movable ? 'cursor-move' : ''}`}
+      className={`absolute p-5 border select-none bg-gray-100 ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
-      <h2>{node.name}</h2>
+      <h2>Type</h2>
       <select className="w-full" disabled={!node.editable}>
         <option>Combine</option>
         <option>Tag</option>
