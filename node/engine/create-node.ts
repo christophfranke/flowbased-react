@@ -1,11 +1,11 @@
 import { Node, Input, NodeType } from '@engine/types'
 
-export function create(type: NodeType): Node
-export function create(type: NodeType, inputs: Input[]): Node
-export function create(type: NodeType, params: Object): Node
-export function create(type: NodeType, params: Object, inputs: Input[]): Node
+export default function create(type: NodeType): Node
+export default function create(type: NodeType, inputs: Input[]): Node
+export default function create(type: NodeType, params: Object): Node
+export default function create(type: NodeType, params: Object, inputs: Input[]): Node
 
-export function create(type: NodeType, arg1?: Input[] | Object, arg2?: Input[] | Object): Node {
+export default function create(type: NodeType, arg1?: Input[] | Object, arg2?: Input[] | Object): Node {
   let inputs: Input[] = []
   let params: Object = {}
 

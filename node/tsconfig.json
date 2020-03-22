@@ -24,6 +24,7 @@
       "@components/*": ["components/*"],
       "@middleware/*": ["middleware/*"],
       "@engine/*": ["engine/*"],
+      "@editor/*": ["editor/*"],
       "@store/*": ["store/*"],
       "@pages/*": ["pages/*"],
       "@css/*": ["css/*"]

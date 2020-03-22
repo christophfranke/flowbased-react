@@ -1,9 +1,9 @@
 import React from 'react'
 import { Node, Input, RenderOutput } from '@engine/types'
 
-import Combine from './combine'
-import Text from './text'
-import Tag from './tag'
+import Combine from './render-node/combine'
+import Text from './render-node/text'
+import Tag from './render-node/tag'
 
 const RenderComponents = {
   Combine,
