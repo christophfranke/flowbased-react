@@ -1,7 +1,7 @@
 import React from 'react'
 
 export type RenderOutput = React.ReactElement | React.ReactElement[] | string | string[] | null | undefined
-export type NodeType = 'Tag' | 'Text' | 'Combine'
+export type NodeType = 'Tag' | 'Text' | 'Output'
 
 export interface RenderProps {
   inputs: Input[]
@@ -13,6 +13,7 @@ export interface Input {
 }
 
 export interface Node {
+  id: number
   type: NodeType
   inputs: Input[]
   params: any
@@ -32,7 +33,7 @@ export interface TagNode extends Node {
     props: Object
   }
 }
-export interface CombineNode extends Node {
-  type: 'Combine',
+export interface OutputNode extends Node {
+  type: 'Output',
   params: {}
 }

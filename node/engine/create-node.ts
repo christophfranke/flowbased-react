@@ -1,5 +1,11 @@
 import { Node, Input, NodeType } from '@engine/types'
 
+let internalIdCounter = 0
+const uid = () => {
+  internalIdCounter += 1
+  return internalIdCounter
+}
+
 export default function create(type: NodeType): Node
 export default function create(type: NodeType, inputs: Input[]): Node
 export default function create(type: NodeType, params: Object): Node
@@ -22,6 +28,7 @@ export default function create(type: NodeType, arg1?: Input[] | Object, arg2?: I
   }
 
   return {
+    id: uid(),
     params,
     type,
     inputs

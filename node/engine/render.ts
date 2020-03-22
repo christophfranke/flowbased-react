@@ -1,17 +1,30 @@
 import React from 'react'
 import { Node, Input, RenderOutput } from '@engine/types'
 
-import Combine from './render-node/combine'
+import Output from './render-node/output'
 import Text from './render-node/text'
 import Tag from './render-node/tag'
 
 const RenderComponents = {
-  Combine,
+  Output,
   Text,
   Tag
 }
 
+
+let renderedNodes: number[] = []
 export function renderNode(node: Node): RenderOutput {
+  if (node.type === 'Output') {
+    renderedNodes = []
+  }
+
+  if (renderedNodes.includes(node.id)) {
+    console.warn(`There is a loop in the render graph. Ignored ${node.type} ${node.id} to escape.`)
+    return null
+  }
+
+  renderedNodes.push(node.id)
+
   const Component = RenderComponents[node.type]
   const props = {
     params: node.params,
