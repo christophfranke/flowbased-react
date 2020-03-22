@@ -3,6 +3,10 @@ import React from 'react'
 import { EditorNode, EditorNodeProps } from '@editor/types'
 import { observer } from 'mobx-react'
 
+import EditParameters from '@components/editor/edit-parameters'
+import OutputConnector from '@components/editor/output-connector'
+import InputConnector from '@components/editor/input-connector'
+
 import tree from '@store/tree'
 
 interface State {
@@ -80,7 +84,6 @@ class EditorNodeComponent extends React.Component<EditorNodeProps, State> {
     const { node } = this.props
     const style = {
       zIndex: node.zIndex,
-      minWidth: '200px',
       left: `${node.position.x}%`,
       top: `${node.position.y}px`,
       transform: `translate(${this.state.transform.x}px, ${this.state.transform.y}px)`
@@ -92,14 +95,11 @@ class EditorNodeComponent extends React.Component<EditorNodeProps, State> {
 
     return <div
       onMouseDown={mouseDown}
-      className={`absolute p-5 border select-none bg-gray-100 ${node.movable ? 'cursor-move' : ''}`}
+      className={`absolute p-5 border select-none bg-white ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
-      <h2>Type</h2>
-      <select className="w-full" disabled={!node.editable}>
-        <option>Combine</option>
-        <option>Tag</option>
-        <option>Text</option>
-      </select>
+      <InputConnector node={node.node} />
+      <EditParameters params={node.node.params} />
+      <OutputConnector node={node.node} className="mt-5" />
     </div>
   }
 }

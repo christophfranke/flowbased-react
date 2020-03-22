@@ -15,5 +15,24 @@ export interface Input {
 export interface Node {
   type: NodeType
   inputs: Input[]
-  params: Object
+  params: any
+}
+
+export interface TextNode extends Node {
+  type: 'Text'
+  params: {
+    text: string
+  }
+}
+
+export interface TagNode extends Node {
+  type: 'Tag'
+  params: {
+    tag: string,
+    props: Object
+  }
+}
+export interface CombineNode extends Node {
+  type: 'Combine',
+  params: {}
 }

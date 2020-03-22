@@ -19,8 +19,14 @@ const RenderTypes = {
 
 @observer
 class Editor extends React.Component {
-  addEditorNode() {
-    const node = createNode('Tag')
+  addTextNode() {
+    const node = createNode('Text', { text: '' })
+    const displayNode = createEditorNode(node)
+    tree.displayNodes.push(displayNode)
+  }
+
+  addTagNode() {
+    const node = createNode('Tag', { tag: 'div' })
     const displayNode = createEditorNode(node)
     tree.displayNodes.push(displayNode)
   }
@@ -32,7 +38,8 @@ class Editor extends React.Component {
   render() {
     return <div>
       <h2>I am the editor</h2>
-      <button onClick={this.addEditorNode}>Create Node</button>
+      <button className="p-2 px-4 bg-blue-400 hover:bg-blue-200 mr-4" onClick={this.addTextNode}>Create Text Node</button>
+      <button className="p-2 px-4 bg-teal-400 hover:bg-teal-200" onClick={this.addTagNode}>Create Tag Node</button>
       <div className="relative border" style={{ height: `${tree.editor.sheetDimensions.y}px` }}>
         {tree.displayNodes.map(this.renderEditorNode)}
       </div>

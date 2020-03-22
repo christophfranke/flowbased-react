@@ -3,6 +3,8 @@ import React from 'react'
 import { EditorNode, EditorNodeProps } from '@editor/types'
 import { observer } from 'mobx-react'
 
+import InputConnector from '@components/editor/input-connector'
+
 import tree from '@store/tree'
 
 
@@ -72,8 +74,6 @@ class EditorOutputNodeComponent extends React.Component<EditorNodeProps, State> 
     const { node } = this.props
     const style = {
       zIndex: 10000,
-      minWidth: '200px',
-      minHeight: '100px',
       bottom: 0,
       left: '50%',
       transform: `translate(-50%, ${this.state.transform.y}px)`
@@ -87,6 +87,7 @@ class EditorOutputNodeComponent extends React.Component<EditorNodeProps, State> 
       onMouseDown={mouseDown}
       className={`absolute p-5 border select-none bg-gray-100 ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
+      <InputConnector node={node.node} className="mb-4" />
       <h2>Html Output</h2>
     </div>
   }

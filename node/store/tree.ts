@@ -1,7 +1,7 @@
 import { observable } from 'mobx'
 import { useStaticRendering } from "mobx-react"
 import { Node } from '@engine/types'
-import { EditorNode } from '@editor/types'
+import { EditorNode, EditorGlobals } from '@editor/types'
 
 import createNode from '@engine/create-node'
 import createEditorNode from '@editor/create-node'
@@ -30,12 +30,13 @@ useStaticRendering(isServer)
 class Tree {
   @observable root: Node
   @observable displayNodes: EditorNode[]
-  @observable editor = {
+  @observable editor: EditorGlobals = {
     sheetDimensions: {
       x: 0, // px
       y: 500, // px
     },
-    highZ: 0
+    highZ: 0,
+    pendingConnections: []
   }
 
   pxToPercentage(pixel: number): number {

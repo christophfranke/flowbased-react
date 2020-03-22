@@ -5,6 +5,7 @@ export default (node: Node, options = {}): EditorNode => {
   return {
     node,
     type: 'Node',
+    name: 'Node',
     position: {
       x: 0,
       y: 0
