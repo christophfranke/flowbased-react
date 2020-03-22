@@ -73,7 +73,7 @@ class EditorOutputNodeComponent extends React.Component<EditorNodeProps, State> 
   render() {
     const { node } = this.props
     const style = {
-      zIndex: 10000,
+      zIndex: 1000,
       bottom: 0,
       left: '50%',
       transform: `translate(-50%, ${this.state.transform.y}px)`
@@ -87,7 +87,7 @@ class EditorOutputNodeComponent extends React.Component<EditorNodeProps, State> 
       onMouseDown={mouseDown}
       className={`absolute p-5 border select-none bg-gray-100 ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
-      <InputConnector node={node.node} className="mb-4" />
+      <InputConnector editorNode={node} className="mb-4" />
       <h2>Html Output</h2>
     </div>
   }

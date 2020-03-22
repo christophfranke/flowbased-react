@@ -9,6 +9,7 @@ import createEditorNode from '@editor/create-node'
 
 import Node from '@components/editor-node/node'
 import Output from '@components/editor-node/output'
+import EditorLines from '@components/editor/lines'
 
 import tree from '@store/tree'
 
@@ -42,6 +43,7 @@ class Editor extends React.Component {
       <button className="p-2 px-4 bg-teal-400 hover:bg-teal-200" onClick={this.addTagNode}>Create Tag Node</button>
       <div className="relative border" style={{ height: `${tree.editor.sheetDimensions.y}px` }}>
         {tree.displayNodes.map(this.renderEditorNode)}
+        <EditorLines />
       </div>
     </div>
   }

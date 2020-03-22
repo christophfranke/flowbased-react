@@ -31,6 +31,10 @@ class Tree {
   @observable root: Node
   @observable displayNodes: EditorNode[]
   @observable editor: EditorGlobals = {
+    mousePosition: {
+      x: 0,
+      y: 0
+    },
     sheetDimensions: {
       x: 0, // px
       y: 500, // px
@@ -41,6 +45,10 @@ class Tree {
 
   pxToPercentage(pixel: number): number {
     return 100 * pixel / this.editor.sheetDimensions.x
+  }
+
+  percentageToPx(percentage: number): number {
+    return this.editor.sheetDimensions.x * percentage / 100
   }
 
   getHighZ() {
@@ -55,6 +63,12 @@ class Tree {
       this.editor.sheetDimensions.x = window.innerWidth / 2
       window.addEventListener('resize', () => {
         this.editor.sheetDimensions.x = window.innerWidth / 2
+      })
+      window.addEventListener('mousemove', e => {
+        this.editor.mousePosition = {
+          x: e.clientX,
+          y: e.clientY
+        }
       })
     }
   }

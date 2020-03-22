@@ -97,9 +97,9 @@ class EditorNodeComponent extends React.Component<EditorNodeProps, State> {
       onMouseDown={mouseDown}
       className={`absolute p-5 border select-none bg-white ${node.movable ? 'cursor-move' : ''}`}
       style={style}>
-      <InputConnector node={node.node} />
+      <InputConnector editorNode={node} />
       <EditParameters params={node.node.params} />
-      <OutputConnector node={node.node} className="mt-5" />
+      <OutputConnector editorNode={node} className="mt-5" />
     </div>
   }
 }

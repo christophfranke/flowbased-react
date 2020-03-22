@@ -1,13 +1,12 @@
 import React from 'react'
 
-import { Node } from '@engine/types'
-import { PendingConnection } from '@editor/types'
+import { PendingConnection, EditorNode } from '@editor/types'
 import connect from '@engine/connect'
 
 import tree from '@store/tree'
 
 interface Props {
-  node: Node
+  editorNode: EditorNode
   className?: string
 }
 
@@ -22,19 +21,14 @@ class InputConnector extends React.Component<Props> {
     // connect pending connections
     if (tree.editor.pendingConnections.some(connection => connection.type === 'Outgoing')) {
       tree.editor.pendingConnections.forEach(connection => {
-        connect(connection.node, this.props.node)
+        connect(connection.node, this.props.editorNode.node)
       })
       tree.editor.pendingConnections = []
     } else {
       const connection: PendingConnection = {
         type: 'Incoming',
-        node: this.props.node,
-        get position() {
-          return {
-            x: 0,
-            y: 0
-          }
-        }
+        node: this.props.editorNode.node,
+        position: tree.editor.mousePosition
       }
       tree.editor.pendingConnections.push(connection)
     }

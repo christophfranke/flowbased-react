@@ -27,6 +27,7 @@ export interface PendingConnection {
 
 export interface EditorGlobals {
   sheetDimensions: Vector2d
+  mousePosition: Vector2d
   highZ: number
   pendingConnections: PendingConnection[]  
 }

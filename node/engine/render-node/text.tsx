@@ -1,4 +1,5 @@
 import React from 'react'
+import { observer } from 'mobx-react'
 import { RenderProps } from '@engine/types'
 
-export default (props: RenderProps) => props.params['text']
+export default observer((props: RenderProps) => props.params['text'])

@@ -18,7 +18,7 @@ export function renderNode(node: Node): RenderOutput {
     inputs: node.inputs
   }
 
-  return Component(props)
+  return React.createElement(Component, props)
 }
 
 export function renderInputs(inputs: Input[]): RenderOutput[] {

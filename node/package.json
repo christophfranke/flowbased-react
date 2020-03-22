@@ -27,7 +27,9 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "dev": "next"
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
   },
   "keywords": [],
   "author": "",
