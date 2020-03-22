@@ -19,7 +19,7 @@ export function renderNode(node: Node): RenderOutput {
   }
 
   if (renderedNodes.includes(node.id)) {
-    console.warn(`There is a loop in the render graph. Ignored ${node.type} ${node.id} to escape.`)
+    console.warn(`There is possibly a loop in the render graph. Ignored ${node.type} ${node.id} for safety.`)
     return null
   }
 

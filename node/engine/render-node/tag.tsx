@@ -13,6 +13,7 @@ const sanitize = tag => {
       const test = firstLetterFound ? allowedFirst : allowed
       const result = test.includes(letter)
       firstLetterFound = result || firstLetterFound
+      return result
     }).join('')
 }
 const isValid = tag => !!tag
@@ -20,8 +21,6 @@ const isValid = tag => !!tag
 export default observer((props: RenderProps) => {
   const Tag = sanitize(props.params['tag'])
   const tagProps = props.params['props']
-
-  console.log(props.params['tag'].split(''), Tag)
 
   if (isValid(Tag)) {
     return props.inputs.length > 0
