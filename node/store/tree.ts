@@ -33,7 +33,7 @@ class Tree {
   @observable editor = {
     sheetDimensions: {
       x: 0, // px
-      y: 1000, // px
+      y: 500, // px
     },
     highZ: 0
   }
@@ -49,7 +49,7 @@ class Tree {
 
   constructor() {
     this.root = createNode('Combine')
-    this.displayNodes = [createEditorNode(this.root, { movable: false, editable: false })]
+    this.displayNodes = [createEditorNode(this.root, { type: 'Output', editable: false })]
     if (!isServer) {
       this.editor.sheetDimensions.x = window.innerWidth / 2
       window.addEventListener('resize', () => {

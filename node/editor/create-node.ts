@@ -1,7 +1,10 @@
+import { EditorNode } from '@editor/types'
+import { Node } from '@engine/types'
 
-export default (node, options = {}) => {
+export default (node: Node, options = {}): EditorNode => {
   return {
     node,
+    type: 'Node',
     position: {
       x: 0,
       y: 0
