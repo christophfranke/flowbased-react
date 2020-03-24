@@ -15,7 +15,8 @@ class Viewport extends React.Component<Props> {
       top: `${dimensions.y}vh`,
       width: `${dimensions.width}vw`,
       height: `${dimensions.height}vh`,
-      outline: '1px solid grey'
+      outline: '1px solid grey',
+      overflow: 'hidden'
     }
     return <div style={style}>
       {this.props.children}

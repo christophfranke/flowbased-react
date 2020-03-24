@@ -15,8 +15,26 @@ class EditorView extends React.Component<Props> {
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
+  @observable dimensions: Vector
   @computed get transformString() {
-    return `translate(${this.offset.x}px, ${this.offset.y}px) scale(${this.scale})`
+    return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
+  }
+  @computed get transformMatrix() {
+    return new DOMMatrix(this.transformString)
+  }
+  @computed get invertedTransformMatrix() {
+    const matrix = new DOMMatrix(this.transformString)
+    matrix.invertSelf()
+    return matrix
+  }
+
+  windowToView(input: Vector): Vector {
+    const point = new DOMPoint(input.x, input.y)
+    const out = point.matrixTransform(this.invertedTransformMatrix)
+    return {
+      x: out.x,
+      y: out.y
+    }
   }
 
   handleMouseDown = e => {
@@ -24,17 +42,20 @@ class EditorView extends React.Component<Props> {
       const point = new DOMPoint(e.clientX, e.clientY)
       const matrix = new DOMMatrix(this.transformString)
       matrix.invertSelf()
-      console.log(matrix)
 
       const position: Vector = point.matrixTransform(matrix)
       this.points.push(position)
-
-      console.log(point, position)
     }
   }
 
   handleScroll = e => {
-    this.scale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
+    // TODO: Prevent the default, make sure to add the event listener correctly
+    // e.preventDefault()
+    const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
+    const scaleChange = newScale / this.scale
+    this.offset.x += (1 - scaleChange) * e.clientX / this.scale
+    this.offset.y += (1 - scaleChange) * e.clientY / this.scale
+    this.scale = newScale
   }
 
   preventDefault(e) {
@@ -42,6 +63,10 @@ class EditorView extends React.Component<Props> {
   }
 
   componentDidMount() {
+    this.dimensions = {
+      x: window.innerWidth,
+      y: window.innerHeight
+    }
     window.addEventListener('contextmenu', this.preventDefault)
   }
 
@@ -78,7 +103,6 @@ class EditorView extends React.Component<Props> {
           }
           return <div style={pointStyle} onClick={() => console.log('hi', point.x)} />
         })}
-        EditorView
       </div>
     </div>
   }
