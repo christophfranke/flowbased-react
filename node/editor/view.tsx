@@ -2,7 +2,7 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
-import { Vector } from '@editor/types'
+import { Vector, Rectangle } from '@editor/types'
 
 interface Props {
 }
@@ -15,7 +15,7 @@ class EditorView extends React.Component<Props> {
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
-  @observable dimensions: Vector
+  @observable dimensions: Rectangle
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
   }
@@ -27,6 +27,7 @@ class EditorView extends React.Component<Props> {
     matrix.invertSelf()
     return matrix
   }
+  rootRef = React.createRef<HTMLDivElement>();
 
   windowToView(input: Vector): Vector {
     const point = new DOMPoint(input.x, input.y)
@@ -37,9 +38,17 @@ class EditorView extends React.Component<Props> {
     }
   }
 
+  clientToWindow(input: Vector): Vector {
+    return {
+      x: input.x - this.dimensions.x,
+      y: input.y - this.dimensions.y
+    }
+  }
+
   handleMouseDown = e => {
     if (e.button === RIGHT_MOUSE_BUTTON) {
-      const point = new DOMPoint(e.clientX, e.clientY)
+      const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
+      const point = new DOMPoint(mouse.x, mouse.y )
       const matrix = new DOMMatrix(this.transformString)
       matrix.invertSelf()
 
@@ -51,8 +60,9 @@ class EditorView extends React.Component<Props> {
   handleScroll = e => {
     const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
     const scaleChange = newScale / this.scale
-    this.offset.x += (1 - scaleChange) * e.clientX / this.scale
-    this.offset.y += (1 - scaleChange) * e.clientY / this.scale
+    const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
+    this.offset.x += (1 - scaleChange) * mouse.x / this.scale
+    this.offset.y += (1 - scaleChange) * mouse.y / this.scale
     this.scale = newScale
   }
 
@@ -60,11 +70,20 @@ class EditorView extends React.Component<Props> {
     e.preventDefault()
   }
 
-  componentDidMount() {
-    this.dimensions = {
-      x: window.innerWidth,
-      y: window.innerHeight
+  updateDimensions() {    
+    const rect = this.rootRef.current && this.rootRef.current.getBoundingClientRect()
+    if (rect) {    
+      this.dimensions = {
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height
+      }
     }
+  }
+
+  componentDidMount() {
+    this.updateDimensions()
     window.addEventListener('contextmenu', this.preventDefault)
     window.addEventListener('wheel', this.preventDefault, { passive: false })
   }
@@ -89,7 +108,7 @@ class EditorView extends React.Component<Props> {
       border: '1 px solid grey'
     } 
 
-    return <div style={outerStyle} onMouseDown={this.handleMouseDown} onWheel={this.handleScroll}>
+    return <div ref={this.rootRef} style={outerStyle} onMouseDown={this.handleMouseDown} onWheel={this.handleScroll}>
       <div style={innerStyle}>
         {this.points.map(point => {
           const pointStyle: React.CSSProperties = {
