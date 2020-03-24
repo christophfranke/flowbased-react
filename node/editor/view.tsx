@@ -49,8 +49,6 @@ class EditorView extends React.Component<Props> {
   }
 
   handleScroll = e => {
-    // TODO: Prevent the default, make sure to add the event listener correctly
-    // e.preventDefault()
     const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
     const scaleChange = newScale / this.scale
     this.offset.x += (1 - scaleChange) * e.clientX / this.scale
@@ -68,10 +66,12 @@ class EditorView extends React.Component<Props> {
       y: window.innerHeight
     }
     window.addEventListener('contextmenu', this.preventDefault)
+    window.addEventListener('wheel', this.preventDefault, { passive: false })
   }
 
   componentWillUnmount() {
     window.removeEventListener('contextmenu', this.preventDefault)
+    window.removeEventListener('wheel', this.preventDefault)
   }
 
   render() {
