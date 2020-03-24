@@ -19,13 +19,13 @@ const Home = (props: Props) => {
   </div>
 }
 
-Home.getInitialProps = async (): Promise<Props> => {  
-  const result = await fetch('http://localhost:3000/api')
-  const data = await result.json() as Data
+// Home.getInitialProps = async (): Promise<Props> => {
+//   const result = await fetch('http://localhost:3000/api')
+//   const data = await result.json() as Data
 
-  return {
-    data
-  }
-}
+//   return {
+//     data
+//   }
+// }
 
 export default Home

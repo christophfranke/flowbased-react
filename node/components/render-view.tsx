@@ -5,10 +5,10 @@ import tree from '@store/tree'
 import { renderNode } from '@engine/render'
 
 @observer
-class Renderer extends React.Component {
+class RenderView extends React.Component {
   render() {
     return <div>
-      Renderer is on.
+      RenderView is on.
       <div>
         {renderNode(tree.root)}
       </div>
@@ -16,4 +16,4 @@ class Renderer extends React.Component {
   }
 }
 
-export default Renderer
+export default RenderView

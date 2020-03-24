@@ -10,7 +10,7 @@ handler.get(async (req, res) => {
     // let doc = await req.db.collection('daily').findOne()
     // console.log(doc);
     // res.json(doc);
-    return res.json({ hellox: 'world data' })
+    res.json({ hellox: 'world data' })
 });
 
 export default handler;
