@@ -11,6 +11,8 @@ const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
 
 const LEFT_MOUSE_BUTTON = 0
 const RIGHT_MOUSE_BUTTON = 2
+const MAX_ZOOM = 4
+const MIN_ZOOM = 0.25
 
 @observer
 class EditorView extends React.Component<Props> {
@@ -88,7 +90,7 @@ class EditorView extends React.Component<Props> {
   }
 
   handleWheel = e => {
-    const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
+    const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), MIN_ZOOM, MAX_ZOOM)
     const scaleChange = newScale / this.scale
     const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
     this.offset.x += (1 - scaleChange) * mouse.x / this.scale
@@ -100,7 +102,7 @@ class EditorView extends React.Component<Props> {
     e.preventDefault()
   }
 
-  updateDimensions() {    
+  updateDimensions = () => {    
     const rect = this.rootRef.current && this.rootRef.current.getBoundingClientRect()
     if (rect) {    
       this.dimensions = {
@@ -116,11 +118,13 @@ class EditorView extends React.Component<Props> {
     this.updateDimensions()
     window.addEventListener('contextmenu', this.preventDefault)
     window.addEventListener('wheel', this.preventDefault, { passive: false })
+    window.addEventListener('resize', this.updateDimensions)
   }
 
   componentWillUnmount() {
     window.removeEventListener('contextmenu', this.preventDefault)
     window.removeEventListener('wheel', this.preventDefault)
+    window.removeEventListener('resize', this.updateDimensions)
   }
 
   render() {
@@ -130,8 +134,8 @@ class EditorView extends React.Component<Props> {
     }
     const innerStyle: React.CSSProperties = {
       position: 'absolute',
-      width: '200%',
-      height: '200%',
+      width: '100%',
+      height: '100%',
       transformOrigin: 'top left',
       transform: this.transformString,
       willChange: 'transform',
