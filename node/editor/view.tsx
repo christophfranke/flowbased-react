@@ -9,13 +9,16 @@ interface Props {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
 
+const LEFT_MOUSE_BUTTON = 0
 const RIGHT_MOUSE_BUTTON = 2
+
 @observer
 class EditorView extends React.Component<Props> {
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
+
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
   }
@@ -27,7 +30,9 @@ class EditorView extends React.Component<Props> {
     matrix.invertSelf()
     return matrix
   }
-  rootRef = React.createRef<HTMLDivElement>();
+
+  mouseDownOffset: Vector
+  rootRef = React.createRef<HTMLDivElement>()
 
   windowToView(input: Vector): Vector {
     const point = new DOMPoint(input.x, input.y)
@@ -45,19 +50,44 @@ class EditorView extends React.Component<Props> {
     }
   }
 
+  handleRightMouseDown = e => {
+    const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
+    const point = new DOMPoint(mouse.x, mouse.y )
+    const matrix = new DOMMatrix(this.transformString)
+    matrix.invertSelf()
+
+    const position: Vector = point.matrixTransform(matrix)
+    this.points.push(position)
+  }
+
   handleMouseDown = e => {
     if (e.button === RIGHT_MOUSE_BUTTON) {
-      const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
-      const point = new DOMPoint(mouse.x, mouse.y )
-      const matrix = new DOMMatrix(this.transformString)
-      matrix.invertSelf()
-
-      const position: Vector = point.matrixTransform(matrix)
-      this.points.push(position)
+      this.handleRightMouseDown(e)
+    } else if (e.button === LEFT_MOUSE_BUTTON) {
+      this.handleLeftMouseDown(e)
     }
   }
 
-  handleScroll = e => {
+  handleLeftMouseDown = e => {
+    this.mouseDownOffset = {
+      x: this.offset.x - e.clientX / this.scale,
+      y: this.offset.y - e.clientY / this.scale
+    }
+    window.addEventListener('mousemove', this.handleMouseMove)
+    window.addEventListener('mouseup', this.handleMouseUp)
+  }
+
+  handleMouseMove = e => {
+    this.offset.x = this.mouseDownOffset.x + e.clientX / this.scale
+    this.offset.y = this.mouseDownOffset.y + e.clientY / this.scale
+  }
+
+  handleMouseUp = e => {
+    window.removeEventListener('mousemove', this.handleMouseMove)
+    window.removeEventListener('mousemove', this.handleMouseUp)
+  }
+
+  handleWheel = e => {
     const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), 0.5, 2)
     const scaleChange = newScale / this.scale
     const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
@@ -108,7 +138,12 @@ class EditorView extends React.Component<Props> {
       border: '1 px solid grey'
     } 
 
-    return <div ref={this.rootRef} style={outerStyle} onMouseDown={this.handleMouseDown} onWheel={this.handleScroll}>
+    return <div
+      ref={this.rootRef}
+      style={outerStyle}
+      onMouseDown={this.handleMouseDown}
+      onWheel={this.handleWheel}
+     >
       <div style={innerStyle}>
         {this.points.map(point => {
           const pointStyle: React.CSSProperties = {
