@@ -1,6 +1,6 @@
 import React from 'react'
 import { observable, computed } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, Provider } from 'mobx-react'
 
 import { Vector, Rectangle, Node } from '@editor/types'
 import { uid } from '@editor/util'
@@ -57,6 +57,17 @@ class EditorView extends React.Component<Props> {
 
   clientToView(input: Vector): Vector {
     return this.windowToView(this.clientToWindow(input))
+  }
+
+  mouseEventToView(e): Vector {
+    return this.clientToView({ x: e.clientX, y: e.clientY })
+  }
+
+  viewFunctions = {
+    windowToView: this.windowToView.bind(this),
+    clientToWindow: this.clientToWindow.bind(this),
+    clientToView: this.clientToView.bind(this),
+    mouseEventToView: this.mouseEventToView.bind(this)
   }
 
   handleRightMouseDown = e => {
@@ -172,9 +183,11 @@ class EditorView extends React.Component<Props> {
       onMouseDown={this.handleMouseDown}
       onWheel={this.handleWheel}
      >
-      <div style={innerStyle}>
-        {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
-      </div>
+      <Provider view={this.viewFunctions}>   
+        <div style={innerStyle}>
+          {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
+        </div>
+      </Provider>
     </div>
   }
 }

@@ -1,9 +1,10 @@
 import React from 'react'
-import { observer } from 'mobx-react'
+import { observer, inject } from 'mobx-react'
 
 import { Node, Vector } from '@editor/types'
 
 import ConnectorView from '@editor/connector'
+import * as LA from '@editor/la'
 
 interface Props {
   node: Node
@@ -14,6 +15,7 @@ const DESCRIPTION_HEIGHT = 20
 const DESCRIPTION_WIDTH = 100
 const NODE_PADDING = 5
 
+@inject('view')
 @observer
 class NodeView extends React.Component<Props> {
   offset: Vector
@@ -21,12 +23,17 @@ class NodeView extends React.Component<Props> {
   handleMouseDown = e => {
     e.preventDefault()
     e.stopPropagation()
+
+    const mouse = this.props['view'].mouseEventToView(e)
+    this.offset = LA.subtract(mouse, this.props.node.position)
+
     window.addEventListener('mousemove', this.handleMouseMove)
     window.addEventListener('mouseup', this.handleMouseUp)
   }
 
-  handleMouseMove = () => {
-    console.log('move')
+  handleMouseMove = e => {
+    const mouse = this.props['view'].mouseEventToView(e)
+    this.props.node.position = LA.subtract(mouse, this.offset)
   }
 
   handleMouseUp = () => {
