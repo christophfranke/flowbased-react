@@ -15,10 +15,13 @@ export interface Connection {
   to: Connector
 }
 
+type ConnectorState = 'empty' | 'connected' | 'hot'
 export interface Connector {
   id: number
   name: string
-  position: Vector
+  state: ConnectorState
+  direction: Vector
+  position?: Vector
 }
 
 export interface Node {
@@ -29,4 +32,8 @@ export interface Node {
     input: Connector[]
     output: Connector[]
   }
+}
+
+export interface Mouse {
+  position?: Vector
 }

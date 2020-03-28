@@ -15,7 +15,7 @@ const DESCRIPTION_HEIGHT = 20
 const DESCRIPTION_WIDTH = 100
 const NODE_PADDING = 5
 
-@inject('view')
+@inject('mouse')
 @observer
 class NodeView extends React.Component<Props> {
   offset: Vector
@@ -24,16 +24,20 @@ class NodeView extends React.Component<Props> {
     e.preventDefault()
     e.stopPropagation()
 
-    const mouse = this.props['view'].mouseEventToView(e)
-    this.offset = LA.subtract(mouse, this.props.node.position)
+    const mouse = this.props['mouse'].position
+    if (mouse) {    
+      this.offset = LA.subtract(mouse, this.props.node.position)
 
-    window.addEventListener('mousemove', this.handleMouseMove)
-    window.addEventListener('mouseup', this.handleMouseUp)
+      window.addEventListener('mousemove', this.handleMouseMove)
+      window.addEventListener('mouseup', this.handleMouseUp)
+    }
   }
 
   handleMouseMove = e => {
-    const mouse = this.props['view'].mouseEventToView(e)
-    this.props.node.position = LA.subtract(mouse, this.offset)
+    const mouse = this.props['mouse'].position
+    if (mouse) {
+      this.props.node.position = LA.subtract(mouse, this.offset)
+    }
   }
 
   handleMouseUp = () => {
@@ -49,16 +53,17 @@ class NodeView extends React.Component<Props> {
       (node.connectors.input.length + node.connectors.output.length) * CONNECTOR_SIZE,
       DESCRIPTION_WIDTH) + 2 * NODE_PADDING
 
-    const pointStyle: React.CSSProperties = {
+    const nodeStyle: React.CSSProperties = {
       padding: '5px',
       position: 'absolute',
+      cursor: 'move',
       willChange: 'transform',
       transform: `translate(${this.props.node.position.x}px, ${this.props.node.position.y}px)`,
       backgroundColor: 'white',
       outline: '1px solid pink',
     }
 
-    return <div style={pointStyle} onMouseDown={this.handleMouseDown}>
+    return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
         <div style={{ position: 'relative' }}>
           {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
           <div style={{ pointerEvents: 'none' }}>{node.name}</div>

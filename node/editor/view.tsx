@@ -2,9 +2,10 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer, Provider } from 'mobx-react'
 
-import { Vector, Rectangle, Node } from '@editor/types'
+import { Vector, Rectangle, Node, Connector, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
 import NodeView from '@editor/node'
+import HotConnectors from '@editor/hot-connectors'
 
 interface Props {
 }
@@ -23,6 +24,7 @@ class EditorView extends React.Component<Props> {
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
   @observable nodes: Node[] = []
+  @observable mouse: Mouse = {}
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -36,8 +38,8 @@ class EditorView extends React.Component<Props> {
     return matrix
   }
 
-  mouseDownOffset: Vector
-  rootRef = React.createRef<HTMLDivElement>()
+  private mouseDownOffset: Vector
+  private rootRef = React.createRef<HTMLDivElement>()
 
   windowToView(input: Vector): Vector {
     const point = new DOMPoint(input.x, input.y)
@@ -63,11 +65,13 @@ class EditorView extends React.Component<Props> {
     return this.clientToView({ x: e.clientX, y: e.clientY })
   }
 
-  viewFunctions = {
-    windowToView: this.windowToView.bind(this),
-    clientToWindow: this.clientToWindow.bind(this),
-    clientToView: this.clientToView.bind(this),
-    mouseEventToView: this.mouseEventToView.bind(this)
+  updateMousePosition = e => {
+    this.mouse.position = this.mouseEventToView(e)
+  }
+
+  removeMousePosition = () => {
+    console.log('remove mouse position from view')
+    this.mouse.position = undefined
   }
 
   handleRightMouseDown = e => {
@@ -79,13 +83,15 @@ class EditorView extends React.Component<Props> {
       connectors: {
         input: [{
           id: uid(),
+          state: 'empty',
           name: '',
-          position: { x: 0, y: 0 }
+          direction: { x: 0, y: -1 }
         }],
         output: [{
           id: uid(),
+          state: 'empty',
           name: '',
-          position: { x: 0, y: 0 }
+          direction: { x: 0, y: 1 }
         }]
       }
     }
@@ -173,19 +179,17 @@ class EditorView extends React.Component<Props> {
       border: '1 px solid grey'
     }
 
-    // this.nodes.forEach(node => {
-    //   console.log(node.value)
-    // })
-
     return <div
       ref={this.rootRef}
       style={outerStyle}
       onMouseDown={this.handleMouseDown}
       onWheel={this.handleWheel}
+      onMouseMove={this.updateMousePosition}
      >
-      <Provider view={this.viewFunctions}>   
+      <Provider mouse={this.mouse}>   
         <div style={innerStyle}>
           {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
+          <HotConnectors nodes={this.nodes} />
         </div>
       </Provider>
     </div>
