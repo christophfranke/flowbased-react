@@ -2,7 +2,9 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
-import { Vector, Rectangle } from '@editor/types'
+import { Vector, Rectangle, Node } from '@editor/types'
+import { uid } from '@editor/util'
+import NodeView from '@editor/node'
 
 interface Props {
 }
@@ -20,6 +22,7 @@ class EditorView extends React.Component<Props> {
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
+  @observable nodes: Node[] = []
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -52,14 +55,31 @@ class EditorView extends React.Component<Props> {
     }
   }
 
-  handleRightMouseDown = e => {
-    const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
-    const point = new DOMPoint(mouse.x, mouse.y )
-    const matrix = new DOMMatrix(this.transformString)
-    matrix.invertSelf()
+  clientToView(input: Vector): Vector {
+    return this.windowToView(this.clientToWindow(input))
+  }
 
-    const position: Vector = point.matrixTransform(matrix)
-    this.points.push(position)
+  handleRightMouseDown = e => {
+    const id = uid()
+    const node: Node = {
+      id,
+      name: `Node ${id}`,
+      position: this.clientToView({ x: e.clientX, y: e.clientY }),
+      connectors: {
+        input: [{
+          id: uid(),
+          name: '',
+          position: { x: 0, y: 0 }
+        }],
+        output: [{
+          id: uid(),
+          name: '',
+          position: { x: 0, y: 0 }
+        }]
+      }
+    }
+
+    this.nodes.push(node)
   }
 
   handleMouseDown = e => {
@@ -140,7 +160,11 @@ class EditorView extends React.Component<Props> {
       transform: this.transformString,
       willChange: 'transform',
       border: '1 px solid grey'
-    } 
+    }
+
+    // this.nodes.forEach(node => {
+    //   console.log(node.value)
+    // })
 
     return <div
       ref={this.rootRef}
@@ -149,18 +173,7 @@ class EditorView extends React.Component<Props> {
       onWheel={this.handleWheel}
      >
       <div style={innerStyle}>
-        {this.points.map(point => {
-          const pointStyle: React.CSSProperties = {
-            position: 'absolute',
-            willChange: 'transform',
-            transform: `translate(${point.x}px, ${point.y}px)`,
-            backgroundColor: 'pink',
-            borderRadius: '50%',
-            width: '20px',
-            height: '20px'
-          }
-          return <div style={pointStyle} onClick={() => console.log('hi', point.x)} />
-        })}
+        {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
       </div>
     </div>
   }
