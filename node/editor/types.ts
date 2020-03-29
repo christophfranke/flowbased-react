@@ -16,11 +16,15 @@ export interface Connection {
   to: Connector
 }
 
-type ConnectorState = 'empty' | 'connected' | 'hot' | 'pending'
+type ConnectorState = 'default' | 'hot' | 'pending'
+type ConnectorConnection = 'empty' | 'connected'
+type ConnectorMode = 'multiple' | 'reconnect'
 export interface Connector {
   id: number
   name: string
   state: ConnectorState
+  connection: ConnectorConnection
+  mode: ConnectorMode
   direction: Vector
   position?: Vector
 }

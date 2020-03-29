@@ -6,25 +6,25 @@ import { flatten, connectors } from '@editor/util'
 import * as LA from '@editor/la'
 
 import { Node, Connector, Mouse } from '@editor/types'
+import store from '@editor/store'
 
 
 const BEZIER_DISTANCE = 100
 
-@inject('mouse', 'nodes')
+@inject('mouse')
 @observer
 class HotConnectors extends React.Component {
   @computed get connectors(): Connector[] {
-    return connectors(this.nodes)
+    return connectors(store.nodes)
   }
   @computed get pendingConnectors(): Connector[] {
     return this.connectors.filter(connector => connector.position && connector.state === 'pending')
   }
 
   mouse: Mouse = this.props['mouse']
-  nodes: Node[] = this.props['nodes']
 
   getNode(connector: Connector): Node | undefined {
-    return this.nodes.find(node => flatten(Object.values(node.connectors))
+    return store.nodes.find(node => flatten(Object.values(node.connectors))
       .some(con => con === connector))
   }
 

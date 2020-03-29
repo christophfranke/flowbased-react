@@ -25,7 +25,7 @@ class NodeView extends React.Component<Props> {
     e.stopPropagation()
 
     const mouse = this.props['mouse'].position
-    if (mouse) {    
+    if (mouse) {
       this.offset = LA.subtract(mouse, this.props.node.position)
 
       window.addEventListener('mousemove', this.handleMouseMove)

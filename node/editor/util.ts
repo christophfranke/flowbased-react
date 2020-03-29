@@ -16,3 +16,8 @@ export function flatten<T>(arr: T[][]): T[] {
 export function connectors(nodes: Node[]): Connector[] {
   return flatten(flatten(nodes.map(node => Object.values(node.connectors))))
 }
+
+export function canConnect(pending: Connector, possiblyHot: Connector): boolean {
+  return pending !== possiblyHot
+    && (possiblyHot.mode === 'multiple' || possiblyHot.connection === 'empty')
+}

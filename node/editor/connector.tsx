@@ -4,21 +4,20 @@ import { observer, inject } from 'mobx-react'
 
 import { Connector, Connection, Vector, Node } from '@editor/types'
 
-import { isServer, uid, connectors } from '@editor/util'
+import { isServer, uid, connectors, canConnect } from '@editor/util'
+import store from '@editor/store'
 
 interface Props {
   connector: Connector
 }
 
-@inject('nodes', 'connections')
+
 @observer
 class ConnectorView extends React.Component<Props> {
   private ref = React.createRef<HTMLDivElement>()
   
-  nodes: Node[] = this.props['nodes']
-  connections: Connection[] = this.props['connections']
   @computed get connectors(): Connector[] {
-    return connectors(this.nodes)
+    return connectors(store.nodes)
   }
 
   consume = e => {
@@ -29,33 +28,56 @@ class ConnectorView extends React.Component<Props> {
     e.preventDefault()
     e.stopPropagation()
 
-    if (this.props.connector.state === 'empty') {
-      this.props.connector.state = 'pending'
-      this.connectors.forEach(connector => {
-        if (connector.state === 'empty') {
-          connector.state = 'hot'
+    if (this.props.connector.state === 'default') {
+      if (this.props.connector.connection === 'connected' && this.props.connector.mode === 'reconnect') {
+        const connection = store.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+        if (connection) {
+          const other = connection.from === this.props.connector
+            ? connection.to
+            : connection.from
+
+          store.connections = store.connections.filter(con => con !== connection)
+
+          this.props.connector.connection = 'empty'
+          other.connection = 'empty'
+          other.state = 'pending'
+          this.connectors.forEach(third => {
+            if (canConnect(other, third)) {
+              third.state = 'hot'
+            }
+          })
         }
-      })
+      } else {      
+        this.props.connector.state = 'pending'
+        this.connectors.forEach(other => {
+          if (canConnect(this.props.connector, other)) {
+            other.state = 'hot'
+          }
+        })
+      }
+
+      return
     }
 
     if (this.props.connector.state === 'hot') {
       const otherConnector = this.connectors.find(other => other.state === 'pending')
       if (otherConnector) {
-        this.props.connector.state = 'connected'
-        otherConnector.state = 'connected'
+        this.props.connector.state = 'default'
+        this.props.connector.connection = 'connected'
+        otherConnector.state = 'default'
+        otherConnector.connection = 'connected'
         const connection: Connection = {
           id: uid(),
           from: this.props.connector,
           to: otherConnector
         }
 
-        this.connections.push(connection)
+        store.connections.push(connection)
       }
 
       this.connectors
-        .filter(connector => connector.state === 'pending' || connector.state === 'hot')
         .forEach(connector => {
-          connector.state = 'empty'
+          connector.state = 'default'
         })
     }
   }
@@ -71,9 +93,11 @@ class ConnectorView extends React.Component<Props> {
 
   render () {
     const backgroundColor = {
-      'connected': 'blue',
       'hot': 'red',
-      'empty': 'transparent',
+      'default': {
+        'empty': 'transparent',
+        'connected': 'blue'
+      }[this.props.connector.connection],
       'pending': 'blue'
     }[this.props.connector.state]
 

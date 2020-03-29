@@ -1,22 +1,20 @@
 import React from 'react'
 import { observable, computed } from 'mobx'
-import { observer, inject } from 'mobx-react'
+import { observer } from 'mobx-react'
 
 import  { Connection, Node, Connector } from '@editor/types'
 
 import { flatten } from '@editor/util'
 import * as LA from '@editor/la'
 
+import store from '@editor/store'
+
 const BEZIER_DISTANCE = 150
 
-@inject('connections', 'nodes')
 @observer
 class Connections extends React.Component {
-  connections: Connection[] = this.props['connections']
-  nodes: Node[] = this.props['nodes']
-
   getNode(connector: Connector): Node | undefined {
-    return this.nodes.find(node => flatten(Object.values(node.connectors))
+    return store.nodes.find(node => flatten(Object.values(node.connectors))
       .some(con => con === connector))
   }
 
@@ -53,7 +51,7 @@ class Connections extends React.Component {
 
     return <svg style={style}>
       <g stroke="black" strokeWidth="2" fill="none">
-        {this.connections.map(connection => <path key={connection.id} d={this.path(connection)} />)}
+        {store.connections.map(connection => <path key={connection.id} d={this.path(connection)} />)}
       </g>
     </svg>
   }

@@ -8,8 +8,8 @@ import NodeView from '@editor/node'
 import HotConnectors from '@editor/hot-connectors'
 import Connections from '@editor/connections'
 
-interface Props {
-}
+import store from '@editor/store'
+
 
 const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
 
@@ -19,17 +19,15 @@ const MAX_ZOOM = 4
 const MIN_ZOOM = 0.25
 
 @observer
-class EditorView extends React.Component<Props> {
+class EditorView extends React.Component {
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
-  @observable nodes: Node[] = []
-  @observable connections: Connection[] = []
   @observable mouse: Mouse = {}
 
   @computed get connectors(): Connector[] {
-    return connectors(this.nodes)
+    return connectors(store.nodes)
   }
 
   @computed get transformString() {
@@ -78,9 +76,8 @@ class EditorView extends React.Component<Props> {
 
   handleClick = () => {
     this.connectors
-      .filter(connector => connector.state === 'pending' || connector.state === 'hot')
       .forEach(connector => {
-        connector.state = 'empty'
+        connector.state = 'default'
       })
   }
 
@@ -93,20 +90,24 @@ class EditorView extends React.Component<Props> {
       connectors: {
         input: [{
           id: uid(),
-          state: 'empty',
+          state: 'default',
+          connection: 'empty',
+          mode: 'reconnect',
           name: '',
           direction: { x: 0, y: -1 }
         }],
         output: [{
           id: uid(),
-          state: 'empty',
+          state: 'default',
+          connection: 'empty',
+          mode: 'multiple',
           name: '',
           direction: { x: 0, y: 1 }
         }]
       }
     }
 
-    this.nodes.push(node)
+    store.nodes.push(node)
   }
 
   handleMouseDown = e => {
@@ -167,14 +168,16 @@ class EditorView extends React.Component<Props> {
     window.addEventListener('wheel', this.preventDefault, { passive: false })
     window.addEventListener('resize', this.updateDimensions)
     this.disposeAutorun = autorun(() => {
-      this.nodes.forEach(node => {
-        if (node.connectors.input.every(connector => connector.state === 'connected')) {
+      store.nodes.forEach(node => {
+        if (node.connectors.input.every(connector => connector.connection === 'connected')) {
           node.connectors.input.push({
-          id: uid(),
-          state: 'empty',
-          name: '',
-          direction: { x: 0, y: -1 }
-        })
+            id: uid(),
+            state: 'default',
+            connection: 'empty',
+            mode: 'reconnect',
+            name: '',
+            direction: { x: 0, y: -1 }
+          })
         }
       })
     })
@@ -212,10 +215,10 @@ class EditorView extends React.Component<Props> {
       onMouseMove={this.updateMousePosition}
       onClick={this.handleClick}
      >
-      <Provider mouse={this.mouse} nodes={this.nodes} connections={this.connections}>
+      <Provider mouse={this.mouse}>
         <div style={innerStyle}>
           <Connections />
-          {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
+          {store.nodes.map(node => <NodeView key={node.id} node={node} />)}
           <HotConnectors />
         </div>
       </Provider>
