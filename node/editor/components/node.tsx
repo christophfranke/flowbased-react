@@ -3,7 +3,7 @@ import { observer, inject } from 'mobx-react'
 
 import { Node, Vector } from '@editor/types'
 
-import ConnectorView from '@editor/connector'
+import ConnectorView from '@editor/components/connector'
 import * as LA from '@editor/la'
 
 interface Props {

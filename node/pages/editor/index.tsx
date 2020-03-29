@@ -1,7 +1,7 @@
 import React from 'react'
 
-import EditorView from '@editor/view'
-import Viewport from '@editor/viewport'
+import EditorView from '@editor/components/view'
+import Viewport from '@editor/components/viewport'
 
 export default () => {
   return <div>

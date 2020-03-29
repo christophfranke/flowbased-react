@@ -2,7 +2,6 @@ import React from 'react'
 import { computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { flatten, connectors } from '@editor/util'
 import * as LA from '@editor/la'
 
 import { Node, Connector, Mouse } from '@editor/types'
@@ -13,23 +12,11 @@ const BEZIER_DISTANCE = 100
 
 @inject('mouse')
 @observer
-class HotConnectors extends React.Component {
-  @computed get connectors(): Connector[] {
-    return connectors(store.nodes)
-  }
-  @computed get pendingConnectors(): Connector[] {
-    return this.connectors.filter(connector => connector.position && connector.state === 'pending')
-  }
-
+class PendingConnections extends React.Component {
   mouse: Mouse = this.props['mouse']
 
-  getNode(connector: Connector): Node | undefined {
-    return store.nodes.find(node => flatten(Object.values(node.connectors))
-      .some(con => con === connector))
-  }
-
   path(connector: Connector): string {
-    const node = this.getNode(connector)
+    const node = store.nodeOfConnector(connector)
     const start = LA.add(node!.position, connector.position!)
     const end = this.mouse.position!
 
@@ -41,7 +28,7 @@ class HotConnectors extends React.Component {
   }
 
   render () {
-    if (!this.mouse.position) {
+    if (!this.mouse.position || !store.pendingConnector) {
       return null
     }
 
@@ -55,10 +42,10 @@ class HotConnectors extends React.Component {
 
     return <svg style={style}>
       <g stroke="black" strokeWidth="2" fill="none">
-        {this.pendingConnectors.map(connector => <path key={connector.id} d={this.path(connector)} />)}
+        <path key={store.pendingConnector.id} d={this.path(store.pendingConnector)} />
       </g>
     </svg>
   }
 }
 
-export default HotConnectors
+export default PendingConnections

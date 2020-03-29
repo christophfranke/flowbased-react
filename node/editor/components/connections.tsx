@@ -4,7 +4,6 @@ import { observer } from 'mobx-react'
 
 import  { Connection, Node, Connector } from '@editor/types'
 
-import { flatten } from '@editor/util'
 import * as LA from '@editor/la'
 
 import store from '@editor/store'
@@ -13,14 +12,9 @@ const BEZIER_DISTANCE = 150
 
 @observer
 class Connections extends React.Component {
-  getNode(connector: Connector): Node | undefined {
-    return store.nodes.find(node => flatten(Object.values(node.connectors))
-      .some(con => con === connector))
-  }
-
   path(connection: Connection): string {
-    const fromNode = this.getNode(connection.from)
-    const toNode = this.getNode(connection.to)
+    const fromNode = store.nodeOfConnector(connection.from)
+    const toNode = store.nodeOfConnector(connection.to)
 
     if (fromNode && toNode && connection.from.position && connection.to.position) {
       const fromCoords = LA.add(fromNode.position, connection.from.position)

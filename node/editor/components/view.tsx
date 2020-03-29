@@ -3,10 +3,12 @@ import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import { observer, Provider } from 'mobx-react'
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
-import { uid, connectors } from '@editor/util'
-import NodeView from '@editor/node'
-import HotConnectors from '@editor/hot-connectors'
-import Connections from '@editor/connections'
+import { uid } from '@editor/util'
+import { createOutput, createInput } from '@editor/connector'
+
+import NodeView from '@editor/components/node'
+import PendingConnections from '@editor/components/pennding-connections'
+import Connections from '@editor/components/connections'
 
 import store from '@editor/store'
 
@@ -25,10 +27,6 @@ class EditorView extends React.Component {
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
   @observable mouse: Mouse = {}
-
-  @computed get connectors(): Connector[] {
-    return connectors(store.nodes)
-  }
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -75,10 +73,7 @@ class EditorView extends React.Component {
   }
 
   handleClick = () => {
-    this.connectors
-      .forEach(connector => {
-        connector.state = 'default'
-      })
+    store.pendingConnector = null
   }
 
   handleRightMouseDown = e => {
@@ -88,22 +83,8 @@ class EditorView extends React.Component {
       name: `Node ${id}`,
       position: this.clientToView({ x: e.clientX, y: e.clientY }),
       connectors: {
-        input: [{
-          id: uid(),
-          state: 'default',
-          connections: 0,
-          mode: 'reconnect',
-          name: '',
-          direction: { x: 0, y: -1 }
-        }],
-        output: [{
-          id: uid(),
-          state: 'default',
-          connections: 0,
-          mode: 'multiple',
-          name: '',
-          direction: { x: 0, y: 1 }
-        }]
+        input: [createInput()],
+        output: [createOutput()]
       }
     }
 
@@ -170,14 +151,7 @@ class EditorView extends React.Component {
     this.disposeAutorun = autorun(() => {
       store.nodes.forEach(node => {
         if (node.connectors.input.every(connector => connector.connections > 0)) {
-          node.connectors.input.push({
-            id: uid(),
-            state: 'default',
-            connections: 0,
-            mode: 'reconnect',
-            name: '',
-            direction: { x: 0, y: -1 }
-          })
+          node.connectors.input.push(createInput())
         }
       })
     })
@@ -219,7 +193,7 @@ class EditorView extends React.Component {
         <div style={innerStyle}>
           <Connections />
           {store.nodes.map(node => <NodeView key={node.id} node={node} />)}
-          <HotConnectors />
+          <PendingConnections />
         </div>
       </Provider>
     </div>
