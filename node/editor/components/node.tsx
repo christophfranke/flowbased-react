@@ -46,10 +46,6 @@ class NodeView extends React.Component<Props> {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
-  handleChangeName = e => {
-    this.props.node.name = e.target.value
-  }
-
   handleDelete = e => {
     e.stopPropagation()
     e.preventDefault()
@@ -69,7 +65,7 @@ class NodeView extends React.Component<Props> {
       DESCRIPTION_WIDTH) + 2 * NODE_PADDING
 
     const nodeStyle: React.CSSProperties = {
-      padding: '5px',
+      padding: '10px',
       position: 'absolute',
       cursor: 'move',
       willChange: 'transform',
@@ -78,30 +74,41 @@ class NodeView extends React.Component<Props> {
       outline: '1px solid pink',
     }
 
+    const nameStyle: React.CSSProperties = {
+      textAlign: 'center',
+      fontSize: '24px'
+    }
+
     const inputStyle: React.CSSProperties = {
       outline: 'none',
       width: 'auto',
-      padding: '0 5px'
+      margin: '8px',
+      borderBottom: '1px solid black'
     }
 
     const closeStyle: React.CSSProperties = {
       position: 'absolute',
       top: 0,
       right: 0,
+      transform: 'scale(1.2)',
       color: 'black',
       cursor: 'pointer'
     }
 
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
         <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '0 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '0 50px' }}>
             {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
           </div>
           <div>
             <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">
               <use xlinkHref="/icons/close.svg#close" />
             </svg>
-            <input style={inputStyle} name="name" value={node.name} onChange={this.handleChangeName} onMouseDown={this.stop} />
+            <div style={nameStyle}>{node.name}</div>
+            {node.params.map(param => <div key={param.key}>
+              <label>{param.name}</label>
+              <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
+            </div>)}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}

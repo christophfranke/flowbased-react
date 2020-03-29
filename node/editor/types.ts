@@ -26,9 +26,16 @@ export interface Connector {
   position?: Vector
 }
 
+export interface Parameter<T> {
+  name: string
+  key: string
+  value: T
+}
+
 export interface Node {
   id: number
   name: string
+  params: Parameter<string>[]
   position: Vector
   connectors: {
     input: Connector[]

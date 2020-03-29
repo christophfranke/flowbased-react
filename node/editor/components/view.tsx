@@ -79,7 +79,12 @@ class EditorView extends React.Component {
     const id = uid()
     const node: Node = {
       id,
-      name: `Node ${id}`,
+      name: `Html Tag`,
+      params: [{
+        name: 'Tag',
+        key: 'tag',
+        value: 'div'
+      }],
       position: this.clientToView({ x: e.clientX, y: e.clientY }),
       connectors: {
         input: [createInput()],
