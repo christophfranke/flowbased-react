@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, computed } from 'mobx'
+import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import { observer, Provider } from 'mobx-react'
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
@@ -44,6 +44,7 @@ class EditorView extends React.Component<Props> {
     return matrix
   }
 
+  private disposeAutorun: IReactionDisposer
   private mouseDownOffset: Vector
   private rootRef = React.createRef<HTMLDivElement>()
 
@@ -165,12 +166,27 @@ class EditorView extends React.Component<Props> {
     window.addEventListener('contextmenu', this.preventDefault)
     window.addEventListener('wheel', this.preventDefault, { passive: false })
     window.addEventListener('resize', this.updateDimensions)
+    this.disposeAutorun = autorun(() => {
+      this.nodes.forEach(node => {
+        if (node.connectors.input.every(connector => connector.state === 'connected')) {
+          node.connectors.input.push({
+          id: uid(),
+          state: 'empty',
+          name: '',
+          direction: { x: 0, y: -1 }
+        })
+        }
+      })
+    })
   }
 
   componentWillUnmount() {
     window.removeEventListener('contextmenu', this.preventDefault)
     window.removeEventListener('wheel', this.preventDefault)
     window.removeEventListener('resize', this.updateDimensions)
+    if (this.disposeAutorun) {
+      this.disposeAutorun()
+    }
   }
 
   render() {

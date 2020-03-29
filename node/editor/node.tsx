@@ -79,7 +79,9 @@ class NodeView extends React.Component<Props> {
 
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
         <div style={{ position: 'relative' }}>
-          {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
+          </div>
           <input style={inputStyle} name="name" value={node.name} onChange={this.handleChangeName} onMouseDown={this.stop} />
           {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
         </div>
