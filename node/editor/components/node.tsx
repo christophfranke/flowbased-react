@@ -3,8 +3,9 @@ import { observer, inject } from 'mobx-react'
 
 import { Node, Vector } from '@editor/types'
 
-import ConnectorView from '@editor/components/connector'
 import * as LA from '@editor/la'
+import store from '@editor/store'
+import ConnectorView from '@editor/components/connector'
 
 interface Props {
   node: Node
@@ -49,6 +50,12 @@ class NodeView extends React.Component<Props> {
     this.props.node.name = e.target.value
   }
 
+  handleDelete = e => {
+    e.stopPropagation()
+    e.preventDefault()
+    store.deleteNode(this.props.node)
+  }
+
   stop = e => {
     e.stopPropagation()
   }
@@ -77,13 +84,28 @@ class NodeView extends React.Component<Props> {
       padding: '0 5px'
     }
 
+    const closeStyle: React.CSSProperties = {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      color: 'black',
+      cursor: 'pointer'
+    }
+
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
         <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '0 20px' }}>
             {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
           </div>
-          <input style={inputStyle} name="name" value={node.name} onChange={this.handleChangeName} onMouseDown={this.stop} />
-          {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
+          <div>
+            <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">
+              <use xlinkHref="/icons/close.svg#close" />
+            </svg>
+            <input style={inputStyle} name="name" value={node.name} onChange={this.handleChangeName} onMouseDown={this.stop} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
+          </div>
         </div>
       </div>
   }

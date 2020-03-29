@@ -21,7 +21,6 @@ export type ConnectorMode = 'multiple' | 'reconnect'
 export interface Connector {
   id: number
   name: string
-  connections: number
   mode: ConnectorMode
   direction: Vector
   position?: Vector

@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connector, Connection, Vector, Node } from '@editor/types'
 
 import { isServer, uid, canConnect } from '@editor/util'
+import { countConnections } from '@editor/connector'
 import { state } from '@editor/connector'
 import store from '@editor/store'
 
@@ -23,8 +24,6 @@ class ConnectorView extends React.Component<Props> {
 
   connect() {
     if (store.pendingConnector) {
-      this.props.connector.connections += 1
-      store.pendingConnector.connections += 1
       const connection: Connection = {
         id: uid(),
         from: this.props.connector,
@@ -44,9 +43,6 @@ class ConnectorView extends React.Component<Props> {
 
       store.connections = store.connections.filter(con => con !== connection)
 
-      this.props.connector.connections -= 1
-      other.connections -= 1
-
       return other
     }
   }
@@ -58,7 +54,7 @@ class ConnectorView extends React.Component<Props> {
 
     if (store.pendingConnector) {
       if (state(this.props.connector) === 'hot') {
-        if (this.props.connector.connections > 0 && this.props.connector.mode === 'reconnect') {
+        if (countConnections(this.props.connector) > 0 && this.props.connector.mode === 'reconnect') {
           this.connect()
           store.pendingConnector = this.unconnect() || null
           return
@@ -71,7 +67,7 @@ class ConnectorView extends React.Component<Props> {
       return
     }
 
-    if (this.props.connector.connections > 0) {
+    if (countConnections(this.props.connector) > 0) {
       if (this.props.connector.mode === 'reconnect') {
         store.pendingConnector = this.unconnect() || null
         return
@@ -102,7 +98,7 @@ class ConnectorView extends React.Component<Props> {
       'default': {
         'empty': 'transparent',
         'connected': 'blue'
-      }[this.props.connector.connections > 0 ? 'connected' : 'empty'],
+      }[countConnections(this.props.connector) > 0 ? 'connected' : 'empty'],
       'pending': 'blue'
     }[state(this.props.connector)]
 
@@ -112,8 +108,7 @@ class ConnectorView extends React.Component<Props> {
       cursor: 'pointer',
       width: '20px',
       height: '20px',
-      borderRadius: '50%',
-      margin: 'auto'
+      borderRadius: '50%'
     }
 
     if (!isServer) {

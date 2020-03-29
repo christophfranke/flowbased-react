@@ -17,10 +17,15 @@ export function state(connector: Connector): ConnectorState {
   return 'default'
 }
 
+export function countConnections(connector: Connector): number {
+  return store.connections
+    .filter(connection => connection.from === connector || connection.to === connector)
+    .length
+}
+
 export function createInput(): Connector {
   const connector: Connector = {
     id: uid(),
-    connections: 0,
     mode: 'reconnect',
     name: '',
     direction: { x: 0, y: -1 }
@@ -32,7 +37,6 @@ export function createInput(): Connector {
 export function createOutput(): Connector {
   const connector: Connector = {
     id: uid(),
-    connections: 0,
     mode: 'multiple',
     name: '',
     direction: { x: 0, y: 1 }

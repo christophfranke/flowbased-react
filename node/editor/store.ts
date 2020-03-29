@@ -1,6 +1,6 @@
 import { observable, computed, autorun } from 'mobx'
 import { Connection, Node, Connector } from '@editor/types'
-import { createInput } from '@editor/connector'
+import { createInput, countConnections } from '@editor/connector'
 
 import { flatten } from '@editor/util'
 
@@ -13,8 +13,19 @@ class Store {
   }
 
   nodeOfConnector(connector: Connector): Node | undefined {
-    return this.nodes.find(node => flatten(Object.values(node.connectors))
+    return this.nodes.find(node => this.connectorsOfNode(node)
       .some(con => con === connector))
+  }
+
+  connectorsOfNode(node: Node): Connector[] {
+    return flatten(Object.values(node.connectors))
+  }
+
+  deleteNode(node: Node) {
+    const connectors = this.connectorsOfNode(node)
+    this.connections = this.connections
+      .filter(connection => !connectors.includes(connection.from) && !connectors.includes(connection.to))
+    this.nodes = this.nodes.filter(other => other !== node)
   }
 
   // removeInputConnectors = () => {
@@ -29,7 +40,7 @@ class Store {
 
   addInputConnectors = () => {
     this.nodes.forEach(node => {
-      if (node.connectors.input.every(connector => connector.connections > 0)) {
+      if (node.connectors.input.every(connector => countConnections(connector) > 0)) {
         node.connectors.input.push(createInput())
       }
     })
