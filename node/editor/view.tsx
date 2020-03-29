@@ -91,7 +91,7 @@ class EditorView extends React.Component {
         input: [{
           id: uid(),
           state: 'default',
-          connection: 'empty',
+          connections: 0,
           mode: 'reconnect',
           name: '',
           direction: { x: 0, y: -1 }
@@ -99,7 +99,7 @@ class EditorView extends React.Component {
         output: [{
           id: uid(),
           state: 'default',
-          connection: 'empty',
+          connections: 0,
           mode: 'multiple',
           name: '',
           direction: { x: 0, y: 1 }
@@ -169,11 +169,11 @@ class EditorView extends React.Component {
     window.addEventListener('resize', this.updateDimensions)
     this.disposeAutorun = autorun(() => {
       store.nodes.forEach(node => {
-        if (node.connectors.input.every(connector => connector.connection === 'connected')) {
+        if (node.connectors.input.every(connector => connector.connections > 0)) {
           node.connectors.input.push({
             id: uid(),
             state: 'default',
-            connection: 'empty',
+            connections: 0,
             mode: 'reconnect',
             name: '',
             direction: { x: 0, y: -1 }

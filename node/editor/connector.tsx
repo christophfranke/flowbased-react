@@ -29,7 +29,7 @@ class ConnectorView extends React.Component<Props> {
     e.stopPropagation()
 
     if (this.props.connector.state === 'default') {
-      if (this.props.connector.connection === 'connected' && this.props.connector.mode === 'reconnect') {
+      if (this.props.connector.connections > 0 && this.props.connector.mode === 'reconnect') {
         const connection = store.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
         if (connection) {
           const other = connection.from === this.props.connector
@@ -38,8 +38,8 @@ class ConnectorView extends React.Component<Props> {
 
           store.connections = store.connections.filter(con => con !== connection)
 
-          this.props.connector.connection = 'empty'
-          other.connection = 'empty'
+          this.props.connector.connections -= 1
+          other.connections -= 1
           other.state = 'pending'
           this.connectors.forEach(third => {
             if (canConnect(other, third)) {
@@ -63,9 +63,9 @@ class ConnectorView extends React.Component<Props> {
       const otherConnector = this.connectors.find(other => other.state === 'pending')
       if (otherConnector) {
         this.props.connector.state = 'default'
-        this.props.connector.connection = 'connected'
+        this.props.connector.connections += 1
         otherConnector.state = 'default'
-        otherConnector.connection = 'connected'
+        otherConnector.connections += 1
         const connection: Connection = {
           id: uid(),
           from: this.props.connector,
@@ -97,7 +97,7 @@ class ConnectorView extends React.Component<Props> {
       'default': {
         'empty': 'transparent',
         'connected': 'blue'
-      }[this.props.connector.connection],
+      }[this.props.connector.connections > 0 ? 'connected' : 'empty'],
       'pending': 'blue'
     }[this.props.connector.state]
 

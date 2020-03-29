@@ -19,5 +19,5 @@ export function connectors(nodes: Node[]): Connector[] {
 
 export function canConnect(pending: Connector, possiblyHot: Connector): boolean {
   return pending !== possiblyHot
-    && (possiblyHot.mode === 'multiple' || possiblyHot.connection === 'empty')
+    && (possiblyHot.mode === 'multiple' || possiblyHot.connections === 0)
 }

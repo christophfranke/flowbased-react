@@ -17,13 +17,12 @@ export interface Connection {
 }
 
 type ConnectorState = 'default' | 'hot' | 'pending'
-type ConnectorConnection = 'empty' | 'connected'
 type ConnectorMode = 'multiple' | 'reconnect'
 export interface Connector {
   id: number
   name: string
   state: ConnectorState
-  connection: ConnectorConnection
+  connections: number
   mode: ConnectorMode
   direction: Vector
   position?: Vector
