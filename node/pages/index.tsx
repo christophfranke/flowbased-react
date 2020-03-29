@@ -12,7 +12,6 @@ interface Data {
 
 const Home = (props: Props) => {
   return <div>
-    <h1>Siteflow</h1>
     <Link href="/editor">
       <button>Start editor</button>
     </Link>
