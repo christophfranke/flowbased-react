@@ -48,7 +48,7 @@ class Connections extends React.Component {
       pointerEvents: 'none',
       width: '100%',
       height: '100%',
-      outline: '1px solid yellow',
+      overflow: 'visible'
     }
 
     return <svg style={style}>

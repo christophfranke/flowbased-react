@@ -50,7 +50,7 @@ class HotConnectors extends React.Component {
       pointerEvents: 'none',
       width: '100%',
       height: '100%',
-      outline: '1px solid pink'
+      overflow: 'visible'
     }
 
     return <svg style={style}>
