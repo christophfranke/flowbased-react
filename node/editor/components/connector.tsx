@@ -32,7 +32,6 @@ class ConnectorView extends React.Component<Props> {
       }
 
       store.connections.push(connection)
-      store.pendingConnector = null    
     }
   }
 
@@ -66,6 +65,7 @@ class ConnectorView extends React.Component<Props> {
         }
 
         this.connect()
+        store.pendingConnector = null    
         return
       }
       return
