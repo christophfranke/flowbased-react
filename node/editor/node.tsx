@@ -45,6 +45,14 @@ class NodeView extends React.Component<Props> {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
+  handleChangeName = e => {
+    this.props.node.name = e.target.value
+  }
+
+  stop = e => {
+    e.stopPropagation()
+  }
+
   render() {
     const { node } = this.props
 
@@ -63,10 +71,16 @@ class NodeView extends React.Component<Props> {
       outline: '1px solid pink',
     }
 
+    const inputStyle: React.CSSProperties = {
+      outline: 'none',
+      width: 'auto',
+      padding: '0 5px'
+    }
+
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
         <div style={{ position: 'relative' }}>
           {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
-          <div style={{ pointerEvents: 'none' }}>{node.name}</div>
+          <input style={inputStyle} name="name" value={node.name} onChange={this.handleChangeName} onMouseDown={this.stop} />
           {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
         </div>
       </div>

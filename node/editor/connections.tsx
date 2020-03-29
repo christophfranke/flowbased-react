@@ -29,7 +29,7 @@ class Connections extends React.Component {
       const toCoords = LA.add(toNode.position, connection.to.position)
 
       const diff = LA.subtract(toCoords, fromCoords)
-      const minFactor = BEZIER_DISTANCE
+      const minFactor = Math.min(LA.distance(diff), BEZIER_DISTANCE)
       const fromFactor = Math.max(minFactor, LA.product(diff, connection.from.direction))
       const toFactor = Math.max(minFactor, LA.product(diff, connection.to.direction))
   
