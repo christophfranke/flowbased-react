@@ -27,3 +27,11 @@ export function subtract(v: Vector, w: Vector): Vector {
     y: v.y - w.y
   }  
 }
+
+export function product(v: Vector, w?: Vector) {
+  return v.x * (w || v).x + v.y * (w || v).y
+}
+
+export function distance(v: Vector, w?: Vector) {
+  return Math.sqrt(product(v, w))
+}

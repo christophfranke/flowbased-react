@@ -198,8 +198,8 @@ class EditorView extends React.Component<Props> {
      >
       <Provider mouse={this.mouse} nodes={this.nodes} connections={this.connections}>
         <div style={innerStyle}>
-          {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
           <Connections />
+          {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
           <HotConnectors />
         </div>
       </Provider>

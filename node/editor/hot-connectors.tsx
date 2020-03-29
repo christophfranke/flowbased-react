@@ -7,9 +7,8 @@ import * as LA from '@editor/la'
 
 import { Node, Connector, Mouse } from '@editor/types'
 
-interface Props {
-  nodes: Node[]
-}
+
+const BEZIER_DISTANCE = 100
 
 @inject('mouse', 'nodes')
 @observer
@@ -34,7 +33,11 @@ class HotConnectors extends React.Component {
     const start = LA.add(node!.position, connector.position!)
     const end = this.mouse.position!
 
-    return `M${start.x} ${start.y} L${end.x} ${end.y}`
+    const diff = LA.subtract(end, start)
+    const factor = Math.max(Math.min(LA.distance(diff), BEZIER_DISTANCE), LA.product(diff, connector.direction))
+    const middle = LA.madd(start, factor, connector.direction)
+
+    return `M${start.x} ${start.y} Q${middle.x} ${middle.y} ${end.x} ${end.y}`
   }
 
   render () {
@@ -51,7 +54,7 @@ class HotConnectors extends React.Component {
     }
 
     return <svg style={style}>
-      <g stroke="black" strokeWidth="2">
+      <g stroke="black" strokeWidth="2" fill="none">
         {this.pendingConnectors.map(connector => <path key={connector.id} d={this.path(connector)} />)}
       </g>
     </svg>

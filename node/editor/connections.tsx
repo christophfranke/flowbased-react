@@ -7,6 +7,8 @@ import  { Connection, Node, Connector } from '@editor/types'
 import { flatten } from '@editor/util'
 import * as LA from '@editor/la'
 
+const BEZIER_DISTANCE = 150
+
 @inject('connections', 'nodes')
 @observer
 class Connections extends React.Component {
@@ -26,7 +28,15 @@ class Connections extends React.Component {
       const fromCoords = LA.add(fromNode.position, connection.from.position)
       const toCoords = LA.add(toNode.position, connection.to.position)
 
-      return `M${fromCoords.x} ${fromCoords.y} L${toCoords.x} ${toCoords.y}`
+      const diff = LA.subtract(toCoords, fromCoords)
+      const minFactor = BEZIER_DISTANCE
+      const fromFactor = Math.max(minFactor, LA.product(diff, connection.from.direction))
+      const toFactor = Math.max(minFactor, LA.product(diff, connection.to.direction))
+  
+      const middle1 = LA.madd(fromCoords, fromFactor, connection.from.direction)
+      const middle2 = LA.madd(toCoords, toFactor, connection.to.direction)
+
+      return `M${fromCoords.x} ${fromCoords.y} C${middle1.x} ${middle1.y} ${middle2.x} ${middle2.y} ${toCoords.x} ${toCoords.y}`
     }
 
     return ''
@@ -42,7 +52,7 @@ class Connections extends React.Component {
     }
 
     return <svg style={style}>
-      <g stroke="black" strokeWidth="2">
+      <g stroke="black" strokeWidth="2" fill="none">
         {this.connections.map(connection => <path key={connection.id} d={this.path(connection)} />)}
       </g>
     </svg>
