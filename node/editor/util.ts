@@ -1,5 +1,5 @@
 import { Connector, Node } from '@editor/types'
-
+import store from '@editor/store'
 
 let id = 0
 export const uid:() => number = () => {
@@ -15,4 +15,6 @@ export function flatten<T>(arr: T[][]): T[] {
 
 export function canConnect(pending: Connector, possiblyHot: Connector): boolean {
   return pending !== possiblyHot
+    && store.nodeOfConnector(pending) !== store.nodeOfConnector(possiblyHot)
+    && !(pending.mode === 'multiple' && possiblyHot.mode === 'multiple')
 }
