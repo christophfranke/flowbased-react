@@ -2,10 +2,11 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer, Provider } from 'mobx-react'
 
-import { Vector, Rectangle, Node, Connector, Mouse } from '@editor/types'
-import { uid } from '@editor/util'
+import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
+import { uid, connectors } from '@editor/util'
 import NodeView from '@editor/node'
 import HotConnectors from '@editor/hot-connectors'
+import Connections from '@editor/connections'
 
 interface Props {
 }
@@ -24,7 +25,12 @@ class EditorView extends React.Component<Props> {
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
   @observable nodes: Node[] = []
+  @observable connections: Connection[] = []
   @observable mouse: Mouse = {}
+
+  @computed get connectors(): Connector[] {
+    return connectors(this.nodes)
+  }
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -69,9 +75,12 @@ class EditorView extends React.Component<Props> {
     this.mouse.position = this.mouseEventToView(e)
   }
 
-  removeMousePosition = () => {
-    console.log('remove mouse position from view')
-    this.mouse.position = undefined
+  handleClick = () => {
+    this.connectors
+      .filter(connector => connector.state === 'pending' || connector.state === 'hot')
+      .forEach(connector => {
+        connector.state = 'empty'
+      })
   }
 
   handleRightMouseDown = e => {
@@ -185,11 +194,13 @@ class EditorView extends React.Component<Props> {
       onMouseDown={this.handleMouseDown}
       onWheel={this.handleWheel}
       onMouseMove={this.updateMousePosition}
+      onClick={this.handleClick}
      >
-      <Provider mouse={this.mouse}>   
+      <Provider mouse={this.mouse} nodes={this.nodes} connections={this.connections}>
         <div style={innerStyle}>
           {this.nodes.map(node => <NodeView key={node.id} node={node} />)}
-          <HotConnectors nodes={this.nodes} />
+          <Connections />
+          <HotConnectors />
         </div>
       </Provider>
     </div>

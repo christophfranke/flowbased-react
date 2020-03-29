@@ -11,11 +11,12 @@ export interface Vector {
 }
 
 export interface Connection {
+  id: number
   from: Connector
   to: Connector
 }
 
-type ConnectorState = 'empty' | 'connected' | 'hot'
+type ConnectorState = 'empty' | 'connected' | 'hot' | 'pending'
 export interface Connector {
   id: number
   name: string
