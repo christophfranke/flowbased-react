@@ -39,11 +39,12 @@ class Store {
   // }
 
   addInputConnectors = () => {
-    this.nodes.forEach(node => {
-      if (node.connectors.input.every(connector => countConnections(connector) > 0)) {
+    this.nodes
+      .filter(node => node.connectors.input.length > 0)
+      .filter(node => node.connectors.input.every(connector => countConnections(connector) > 0))
+      .forEach(node => {        
         node.connectors.input.push(cloneConnector(node.connectors.input[0]))
-      }
-    })
+      })
   }
 }
 

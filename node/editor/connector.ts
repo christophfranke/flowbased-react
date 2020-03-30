@@ -111,7 +111,7 @@ export function createValueInput(type: ValueType): Connector {
     mode: 'reconnect',
     function: 'input',
     type,
-    name: 'input',
+    name: type,
     direction: { x: 0, y: -1 }
   }
 }
@@ -120,7 +120,7 @@ export function createValueOutput(type: ValueType): Connector {
   return {
     id: uid(),
     mode: 'multiple',
-    name: 'output',
+    name: type,
     function: 'output',
     type,
     direction: { x: 0, y: 1 }

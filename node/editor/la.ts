@@ -14,7 +14,7 @@ export function madd(v: Vector, m: number, w: Vector): Vector {
   }
 }
 
-export function multiply(m: number, v: Vector): Vector {
+export function scale(m: number, v: Vector): Vector {
   return {  
     x: m * v.x,
     y: m * v.y
@@ -34,4 +34,18 @@ export function product(v: Vector, w?: Vector) {
 
 export function distance(v: Vector, w?: Vector) {
   return Math.sqrt(product(v, w))
+}
+
+export function rotate90(v: Vector): Vector {
+  return {
+    x: -v.y,
+    y: v.x
+  }
+}
+
+export function rotate270(v: Vector): Vector {
+  return {
+    x: v.y,
+    y: -v.x
+  }
 }

@@ -5,9 +5,13 @@ import { observer, inject } from 'mobx-react'
 import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/types'
 
 import { isServer, uid } from '@editor/util'
+import { rotate90, rotate270, scale } from '@editor/la'
 import { countConnections, canConnect } from '@editor/connector'
 import { state } from '@editor/connector'
 import store from '@editor/store'
+
+import DownArrow from '@editor/components/down-arrow'
+import RightArrow from '@editor/components/right-arrow'
 
 interface Props {
   connector: Connector
@@ -110,7 +114,7 @@ class ConnectorView extends React.Component<Props> {
   }
 
   render () {
-    const backgroundColor = {
+    const fill = {
       'hot': this.isHovering ? 'blue': 'red',
       'default': {
         'empty': (this.isHovering && !store.pendingConnector) ? 'blue': 'transparent',
@@ -122,8 +126,6 @@ class ConnectorView extends React.Component<Props> {
     const size = 20
 
     const style: React.CSSProperties = {
-      border: '1px solid blue',
-      backgroundColor,
       cursor: 'pointer',
       width: `${size}px`,
       height: `${size}px`,
@@ -166,8 +168,14 @@ class ConnectorView extends React.Component<Props> {
       requestAnimationFrame(this.updatePosition)
     }
 
+    const arrow = ['input', 'output'].includes(this.props.connector.function)
+      ? <DownArrow fill={fill} stroke="blue" size={size} />
+      : <RightArrow fill={fill} stroke="blue" size={size} />
+
+
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
       <div style={titleStyle}>{this.props.connector.name}</div>
+      {arrow}
     </div>
   }
 }
