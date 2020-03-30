@@ -108,7 +108,7 @@ class NodeView extends React.Component<Props> {
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
             {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gridArea: 'props' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
             {node.connectors.properties.map(property => <ConnectorView key={property.id} connector={property} />)}
           </div>
           <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">

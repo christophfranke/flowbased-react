@@ -8,6 +8,45 @@ import {
   createProperty
 } from '@editor/connector'
 
+export function createObjectNode(position: Vector): Node {
+  return {
+    id: uid(),
+    name: 'Object',
+    params: [],
+    position,
+    connectors: {
+      input: [createValueInput('Pair')],
+      output: [createValueOutput('Object')],
+      properties: []
+    }
+  }
+}
+
+export function createPairNode(position: Vector): Node {
+  return {
+    id: uid(),
+    name: 'Pair',
+    params: [{
+      name: 'Key',
+      key: 'key',
+      value: ''
+    }, {
+      name: 'Value',
+      key: 'value',
+      value: ''
+    }],
+    position,
+    connectors: {
+      input: [createValueInput('Pair')],
+      output: [createValueOutput('Pair')],
+      properties: [
+        createProperty('key', 'Text'),
+        createProperty('value', 'Text')
+      ]
+    }
+  }
+}
+
 export function createHtmlNode(position: Vector): Node {
   return {
     id: uid(),
@@ -46,4 +85,11 @@ export function createTextNode(position: Vector): Node {
       properties: []
     }
   }
+}
+
+export function createRandomNode(position: Vector): Node {
+  const factories = [createHtmlNode, createTextNode, createPairNode, createObjectNode]
+  const func = factories[Math.floor(Math.random() * factories.length)]
+
+  return func(position)
 }
