@@ -9,6 +9,7 @@ import { createRandomNode } from '@editor/node'
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
 import Connections from '@editor/components/connections'
+import NodeList from '@editor/components/node-list'
 
 import store from '@editor/store'
 
@@ -27,6 +28,7 @@ class EditorView extends React.Component {
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
   @observable mouse: Mouse = {}
+  @observable nodeListPosition: Vector | null = null
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -73,13 +75,15 @@ class EditorView extends React.Component {
 
   handleClick = () => {
     store.pendingConnector = null
+    this.nodeListPosition = null
   }
 
   handleRightMouseDown = e => {
-    if (this.mouse.position) {    
-      const node = createRandomNode(this.mouse.position)
-      store.nodes.push(node)
-    }
+    this.nodeListPosition = this.clientToWindow({ x: e.clientX, y: e.clientY })
+  }
+
+  handleNodeCreated = () => {
+    this.nodeListPosition = null
   }
 
   handleMouseDown = e => {
@@ -162,6 +166,17 @@ class EditorView extends React.Component {
       border: '1 px solid grey'
     }
 
+
+    const nodeListStyle: React.CSSProperties = this.nodeListPosition ? {
+      position: 'absolute',
+      left: `${this.nodeListPosition.x}px`,
+      top: `${this.nodeListPosition.y}px`
+    } : {}
+
+    const nodeList = this.nodeListPosition
+      ? <NodeList onComplete={this.handleNodeCreated} style={nodeListStyle} />
+      : null
+
     return <div
       ref={this.rootRef}
       style={outerStyle}
@@ -176,6 +191,7 @@ class EditorView extends React.Component {
           {store.nodes.map(node => <NodeView key={node.id} node={node} />)}
           <PendingConnections />
         </div>
+        {nodeList}
       </Provider>
     </div>
   }
