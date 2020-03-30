@@ -1,9 +1,51 @@
 import { computed } from 'mobx'
 
 import { Connector, ConnectorState, ValueType } from '@editor/types'
-import { uid, canConnect } from '@editor/util'
+import { uid } from '@editor/util'
 import store from '@editor/store'
 
+function functionsAreCompatible(src: Connector, dest: Connector): boolean {
+  if (dest.function === 'input') {
+    if (src.function !== 'property') {
+      return true
+    }
+  }
+
+  if (dest.function === 'property') {
+    if (src.function === 'output') {
+      return true
+    }
+  }
+
+  return false
+}
+
+function valuesAreCompatible(src: Connector, dest: Connector): boolean {
+  if (dest.type === 'Element') {
+    return true
+  }
+
+  if (src.type === dest.type) {
+    return true
+  }
+
+  return false
+}
+
+function isSrc(connector: Connector): boolean {
+  return ['action', 'output'].includes(connector.function)
+}
+
+export function canConnect(pending: Connector, possiblyHot: Connector): boolean {
+  const src = isSrc(pending) ? pending : possiblyHot
+  const dest = isSrc(possiblyHot) ? pending : possiblyHot
+  
+  return src !== dest
+    && store.nodeOfConnector(src) !== store.nodeOfConnector(dest)
+    && !(src.mode === 'multiple' && dest.mode === 'multiple')
+    && functionsAreCompatible(src, dest)
+    && valuesAreCompatible(src, dest)
+}
 export function state(connector: Connector): ConnectorState {
   if (store.pendingConnector) {
     if (store.pendingConnector === connector) {

@@ -4,8 +4,8 @@ import { observer, inject } from 'mobx-react'
 
 import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/types'
 
-import { isServer, uid, canConnect } from '@editor/util'
-import { countConnections } from '@editor/connector'
+import { isServer, uid } from '@editor/util'
+import { countConnections, canConnect } from '@editor/connector'
 import { state } from '@editor/connector'
 import store from '@editor/store'
 
