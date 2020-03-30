@@ -16,12 +16,16 @@ export interface Connection {
   to: Connector
 }
 
+export type ConnectorFunction = 'input' | 'output' | 'property' | 'action'
+export type ValueType = 'Element' | 'Text' | 'Boolean' | 'Number' | 'List' | 'Object' | 'Nothing'
 export type ConnectorState = 'default' | 'hot' | 'pending'
 export type ConnectorMode = 'multiple' | 'reconnect'
 export interface Connector {
   id: number
   name: string
   mode: ConnectorMode
+  function: ConnectorFunction
+  type: ValueType
   direction: Vector
   position?: Vector
 }
@@ -40,6 +44,7 @@ export interface Node {
   connectors: {
     input: Connector[]
     output: Connector[]
+    properties: Connector[]
   }
 }
 

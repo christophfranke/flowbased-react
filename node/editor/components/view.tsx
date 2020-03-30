@@ -4,7 +4,7 @@ import { observer, Provider } from 'mobx-react'
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
-import { createOutput, createInput } from '@editor/connector'
+import { createOutput, createInput, createProperty } from '@editor/connector'
 
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
@@ -79,7 +79,7 @@ class EditorView extends React.Component {
     const id = uid()
     const node: Node = {
       id,
-      name: `Html Tag`,
+      name: 'HTML Element',
       params: [{
         name: 'Tag',
         key: 'tag',
@@ -88,7 +88,12 @@ class EditorView extends React.Component {
       position: this.clientToView({ x: e.clientX, y: e.clientY }),
       connectors: {
         input: [createInput()],
-        output: [createOutput()]
+        output: [createOutput()],
+        properties: [
+          createProperty('classList', 'List'),
+          createProperty('style', 'Object'),
+          createProperty('props', 'Object')
+        ]
       }
     }
 

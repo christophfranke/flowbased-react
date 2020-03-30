@@ -87,30 +87,41 @@ class NodeView extends React.Component<Props> {
     }
 
     const closeStyle: React.CSSProperties = {
-      position: 'absolute',
-      top: 0,
-      right: 0,
+      gridArea: 'close',
       transform: 'scale(1.2)',
       color: 'black',
       cursor: 'pointer'
     }
 
+    const innerStyle: React.CSSProperties = {
+      position: 'relative',
+      display: 'grid',
+      gridTemplate: `
+        "x input close" auto
+        "props params actions" auto
+        "y output z" auto /
+        1fr min-content 1fr`
+    }
+
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown}>
-        <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '0 50px' }}>
+        <div style={innerStyle}>
+          <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
             {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
           </div>
-          <div>
-            <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">
-              <use xlinkHref="/icons/close.svg#close" />
-            </svg>
+          <div style={{ display: 'flex', flexDirection: 'column', gridArea: 'props' }}>
+            {node.connectors.properties.map(property => <ConnectorView key={property.id} connector={property} />)}
+          </div>
+          <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">
+            <use xlinkHref="/icons/close.svg#close" />
+          </svg>
+          <div style={{ gridArea: 'params' }}>
             <div style={nameStyle}>{node.name}</div>
-            {node.params.map(param => <div key={param.key}>
+            {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center' }}>
               <label>{param.name}</label>
               <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
             </div>)}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
             {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
           </div>
         </div>

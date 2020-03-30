@@ -1,6 +1,6 @@
 import { computed } from 'mobx'
 
-import { Connector, ConnectorState } from '@editor/types'
+import { Connector, ConnectorState, ValueType } from '@editor/types'
 import { uid, canConnect } from '@editor/util'
 import store from '@editor/store'
 
@@ -23,24 +23,35 @@ export function countConnections(connector: Connector): number {
     .length
 }
 
-export function createInput(): Connector {
-  const connector: Connector = {
+export function createProperty(name: string, type: ValueType): Connector {
+  return {
     id: uid(),
     mode: 'reconnect',
+    function: 'property',
+    name,
+    type,
+    direction: { x: -1, y: 0 }
+  }
+}
+
+export function createInput(): Connector {
+  return {
+    id: uid(),
+    mode: 'reconnect',
+    function:  'input',
+    type: 'Element',
     name: '',
     direction: { x: 0, y: -1 }
   }
-
-  return connector
 }
 
 export function createOutput(): Connector {
-  const connector: Connector = {
+  return {
     id: uid(),
     mode: 'multiple',
     name: '',
+    function: 'output',
+    type: 'Element',
     direction: { x: 0, y: 1 }
   }
-
-  return connector
 }
