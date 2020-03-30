@@ -4,7 +4,7 @@ import { observer, Provider } from 'mobx-react'
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
-import { createOutput, createInput, createProperty } from '@editor/connector'
+import { createHtmlNode, createTextNode } from '@editor/node'
 
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
@@ -76,28 +76,12 @@ class EditorView extends React.Component {
   }
 
   handleRightMouseDown = e => {
-    const id = uid()
-    const node: Node = {
-      id,
-      name: 'HTML Element',
-      params: [{
-        name: 'Tag',
-        key: 'tag',
-        value: 'div'
-      }],
-      position: this.clientToView({ x: e.clientX, y: e.clientY }),
-      connectors: {
-        input: [createInput()],
-        output: [createOutput()],
-        properties: [
-          createProperty('classList', 'List'),
-          createProperty('style', 'Object'),
-          createProperty('props', 'Object')
-        ]
-      }
+    if (this.mouse.position) {    
+      const node = Math.random() > 0.5
+        ? createHtmlNode(this.mouse.position)
+        : createTextNode(this.mouse.position)
+      store.nodes.push(node)
     }
-
-    store.nodes.push(node)
   }
 
   handleMouseDown = e => {

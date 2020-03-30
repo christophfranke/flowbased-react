@@ -76,24 +76,53 @@ export function createProperty(name: string, type: ValueType): Connector {
   }
 }
 
-export function createInput(): Connector {
+export function cloneConnector(src: Connector) {
+  return {
+    ...src,
+    id: uid()
+  }
+}
+
+export function createRenderInput(): Connector {
   return {
     id: uid(),
     mode: 'reconnect',
-    function:  'input',
+    function: 'input',
     type: 'Element',
     name: 'input',
     direction: { x: 0, y: -1 }
   }
 }
 
-export function createOutput(): Connector {
+export function createRenderOutput(): Connector {
   return {
     id: uid(),
     mode: 'multiple',
     name: 'output',
     function: 'output',
     type: 'Element',
+    direction: { x: 0, y: 1 }
+  }
+}
+
+export function createValueInput(type: ValueType): Connector {
+  return {
+    id: uid(),
+    mode: 'reconnect',
+    function: 'input',
+    type,
+    name: 'input',
+    direction: { x: 0, y: -1 }
+  }
+}
+
+export function createValueOutput(type: ValueType): Connector {
+  return {
+    id: uid(),
+    mode: 'multiple',
+    name: 'output',
+    function: 'output',
+    type,
     direction: { x: 0, y: 1 }
   }
 }

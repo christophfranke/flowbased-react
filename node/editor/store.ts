@@ -1,6 +1,6 @@
 import { observable, computed, autorun } from 'mobx'
 import { Connection, Node, Connector } from '@editor/types'
-import { createInput, countConnections } from '@editor/connector'
+import { cloneConnector, countConnections } from '@editor/connector'
 
 import { flatten } from '@editor/util'
 
@@ -41,7 +41,7 @@ class Store {
   addInputConnectors = () => {
     this.nodes.forEach(node => {
       if (node.connectors.input.every(connector => countConnections(connector) > 0)) {
-        node.connectors.input.push(createInput())
+        node.connectors.input.push(cloneConnector(node.connectors.input[0]))
       }
     })
   }
