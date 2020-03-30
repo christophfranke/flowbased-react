@@ -2,7 +2,7 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Connector, Connection, Vector, Node } from '@editor/types'
+import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/types'
 
 import { isServer, uid, canConnect } from '@editor/util'
 import { countConnections } from '@editor/connector'
@@ -16,8 +16,17 @@ interface Props {
 
 @observer
 class ConnectorView extends React.Component<Props> {
+  @observable isHovering = false
   private ref = React.createRef<HTMLDivElement>()
   
+  @computed get connectorState(): ConnectorState {
+    return state(this.props.connector)
+  }
+  
+  @computed get showTitle(): boolean {
+    return this.isHovering || this.connectorState === 'hot' || this.connectorState === 'pending'
+  }
+
   consume = e => {
     e.stopPropagation()
   }
@@ -45,6 +54,14 @@ class ConnectorView extends React.Component<Props> {
 
       return other
     }
+  }
+
+  handleMouseOver = e => {
+    this.isHovering = true
+  }
+
+  handleMouseOut = e => {
+    this.isHovering = false
   }
 
 
@@ -94,28 +111,64 @@ class ConnectorView extends React.Component<Props> {
 
   render () {
     const backgroundColor = {
-      'hot': 'red',
+      'hot': this.isHovering ? 'blue': 'red',
       'default': {
-        'empty': 'transparent',
+        'empty': (this.isHovering && !store.pendingConnector) ? 'blue': 'transparent',
         'connected': 'blue'
       }[countConnections(this.props.connector) > 0 ? 'connected' : 'empty'],
       'pending': 'blue'
-    }[state(this.props.connector)]
+    }[this.connectorState]
 
-    const style = {
+    const size = 20
+
+    const style: React.CSSProperties = {
       border: '1px solid blue',
       backgroundColor,
       cursor: 'pointer',
-      width: '20px',
-      height: '20px',
-      borderRadius: '50%'
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '50%',
+      position: 'relative'
     }
+
+
+    let positioning = {}
+    const margin = 5
+    if (this.props.connector.direction.x > 0) {
+      positioning['left'] = `${size + margin}px`
+    }
+    if (this.props.connector.direction.x < 0) {
+      positioning['right'] = `${size + margin}px`
+    }
+    if (this.props.connector.direction.y > 0) {
+      positioning['top'] = `${size + margin}px`
+    }
+    if (this.props.connector.direction.y < 0) {
+      positioning['bottom'] = `${size + margin}px`
+    }
+    if (this.props.connector.direction.y !== 0) {
+      positioning['transform'] = 'translateY(-5px) rotate(-50deg)'
+    }
+
+    const titleStyle: React.CSSProperties = this.showTitle
+      ? {
+        position: 'absolute',
+        ...positioning,
+        pointerEvents: 'none',
+        opacity: 0.9,
+        lineHeight: `${size}px`,
+        backgroundColor: 'white'
+      } : {
+        display: 'none'
+      }
 
     if (!isServer) {
       requestAnimationFrame(this.updatePosition)
     }
 
-    return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} />
+    return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
+      <div style={titleStyle}>{this.props.connector.name}</div>
+    </div>
   }
 }
 

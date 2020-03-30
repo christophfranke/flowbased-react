@@ -40,7 +40,7 @@ export function createInput(): Connector {
     mode: 'reconnect',
     function:  'input',
     type: 'Element',
-    name: '',
+    name: 'input',
     direction: { x: 0, y: -1 }
   }
 }
@@ -49,7 +49,7 @@ export function createOutput(): Connector {
   return {
     id: uid(),
     mode: 'multiple',
-    name: '',
+    name: 'output',
     function: 'output',
     type: 'Element',
     direction: { x: 0, y: 1 }
