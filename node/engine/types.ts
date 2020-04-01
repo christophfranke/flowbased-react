@@ -34,5 +34,6 @@ export interface RenderProps {
 
 export interface NodeProps {
   key: number
+  parents: Node[]
   node: Node
 }

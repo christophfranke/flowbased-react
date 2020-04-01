@@ -10,7 +10,7 @@ export default (Component) => {
     @observable childMap = {}
     getChild(node: Node) {
       if (!this.childMap[node.id]) {
-        this.childMap[node.id] = render(node)
+        this.childMap[node.id] = render(node, [...this.props.parents, this.props.node])
       }
       return this.childMap[node.id]
     }
@@ -31,8 +31,6 @@ export default (Component) => {
     }
 
     render() {
-      console.log('render ....', this.props.node.id)
-
       return <Component params={this.params} properties={this.properties}>
         {this.children}
       </Component>

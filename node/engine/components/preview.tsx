@@ -9,7 +9,6 @@ import { render } from '@engine/render'
 class Preview extends React.Component {
   render() {
     if (store.tree) {
-      console.log('render tree')
       return <div>
         {render(store.tree)}
       </div>
