@@ -2,7 +2,7 @@ import React from 'react'
 import { Node } from '@engine/types'
 
 import Nodes from '@engine/nodes'
-import withChildren from '@engine/nodes/with-children'
+import observerComponent from '@engine/nodes/observer-component'
 
 
 export function value(node: Node): any {
@@ -19,5 +19,5 @@ function getRenderKey(): number {
 export function render(node: Node): React.ReactElement {
   console.log('create ----------', node.id)
   const Component = Nodes[node.type].render
-  return React.createElement(withChildren(Component), { node, key: getRenderKey() })
+  return React.createElement(observerComponent(Component), { node, key: getRenderKey() })
 }

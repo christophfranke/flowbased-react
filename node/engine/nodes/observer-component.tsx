@@ -1,14 +1,22 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { computed } from 'mobx'
-import { RenderProps, NodeProps } from '@engine/types'
+import { computed, observable } from 'mobx'
+import { RenderProps, NodeProps, Node } from '@engine/types'
 import { render, value } from '@engine/render'
 
 export default (Component) => {
   @observer
-  class WithChildren extends React.Component<NodeProps> {
+  class ObserverComponent extends React.Component<NodeProps> {
+    @observable childMap = {}
+    getChild(node: Node) {
+      if (!this.childMap[node.id]) {
+        this.childMap[node.id] = render(node)
+      }
+      return this.childMap[node.id]
+    }
+
     @computed get children() {
-      return this.props.node.connections.input.map(child => render(child.node))
+      return this.props.node.connections.input.map(child => this.getChild(child.node))
     }
 
     @computed get properties() {
@@ -31,5 +39,5 @@ export default (Component) => {
     }
   }
 
-  return WithChildren
+  return ObserverComponent
 }
