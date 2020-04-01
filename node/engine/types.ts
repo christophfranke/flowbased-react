@@ -14,7 +14,7 @@ export interface Params<T> {
 export interface Properties {
   [key: string]: any
 }
-export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Object' | 'Pair'
+export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Object' | 'Pair' | 'List'
 export interface Node {
   readonly id: number
   readonly type: NodeType

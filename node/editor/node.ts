@@ -56,7 +56,7 @@ export function createListNode(position: Vector): Node {
     name: 'List',
     params: [],
     position,
-    type: 'Blank',
+    type: 'List',
     connectors: {
       input: [createValueInput('Text')],
       output: [createValueOutput('List')],

@@ -26,6 +26,7 @@ import TagValue from '@engine/nodes/tag/value'
 import BlankRender from '@engine/nodes/blank/render'
 import BlankValue from '@engine/nodes/blank/value'
 import ObjectValue from '@engine/nodes/object/value'
+import ListValue from '@engine/nodes/list/value'
 export default {
   Text: {
     render: TextRender,
@@ -50,5 +51,9 @@ export default {
   Object: {
     render: BlankRender,
     value: ObjectValue
+  },
+  List: {
+    render: BlankRender,
+    value: ListValue
   }
 }
