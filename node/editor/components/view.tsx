@@ -143,6 +143,7 @@ class EditorView extends React.Component {
     window.addEventListener('contextmenu', this.preventDefault)
     window.addEventListener('wheel', this.preventDefault, { passive: false })
     window.addEventListener('resize', this.updateDimensions)
+    store.initialize()
   }
 
   componentWillUnmount() {
