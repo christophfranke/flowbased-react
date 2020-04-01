@@ -18,8 +18,8 @@ const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
 
 const LEFT_MOUSE_BUTTON = 0
 const RIGHT_MOUSE_BUTTON = 2
-const MAX_ZOOM = 4
-const MIN_ZOOM = 0.25
+const MAX_ZOOM = 2
+const MIN_ZOOM = 0.1
 
 @observer
 class EditorView extends React.Component {
