@@ -16,12 +16,17 @@ const RenderNodes: RenderNodes = {
   Pair,
   Blank,
   Text,
-  Tag
+  Tag,
+  Preview: Blank
+}
+
+function value(node: Node): any {
+  return 
 }
 
 const renderedIds = {}
 function render(node: Node): React.ReactElement {
-  const Component = RenderNodes[node.renderer]
+  const Component = RenderNodes[node.type]
 
   const children = node.connections.input.map(child => render(child.node))
   const props: RenderProps = {

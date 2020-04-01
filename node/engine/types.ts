@@ -13,10 +13,10 @@ export interface Params<T> {
 export interface Properties {
   [key: string]: any
 }
-export type RenderNode = 'Blank' | 'Tag' | 'Text' | 'Omit' | 'Pair'
+export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Omit' | 'Pair'
 export interface Node {
   readonly id: number
-  readonly renderer: RenderNode
+  readonly type: NodeType
   readonly params: Params<string>
   connections: {
     readonly input: Connection[]

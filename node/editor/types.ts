@@ -41,8 +41,7 @@ export interface Parameter<T> {
 export interface Node {
   id: number
   name: string
-  renderer: Engine.RenderNode
-  special?: string
+  type: Engine.NodeType
   params: Parameter<string>[]
   position: Vector
   connectors: {

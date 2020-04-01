@@ -17,7 +17,7 @@ interface ConnectionMap {
 
 class Store {
   @computed get preview(): Editor.Node | undefined {
-    return store.nodes.find(node => node.special === 'Preview')
+    return store.nodes.find(node => node.type === 'Preview')
   }
 
   @computed get tree(): Node | undefined {
@@ -60,7 +60,7 @@ class Store {
 
       this.nodes[id] = {
         id: editorNode.id,
-        renderer: editorNode.renderer,
+        type: editorNode.type,
         get params() {
           return editorNode.params.reduce((obj, {key, value}) => ({
             ...obj,

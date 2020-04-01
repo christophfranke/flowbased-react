@@ -39,9 +39,8 @@ export function createPreviewNode(position: Vector): Node {
   return {
     id: uid(),
     name: 'Preview',
-    special: 'Preview',
     params: [],
-    renderer: 'Blank',
+    type: 'Preview',
     position,
     connectors: {
       input: [createRenderInput()],
@@ -57,7 +56,7 @@ export function createListNode(position: Vector): Node {
     name: 'List',
     params: [],
     position,
-    renderer: 'Blank',
+    type: 'Blank',
     connectors: {
       input: [createValueInput('Text')],
       output: [createValueOutput('List')],
@@ -71,7 +70,7 @@ export function createObjectNode(position: Vector): Node {
     id: uid(),
     name: 'Object',
     params: [],
-    renderer: 'Blank',
+    type: 'Blank',
     position,
     connectors: {
       input: [createValueInput('Pair')],
@@ -95,7 +94,7 @@ export function createPairNode(position: Vector): Node {
       value: ''
     }],
     position,
-    renderer: 'Pair',
+    type: 'Pair',
     connectors: {
       input: [],
       output: [createValueOutput('Pair')],
@@ -114,7 +113,7 @@ export function createTagNode(position: Vector): Node {
       value: 'div'
     }],
     position,
-    renderer: 'Tag',
+    type: 'Tag',
     connectors: {
       input: [createRenderInput()],
       output: [createRenderOutput()],
@@ -137,7 +136,7 @@ export function createTextNode(position: Vector): Node {
       value: ''
     }],
     position,
-    renderer: 'Text',
+    type: 'Text',
     connectors: {
       input: [],
       output: [createValueOutput('Text')],

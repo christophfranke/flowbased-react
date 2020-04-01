@@ -6,7 +6,7 @@ import store from '@editor/store'
 
 function functionsAreCompatible(src: Connector, dest: Connector): boolean {
   if (dest.function === 'input') {
-    if (src.function !== 'property') {
+    if (src.function === 'output') {
       return true
     }
   }
