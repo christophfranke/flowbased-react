@@ -83,7 +83,7 @@ class NodeView extends React.Component<Props> {
       outline: 'none',
       width: 'auto',
       margin: '8px',
-      borderBottom: '1px solid black'
+      borderBottom: '1px solid black',
     }
 
     const closeStyle: React.CSSProperties = {
@@ -116,7 +116,7 @@ class NodeView extends React.Component<Props> {
           </svg>
           <div style={{ gridArea: 'params' }}>
             <div style={nameStyle}>{node.name}</div>
-            {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center' }}>
+            {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <label>{param.name}</label>
               <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
             </div>)}

@@ -1,6 +1,6 @@
 import { computed } from 'mobx'
 
-import { Connector, ConnectorState, ValueType } from '@editor/types'
+import { Connector, Connection, ConnectorState, ValueType } from '@editor/types'
 import { uid } from '@editor/util'
 import store from '@editor/store'
 
@@ -59,10 +59,13 @@ export function state(connector: Connector): ConnectorState {
   return 'default'
 }
 
-export function countConnections(connector: Connector): number {
+export function getConnections(connector: Connector): Connection[] {
   return store.connections
     .filter(connection => connection.from === connector || connection.to === connector)
-    .length
+}
+
+export function countConnections(connector: Connector): number {
+  return getConnections(connector).length
 }
 
 export function createProperty(name: string, type: ValueType): Connector {

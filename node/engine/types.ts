@@ -1,39 +1,33 @@
 import React from 'react'
 
-export type RenderOutput = React.ReactElement | React.ReactElement[] | string | string[] | null | undefined
-export type NodeType = 'Tag' | 'Text' | 'Output'
+export type ValueType = 'Element' | 'Text' | 'Pair' | 'List' | 'Object' | 'Nothing'
+export interface Connection {
+  readonly id: number
+  readonly node: Node
+  readonly type: ValueType
+}
+
+export interface Params<T> {
+  [key: string]: T
+}
+export interface Properties {
+  [key: string]: any
+}
+export type RenderNode = 'Blank' | 'Tag' | 'Text' | 'Omit' | 'Pair'
+export interface Node {
+  readonly id: number
+  readonly renderer: RenderNode
+  readonly params: Params<string>
+  connections: {
+    readonly input: Connection[]
+    readonly output: Connection[]
+    readonly properties: Connection[]
+  }
+}
 
 export interface RenderProps {
-  inputs: Input[]
-  params: Object
-}
-
-export interface Input {
-  node: Node
-}
-
-export interface Node {
-  id: number
-  type: NodeType
-  inputs: Input[]
-  params: any
-}
-
-export interface TextNode extends Node {
-  type: 'Text'
-  params: {
-    text: string
-  }
-}
-
-export interface TagNode extends Node {
-  type: 'Tag'
-  params: {
-    tag: string,
-    props: Object
-  }
-}
-export interface OutputNode extends Node {
-  type: 'Output',
-  params: {}
+  children?: React.ReactChildren
+  key: number
+  params: Params<string>
+  properties: Properties
 }

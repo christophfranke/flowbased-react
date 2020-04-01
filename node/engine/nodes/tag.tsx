@@ -1,8 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 
-import { Input, Node, RenderProps } from '@engine/types'
-import { renderInputs } from '@engine/render'
+import { Node, RenderProps } from '@engine/types'
 
 const allowedFirst = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const allowed = 'abcdefghijklmnopqrstuvwxyz1234567890'.split('')
@@ -20,13 +19,13 @@ const isValid = tag => !!tag
 
 export default observer((props: RenderProps) => {
   const Tag = sanitize(props.params['tag'])
-  const tagProps = props.params['props']
+  const tagProps = {}
 
   if (isValid(Tag)) {
-    return props.inputs.length > 0
-      ? <Tag {...tagProps}>{renderInputs(props.inputs)}</Tag>
+    return React.Children.count(props.children) > 0
+      ? <Tag {...tagProps}>{props.children}</Tag>
       : <Tag {...tagProps} />
   }
 
-  return <>{renderInputs(props.inputs)}</>
+  return <>{props.children}</>
 })

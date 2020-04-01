@@ -1,3 +1,6 @@
+import * as Engine from '@engine/types'
+
+export type ValueType = Engine.ValueType
 export interface Rectangle {
   x: number
   y: number
@@ -17,7 +20,6 @@ export interface Connection {
 }
 
 export type ConnectorFunction = 'input' | 'output' | 'property' | 'action'
-export type ValueType = 'Element' | 'Text' | 'Boolean' | 'Number' | 'Pair' | 'List' | 'Object' | 'Nothing'
 export type ConnectorState = 'default' | 'hot' | 'pending'
 export type ConnectorMode = 'multiple' | 'reconnect'
 export interface Connector {
@@ -39,6 +41,8 @@ export interface Parameter<T> {
 export interface Node {
   id: number
   name: string
+  renderer: Engine.RenderNode
+  special?: string
   params: Parameter<string>[]
   position: Vector
   connectors: {

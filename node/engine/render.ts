@@ -1,44 +1,37 @@
 import React from 'react'
-import { Node, Input, RenderOutput } from '@engine/types'
+import { Node, RenderProps } from '@engine/types'
 
-import Output from './render-node/output'
-import Text from './render-node/text'
-import Tag from './render-node/tag'
+import Blank from '@engine/nodes/blank'
+import Text from '@engine/nodes/text'
+import Tag from '@engine/nodes/tag'
+import Pair from '@engine/nodes/pair'
 
-const RenderComponents = {
-  Output,
+type ClassComponent = React.Component<RenderProps>
+type FunctionalComponent = (props: RenderProps) => React.ReactElement
+interface RenderNodes {
+  [key: string]: FunctionalComponent
+}
+
+const RenderNodes: RenderNodes = {
+  Pair,
+  Blank,
   Text,
   Tag
 }
 
+const renderedIds = {}
+function render(node: Node): React.ReactElement {
+  const Component = RenderNodes[node.renderer]
 
-let renderedNodes: number[] = []
-export function renderNode(node: Node): RenderOutput {
-  if (node.type === 'Output') {
-    renderedNodes = []
-  }
-
-  if (renderedNodes.includes(node.id)) {
-    console.warn(`There is possibly a loop in the render graph. Ignored ${node.type} ${node.id} for safety.`)
-    return null
-  }
-
-  renderedNodes.push(node.id)
-  if (typeof window !== 'undefined') {  
-    requestAnimationFrame(() => {
-      renderedNodes = []
-    })
-  }
-
-  const Component = RenderComponents[node.type]
-  const props = {
+  const children = node.connections.input.map(child => render(child.node))
+  const props: RenderProps = {
+    key: node.id,
     params: node.params,
-    inputs: node.inputs
+    properties: {}
   }
 
-  return React.createElement(Component, props)
+  return React.createElement(Component, props, children)
 }
 
-export function renderInputs(inputs: Input[]): RenderOutput[] {
-  return inputs.map(input => renderNode(input.node))
-}
+
+export default render

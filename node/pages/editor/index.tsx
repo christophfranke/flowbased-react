@@ -2,14 +2,15 @@ import React from 'react'
 
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
+import Preview from '@engine/components/preview'
 
 export default () => {
   return <div>
-    <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 50 }}>
+    <Viewport dimensions={{ x: 0, y: 0, width: 50, height: 100 }}>
       <EditorView  />
     </Viewport>
-    <Viewport dimensions={{ x: 0, y: 50, width: 100, height: 50 }}>
-      <EditorView  />
+    <Viewport dimensions={{ x: 50, y: 0, width: 50, height: 100 }}>
+      <Preview  />
     </Viewport>
   </div>
 }

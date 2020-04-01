@@ -39,8 +39,8 @@ class ConnectorView extends React.Component<Props> {
     if (store.pendingConnector) {
       const connection: Connection = {
         id: uid(),
-        from: this.props.connector,
-        to: store.pendingConnector
+        from: store.pendingConnector,
+        to: this.props.connector
       }
 
       store.connections.push(connection)

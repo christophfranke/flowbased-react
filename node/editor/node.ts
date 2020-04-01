@@ -11,11 +11,11 @@ import {
 
 export const nodeList = [{
   name: 'List',
-  type: 'Value',
+  type: 'Transform',
   create: createListNode
 }, {
   name: 'Object',
-  type: 'Value',
+  type: 'Transform',
   create: createObjectNode
 }, {
   name: 'Pair',
@@ -29,7 +29,27 @@ export const nodeList = [{
   name: 'Tag',
   type: 'Render',
   create: createTagNode
+}, {
+  name: 'Preview',
+  type: 'Output',
+  create: createPreviewNode
 }]
+
+export function createPreviewNode(position: Vector): Node {
+  return {
+    id: uid(),
+    name: 'Preview',
+    special: 'Preview',
+    params: [],
+    renderer: 'Blank',
+    position,
+    connectors: {
+      input: [createRenderInput()],
+      output: [],
+      properties: []
+    }
+  }
+}
 
 export function createListNode(position: Vector): Node {
   return {
@@ -37,6 +57,7 @@ export function createListNode(position: Vector): Node {
     name: 'List',
     params: [],
     position,
+    renderer: 'Blank',
     connectors: {
       input: [createValueInput('Text')],
       output: [createValueOutput('List')],
@@ -50,6 +71,7 @@ export function createObjectNode(position: Vector): Node {
     id: uid(),
     name: 'Object',
     params: [],
+    renderer: 'Blank',
     position,
     connectors: {
       input: [createValueInput('Pair')],
@@ -73,13 +95,11 @@ export function createPairNode(position: Vector): Node {
       value: ''
     }],
     position,
+    renderer: 'Pair',
     connectors: {
-      input: [createValueInput('Pair')],
+      input: [],
       output: [createValueOutput('Pair')],
-      properties: [
-        createProperty('key', 'Text'),
-        createProperty('value', 'Text')
-      ]
+      properties: []
     }
   }
 }
@@ -94,6 +114,7 @@ export function createTagNode(position: Vector): Node {
       value: 'div'
     }],
     position,
+    renderer: 'Tag',
     connectors: {
       input: [createRenderInput()],
       output: [createRenderOutput()],
@@ -112,12 +133,13 @@ export function createTextNode(position: Vector): Node {
     name: 'Text',
     params: [{
       name: '',
-      key: 'default',
+      key: 'text',
       value: ''
     }],
     position,
+    renderer: 'Text',
     connectors: {
-      input: [createValueInput('Text')],
+      input: [],
       output: [createValueOutput('Text')],
       properties: []
     }
