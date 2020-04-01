@@ -7,7 +7,7 @@ import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/typ
 import { isServer, uid } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { countConnections, canConnect } from '@editor/connector'
-import { state } from '@editor/connector'
+import { state, isSrc } from '@editor/connector'
 import store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
@@ -37,10 +37,17 @@ class ConnectorView extends React.Component<Props> {
 
   connect() {
     if (store.pendingConnector) {
+      const from = isSrc(store.pendingConnector)
+        ? store.pendingConnector
+        : this.props.connector
+      const to = isSrc(store.pendingConnector)
+        ? this.props.connector
+        : store.pendingConnector
+
       const connection: Connection = {
         id: uid(),
-        from: store.pendingConnector,
-        to: this.props.connector
+        from,
+        to
       }
 
       store.connections.push(connection)

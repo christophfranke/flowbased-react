@@ -32,7 +32,7 @@ function valuesAreCompatible(src: Connector, dest: Connector): boolean {
   return false
 }
 
-function isSrc(connector: Connector): boolean {
+export function isSrc(connector: Connector): boolean {
   return ['action', 'output'].includes(connector.function)
 }
 

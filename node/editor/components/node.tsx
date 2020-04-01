@@ -115,7 +115,7 @@ class NodeView extends React.Component<Props> {
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params' }}>
-            <div style={nameStyle}>{node.name}</div>
+            <div style={nameStyle}>{node.name} ({node.id})</div>
             {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <label>{param.name}</label>
               <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
