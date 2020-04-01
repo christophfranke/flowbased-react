@@ -82,7 +82,7 @@ class ConnectorView extends React.Component<Props> {
 
     if (store.pendingConnector) {
       if (state(this.props.connector) === 'hot') {
-        if (countConnections(this.props.connector) > 0 && this.props.connector.mode === 'reconnect') {
+        if (countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.mode)) {
           this.connect()
           store.pendingConnector = this.unconnect() || null
           return
@@ -96,7 +96,7 @@ class ConnectorView extends React.Component<Props> {
     }
 
     if (countConnections(this.props.connector) > 0) {
-      if (this.props.connector.mode === 'reconnect') {
+      if (['duplicate', 'single'].includes(this.props.connector.mode)) {
         store.pendingConnector = this.unconnect() || null
         return
       }

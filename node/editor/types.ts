@@ -21,7 +21,7 @@ export interface Connection {
 
 export type ConnectorFunction = 'input' | 'output' | 'property' | 'action'
 export type ConnectorState = 'default' | 'hot' | 'pending'
-export type ConnectorMode = 'multiple' | 'reconnect'
+export type ConnectorMode = 'single' | 'multiple' | 'duplicate'
 export interface Connector {
   id: number
   name: string

@@ -61,19 +61,14 @@ class Store {
     this.nodes = this.nodes.filter(other => other !== node)
   }
 
-  // removeInputConnectors = () => {
-  //   this.nodes.forEach(node => {
-  //     const emptyConnectors = node.connectors.input.filter(connector => connector.connections === 0)
-  //     if (emptyConnectors.length > 1) {
-  //       node.connectors.input = node.connectors.input
-  //         .filter(connector => connector === emptyConnectors[0] || connector.connections > 0)
-  //     }
-  //   })    
-  // }
+  @computed get nodesWithDuplicateSetting() {
+    return this.nodes.filter(node =>
+      node.connectors.input.length > 0
+      && node.connectors.input[0].mode === 'duplicate')
+  }
 
   addInputConnectors = () => {
-    this.nodes
-      .filter(node => node.connectors.input.length > 0)
+    this.nodesWithDuplicateSetting
       .filter(node => node.connectors.input.every(connector => countConnections(connector) > 0))
       .forEach(node => {        
         node.connectors.input.push(cloneConnector(node.connectors.input[0]))

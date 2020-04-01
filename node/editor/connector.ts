@@ -71,7 +71,7 @@ export function countConnections(connector: Connector): number {
 export function createProperty(name: string, type: ValueType): Connector {
   return {
     id: uid(),
-    mode: 'reconnect',
+    mode: 'single',
     function: 'property',
     name,
     type,
@@ -89,7 +89,7 @@ export function cloneConnector(src: Connector) {
 export function createRenderInput(): Connector {
   return {
     id: uid(),
-    mode: 'reconnect',
+    mode: 'duplicate',
     function: 'input',
     type: 'Element',
     name: 'input',
@@ -111,7 +111,7 @@ export function createRenderOutput(): Connector {
 export function createValueInput(type: ValueType): Connector {
   return {
     id: uid(),
-    mode: 'reconnect',
+    mode: 'duplicate',
     function: 'input',
     type,
     name: type,

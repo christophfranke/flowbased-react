@@ -36,6 +36,9 @@ export const nodeList = [{
 }]
 
 export function createPreviewNode(position: Vector): Node {
+  const input = createRenderInput()
+  input.mode = 'single'
+
   return {
     id: uid(),
     name: 'Preview',
@@ -43,7 +46,7 @@ export function createPreviewNode(position: Vector): Node {
     type: 'Preview',
     position,
     connectors: {
-      input: [createRenderInput()],
+      input: [input],
       output: [],
       properties: []
     }
