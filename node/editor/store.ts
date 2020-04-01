@@ -15,7 +15,7 @@ class Store {
   }
 
   initialize() {
-    this.nodes = load(['editor', 'nodes'])
+    this.nodes = load(['editor', 'nodes']) || []
 
     // the connectors map reassures that strict equality comparisions
     // work because two connections with the same id will be the same objects
@@ -25,7 +25,7 @@ class Store {
     }), {})
 
     // take the connectors from the map
-    const connections = load(['editor', 'connections'])
+    const connections = load(['editor', 'connections']) || []
     this.connections = connections.map(connection => ({
       ...connection,
       from: connectorsMap[connection.from.id],
@@ -61,7 +61,7 @@ class Store {
     this.nodes = this.nodes.filter(other => other !== node)
   }
 
-  @computed get nodesWithDuplicateSetting() {
+  @computed get nodesWithDuplicateSetting(): Node[] {
     return this.nodes.filter(node =>
       node.connectors.input.length > 0
       && node.connectors.input[0].mode === 'duplicate')
