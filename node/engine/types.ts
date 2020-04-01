@@ -29,10 +29,10 @@ export interface Node {
 export interface RenderProps {
   children?: React.ReactChildren
   properties: Properties
-  key: number
   params: Params<string>
 }
 
 export interface NodeProps {
+  key: number
   node: Node
 }

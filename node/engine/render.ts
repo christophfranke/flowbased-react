@@ -10,9 +10,14 @@ export function value(node: Node): any {
   return fn(node)
 }
 
-const renderedIds = {}
+let currentRenderId = 0
+function getRenderKey(): number {
+  currentRenderId += 1
+  return currentRenderId
+}
+
 export function render(node: Node): React.ReactElement {
-  console.log('create', node.id)
+  console.log('create ----------', node.id)
   const Component = Nodes[node.type].render
-  return React.createElement(withChildren(Component), { node })
+  return React.createElement(withChildren(Component), { node, key: getRenderKey() })
 }
