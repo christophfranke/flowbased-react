@@ -19,9 +19,11 @@ const isValid = tag => !!tag
 
 export default observer((props: RenderProps) => {
   const Tag = sanitize(props.params['tag'])
+  const classes = props.properties.classList || []
   const tagProps = {
     ...(props.properties.props || {}),
-    style: props.properties.style
+    style: props.properties.style,
+    className: classes.join(' ')
   }
 
   if (isValid(Tag)) {
