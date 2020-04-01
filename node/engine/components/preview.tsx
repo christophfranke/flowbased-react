@@ -7,6 +7,16 @@ import { render } from '@engine/render'
 
 @observer
 class Preview extends React.Component {
+  ref = React.createRef<HTMLDivElement>()
+
+  componentDidMount() {
+    if (this.ref.current) {    
+      this.ref.current.addEventListener('error', e => {
+        // TODO: Do something useful with it
+      }, true)
+    }
+  }
+
   render() {
     if (store.tree) {
       return <div>
@@ -14,7 +24,7 @@ class Preview extends React.Component {
       </div>
     }
 
-    return <div>
+    return <div ref={this.ref}>
       Create a Preview node to see a preview
     </div>
   }
