@@ -70,7 +70,7 @@ export function createObjectNode(position: Vector): Node {
     id: uid(),
     name: 'Object',
     params: [],
-    type: 'Blank',
+    type: 'Object',
     position,
     connectors: {
       input: [createValueInput('Pair')],

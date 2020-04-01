@@ -19,7 +19,10 @@ const isValid = tag => !!tag
 
 export default observer((props: RenderProps) => {
   const Tag = sanitize(props.params['tag'])
-  const tagProps = {}
+  const tagProps = {
+    ...(props.properties.props || {}),
+    style: props.properties.style
+  }
 
   if (isValid(Tag)) {
     return React.Children.count(props.children) > 0

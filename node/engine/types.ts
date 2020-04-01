@@ -5,6 +5,7 @@ export interface Connection {
   readonly id: number
   readonly node: Node
   readonly type: ValueType
+  readonly key: string
 }
 
 export interface Params<T> {
@@ -13,7 +14,7 @@ export interface Params<T> {
 export interface Properties {
   [key: string]: any
 }
-export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Omit' | 'Pair'
+export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Object' | 'Pair'
 export interface Node {
   readonly id: number
   readonly type: NodeType

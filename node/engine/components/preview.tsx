@@ -1,9 +1,9 @@
 import React from 'react'
-import { toJS } from 'mobx'
+import { observable } from 'mobx'
 import { observer } from 'mobx-react'
 
 import store from '@engine/store'
-import render from '@engine/render'
+import { render } from '@engine/render'
 
 @observer
 class Preview extends React.Component {

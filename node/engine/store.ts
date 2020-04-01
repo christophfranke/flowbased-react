@@ -36,6 +36,7 @@ class Store {
       this.connections[id] = {
         id: editorConnection.id,
         node: this.getNode(node),
+        key: editorConnection.to.name,
         type: editorConnection.from.type
       }
     }
