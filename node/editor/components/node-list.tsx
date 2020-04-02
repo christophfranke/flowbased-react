@@ -85,15 +85,21 @@ class NodeList extends React.Component<Props> {
       }
     })
 
-    const itemStyleTemplate = {
+    const itemStyleTemplate: React.CSSProperties = {
       display: 'flex',
       justifyContent: 'space-between',
       cursor: 'pointer',
       padding: '0 5px'
     }
 
-    const inputStyle = {
+    const inputStyle: React.CSSProperties = {
       outline: 'none'
+    }
+
+    const nameStyle: React.CSSProperties = {
+      display: 'inline-block',
+      marginRight: '15px',
+      whiteSpace: 'nowrap'
     }
 
     return <div style={this.props.style}>
@@ -112,7 +118,7 @@ class NodeList extends React.Component<Props> {
           }
 
           return <li key={item.name} onClick={() => this.create(item.create)} style={itemStyle} onMouseOver={mouseOver}>
-            <span>{item.name}</span>
+            <span style={nameStyle}>{item.name}</span>
             <span style={{ fontStyle: 'italic' }}>{item.type}</span>
           </li>
         })}

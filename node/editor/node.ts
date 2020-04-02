@@ -26,7 +26,7 @@ export const nodeList = [{
   type: 'Value',
   create: createTextNode
 }, {
-  name: 'Tag',
+  name: 'HTML Element',
   type: 'Render',
   create: createTagNode
 }, {

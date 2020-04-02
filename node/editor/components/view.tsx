@@ -73,6 +73,12 @@ class EditorView extends React.Component {
     this.mouse.position = this.mouseEventToView(e)
   }
 
+  handleMouseOut = e => {
+    if (e.target === e.currentTarget) {
+      this.mouse.position = undefined
+    }
+  }
+
   handleClick = () => {
     store.pendingConnector = null
     this.nodeListPosition = null
@@ -122,8 +128,10 @@ class EditorView extends React.Component {
     this.scale = newScale
   }
 
-  preventDefault(e) {
-    e.preventDefault()
+  preventDefault = e => {
+    if (this.mouse.position) {
+      e.preventDefault()
+    }
   }
 
   updateDimensions = () => {    
@@ -184,6 +192,7 @@ class EditorView extends React.Component {
       onMouseDown={this.handleMouseDown}
       onWheel={this.handleWheel}
       onMouseMove={this.updateMousePosition}
+      onMouseOut={this.handleMouseOut}
       onClick={this.handleClick}
      >
       <Provider mouse={this.mouse}>

@@ -19,7 +19,7 @@ class Preview extends React.Component {
 
   render() {
     if (store.tree) {
-      return <div>
+      return <div style={{ overflowY: 'auto', height: '100%' }}>
         {render(store.tree)}
       </div>
     }
