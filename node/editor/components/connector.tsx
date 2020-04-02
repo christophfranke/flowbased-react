@@ -113,9 +113,15 @@ class ConnectorView extends React.Component<Props> {
 
   updatePosition = () => {
     if (this.ref.current) {
-      this.props.connector.position = {
-        x: this.ref.current.offsetLeft + 0.5 * this.ref.current.clientWidth,
-        y: this.ref.current.offsetTop + 0.5 * this.ref.current.clientHeight
+      const newPosition = {
+        x: this.ref.current.offsetLeft, // + 0.5 * this.ref.current.clientWidth,
+        y: this.ref.current.offsetTop // + 0.5 * this.ref.current.clientHeight
+      }
+
+      if (!this.props.connector.position
+        || newPosition.x !== this.props.connector.position.x
+        || newPosition.y !== this.props.connector.position.y) {
+        this.props.connector.position = newPosition
       }
     }
   }
