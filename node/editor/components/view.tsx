@@ -1,6 +1,7 @@
 import React from 'react'
 import { observable, computed,  } from 'mobx'
 import { observer, Provider } from 'mobx-react'
+import normalizeWheel from 'normalize-wheel';
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
@@ -120,7 +121,8 @@ class EditorView extends React.Component {
   }
 
   handleWheel = e => {
-    const newScale = clamp(this.scale * Math.pow(2, -e.deltaY / 1000), MIN_ZOOM, MAX_ZOOM)
+    const normalized = normalizeWheel(e.nativeEvent)
+    const newScale = clamp(this.scale * Math.pow(2, -normalized.pixelY / 1000), MIN_ZOOM, MAX_ZOOM)
     const scaleChange = newScale / this.scale
     const mouse = this.clientToWindow({ x: e.clientX, y: e.clientY })
     this.offset.x += (1 - scaleChange) * mouse.x / this.scale
