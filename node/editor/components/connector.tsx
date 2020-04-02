@@ -17,6 +17,7 @@ interface Props {
   connector: Connector
 }
 
+const CONNECTOR_SIZE = 40
 
 @observer
 class ConnectorView extends React.Component<Props> {
@@ -29,6 +30,17 @@ class ConnectorView extends React.Component<Props> {
   
   @computed get showTitle(): boolean {
     return this.isHovering || this.connectorState === 'hot' || this.connectorState === 'pending'
+  }
+
+  @computed get fillColor(): string {
+    return {
+      'hot': this.isHovering ? 'blue': 'red',
+      'default': {
+        'empty': (this.isHovering && !store.pendingConnector) ? 'blue': 'transparent',
+        'connected': 'blue'
+      }[countConnections(this.props.connector) > 0 ? 'connected' : 'empty'],
+      'pending': 'blue'
+    }[this.connectorState]
   }
 
   consume = e => {
@@ -114,8 +126,8 @@ class ConnectorView extends React.Component<Props> {
   updatePosition = () => {
     if (this.ref.current) {
       const newPosition = {
-        x: this.ref.current.offsetLeft, // + 0.5 * this.ref.current.clientWidth,
-        y: this.ref.current.offsetTop // + 0.5 * this.ref.current.clientHeight
+        x: this.ref.current.offsetLeft + 30,
+        y: this.ref.current.offsetTop + 30
       }
 
       if (!this.props.connector.position
@@ -127,21 +139,10 @@ class ConnectorView extends React.Component<Props> {
   }
 
   render () {
-    const fill = {
-      'hot': this.isHovering ? 'blue': 'red',
-      'default': {
-        'empty': (this.isHovering && !store.pendingConnector) ? 'blue': 'transparent',
-        'connected': 'blue'
-      }[countConnections(this.props.connector) > 0 ? 'connected' : 'empty'],
-      'pending': 'blue'
-    }[this.connectorState]
-
-    const size = 20
-
     const style: React.CSSProperties = {
       cursor: 'pointer',
-      width: `${size}px`,
-      height: `${size}px`,
+      width: `${CONNECTOR_SIZE}px`,
+      height: `${CONNECTOR_SIZE}px`,
       borderRadius: '50%',
       position: 'relative'
     }
@@ -150,19 +151,19 @@ class ConnectorView extends React.Component<Props> {
     let positioning = {}
     const margin = 5
     if (this.props.connector.direction.x > 0) {
-      positioning['left'] = `${size + margin}px`
+      positioning['left'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.x < 0) {
-      positioning['right'] = `${size + margin}px`
+      positioning['right'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y > 0) {
-      positioning['top'] = `${size + margin}px`
+      positioning['top'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y < 0) {
-      positioning['bottom'] = `${size + margin}px`
+      positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y !== 0) {
-      positioning['transform'] = 'translateY(-5px) rotate(-50deg)'
+      positioning['transform'] = 'translateY(-10px) rotate(-50deg)'
     }
 
     const titleStyle: React.CSSProperties = this.showTitle
@@ -171,7 +172,8 @@ class ConnectorView extends React.Component<Props> {
         ...positioning,
         pointerEvents: 'none',
         opacity: 0.9,
-        lineHeight: `${size}px`,
+        lineHeight: `${CONNECTOR_SIZE}px`,
+        fontSize: '30px',
         backgroundColor: 'white'
       } : {
         display: 'none'
@@ -182,8 +184,8 @@ class ConnectorView extends React.Component<Props> {
     }
 
     const arrow = ['input', 'output'].includes(this.props.connector.function)
-      ? <DownArrow fill={fill} stroke="blue" size={size} />
-      : <RightArrow fill={fill} stroke="blue" size={size} />
+      ? <DownArrow fill={this.fillColor} stroke="blue" size={CONNECTOR_SIZE} />
+      : <RightArrow fill={this.fillColor} stroke="blue" size={CONNECTOR_SIZE} />
 
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>

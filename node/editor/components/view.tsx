@@ -74,7 +74,7 @@ class EditorView extends React.Component {
   }
 
   handleMouseOut = e => {
-    if (e.target === e.currentTarget) {
+    if (e.currentTarget.contains(e.target) || e.target === e.currentTarget) {
       this.mouse.position = undefined
     }
   }

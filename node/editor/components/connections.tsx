@@ -40,8 +40,7 @@ class Connections extends React.Component {
       pointerEvents: 'none',
       width: '100%',
       height: '100%',
-      overflow: 'visible',
-      transform: 'translate(10px, 10px)' // TODO: do not compensate this here
+      overflow: 'visible'
     }
 
     return <svg style={style}>
