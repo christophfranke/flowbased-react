@@ -9,7 +9,7 @@ const sanitize = tag => {
   let firstLetterFound = false
   return tag.split('')
     .filter(letter => {
-      const test = firstLetterFound ? allowedFirst : allowed
+      const test = firstLetterFound ? allowed : allowedFirst
       const result = test.includes(letter)
       firstLetterFound = result || firstLetterFound
       return result
