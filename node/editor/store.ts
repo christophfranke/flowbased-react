@@ -45,9 +45,14 @@ class Store {
     return this.currentId
   }
 
+  @observable nodeOfConnectorMap = {}
   nodeOfConnector(connector: Connector): Node | undefined {
-    return this.nodes.find(node => this.connectorsOfNode(node)
-      .some(con => con === connector))
+    if (!this.nodeOfConnectorMap[connector.id]) {
+      this.nodeOfConnectorMap[connector.id] = this.nodes.find(node => this.connectorsOfNode(node)
+        .some(con => con === connector))      
+    }
+    
+    return this.nodeOfConnectorMap[connector.id]
   }
 
   connectorsOfNode(node: Node): Connector[] {

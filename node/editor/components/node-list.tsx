@@ -2,6 +2,7 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
+import { Vector } from '@editor/types'
 import { nodeList } from '@editor/node'
 import store from '@editor/store'
 
@@ -9,14 +10,13 @@ import store from '@editor/store'
 interface Props {
   onComplete(): void
   style: React.CSSProperties
+  position: Vector
 }
 
 const MAX_ITEMS = 6
 
-@inject('mouse')
 @observer
 class NodeList extends React.Component<Props> {
-  @observable mouse = this.props['mouse']
   @observable searchString = ''
   @observable selected = 0
 
@@ -28,10 +28,8 @@ class NodeList extends React.Component<Props> {
   }
 
   create = factory => {
-    if (this.mouse.position) {
-      store.nodes.push(factory(this.mouse.position))
-      this.props.onComplete()
-    }
+    store.nodes.push(factory(this.props.position))
+    this.props.onComplete()
   }
 
   handleKeyDown = e => {

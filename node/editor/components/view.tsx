@@ -183,7 +183,7 @@ class EditorView extends React.Component {
     } : {}
 
     const nodeList = this.nodeListPosition
-      ? <NodeList onComplete={this.handleNodeCreated} style={nodeListStyle} />
+      ? <NodeList onComplete={this.handleNodeCreated} style={nodeListStyle} position={this.windowToView(this.nodeListPosition)} />
       : null
 
     return <div

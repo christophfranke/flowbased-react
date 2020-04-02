@@ -46,6 +46,7 @@ export function canConnect(pending: Connector, possiblyHot: Connector): boolean 
     && functionsAreCompatible(src, dest)
     && valuesAreCompatible(src, dest)
 }
+
 export function state(connector: Connector): ConnectorState {
   if (store.pendingConnector) {
     if (store.pendingConnector === connector) {
