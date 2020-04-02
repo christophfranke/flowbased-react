@@ -24,6 +24,7 @@ const MIN_ZOOM = 0.1
 
 @observer
 class EditorView extends React.Component {
+  backgroundColor = 'rgb(15, 15, 15)'
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
@@ -165,7 +166,8 @@ class EditorView extends React.Component {
   render() {
     const outerStyle: React.CSSProperties = {
       height: '100%',
-      width: '100%'
+      width: '100%',
+      backgroundColor: this.backgroundColor
     }
     const innerStyle: React.CSSProperties = {
       position: 'absolute',
@@ -179,7 +181,7 @@ class EditorView extends React.Component {
 
 
     const nodeListStyle: React.CSSProperties = this.nodeListPosition ? {
-      position: 'absolute',
+      position: 'fixed',
       left: `${this.nodeListPosition.x}px`,
       top: `${this.nodeListPosition.y}px`
     } : {}

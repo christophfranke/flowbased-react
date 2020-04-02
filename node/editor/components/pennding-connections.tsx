@@ -5,6 +5,7 @@ import { observer, inject } from 'mobx-react'
 import * as LA from '@editor/la'
 
 import { Node, Connector, Mouse } from '@editor/types'
+import { colors } from '@editor/colors'
 import store from '@editor/store'
 
 
@@ -40,7 +41,7 @@ class PendingConnections extends React.Component {
       overflow: 'visible'    }
 
     return <svg style={style}>
-      <g stroke="black" strokeWidth="2" fill="none">
+      <g stroke={colors.connections} strokeWidth="2" fill="none">
         <path key={store.pendingConnector.id} d={this.path(store.pendingConnector)} />
       </g>
     </svg>

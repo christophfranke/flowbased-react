@@ -4,6 +4,7 @@ import { inject, observer } from 'mobx-react'
 
 import { Vector } from '@editor/types'
 import { nodeList } from '@editor/node'
+import { colors } from '@editor/colors'
 import store from '@editor/store'
 
 
@@ -19,9 +20,12 @@ const MAX_ITEMS = 6
 class NodeList extends React.Component<Props> {
   @observable searchString = ''
   @observable selected = 0
-
   inputRef = React.createRef<HTMLInputElement>()
   
+  @computed get selectedShown() {
+    return Math.min(this.selected, this.filteredNodeList.length - 1)
+  }
+
   @computed get filteredNodeList() {
     const regex = new RegExp(this.searchString.split('').join('.*'), 'i')
     return nodeList.filter(node => !!node.name.match(regex)).slice(0, MAX_ITEMS)
@@ -42,7 +46,7 @@ class NodeList extends React.Component<Props> {
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       e.stopPropagation()
-      this.selected += 1
+      this.selected = this.selectedShown + 1
       if (this.selected >= this.filteredNodeList.length) {
         this.selected = 0
       }
@@ -51,15 +55,15 @@ class NodeList extends React.Component<Props> {
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       e.stopPropagation()
-      this.selected -= 1
+      this.selected = this.selectedShown - 1
       if (this.selected < 0) {
         this.selected = this.filteredNodeList.length - 1
       }
     }
 
     if (e.key === 'Enter') {
-      if (this.filteredNodeList.length > this.selected) {
-        this.create(this.filteredNodeList[this.selected].create)
+      if (this.selectedShown >= 0) {
+        this.create(this.filteredNodeList[this.selectedShown].create)
       }
     }
   }
@@ -91,7 +95,10 @@ class NodeList extends React.Component<Props> {
     }
 
     const inputStyle: React.CSSProperties = {
-      outline: 'none'
+      outline: 'none',
+      width: '100%',
+      backgroundColor: colors.nodeList.input.background,
+      color: colors.nodeList.input.color
     }
 
     const nameStyle: React.CSSProperties = {
@@ -106,9 +113,9 @@ class NodeList extends React.Component<Props> {
         {this.filteredNodeList.map((item, index) => {
           const itemStyle = {
             ...itemStyleTemplate,
-            borderTop: index > -1 ? '1px solid black' : 'none',
-            backgroundColor: index === this.selected ? 'blue' : 'white',
-            color: index === this.selected ? 'white' : 'black'
+            borderTop: index > -1 ? `1px solid ${colors.nodeList.border}` : 'none',
+            backgroundColor: index === this.selectedShown ? colors.nodeList.background.selected : colors.nodeList.background.default,
+            color: index === this.selectedShown ? colors.nodeList.text.selected : colors.nodeList.text.default
           }
 
           const mouseOver = () => {

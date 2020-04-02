@@ -2,7 +2,8 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
-import  { Connection, Node, Connector } from '@editor/types'
+import { Connection, Node, Connector } from '@editor/types'
+import { colors } from '@editor/colors'
 
 import * as LA from '@editor/la'
 
@@ -44,7 +45,7 @@ class Connections extends React.Component {
     }
 
     return <svg style={style}>
-      <g stroke="black" strokeWidth="2" fill="none">
+      <g stroke={colors.connections} strokeWidth="2" fill="none">
         {store.connections.map(connection => <path key={connection.id} d={this.path(connection)} />)}
       </g>
     </svg>

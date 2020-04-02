@@ -6,10 +6,12 @@ import { Node, Vector } from '@editor/types'
 import * as LA from '@editor/la'
 import store from '@editor/store'
 import ConnectorView from '@editor/components/connector'
+import { colors, colorOfNodeType } from '@editor/colors'
 
 interface Props {
   node: Node
 }
+
 
 const CONNECTOR_SIZE = 15
 const DESCRIPTION_HEIGHT = 20
@@ -58,6 +60,7 @@ class NodeView extends React.Component<Props> {
 
   render() {
     const { node } = this.props
+    const typeColor = colors.types[colorOfNodeType(node.type)].default
 
     const height = 2 * CONNECTOR_SIZE + DESCRIPTION_HEIGHT + 2 * NODE_PADDING
     const width = Math.max(
@@ -70,26 +73,35 @@ class NodeView extends React.Component<Props> {
       cursor: 'move',
       willChange: 'transform',
       transform: `translate(${this.props.node.position.x}px, ${this.props.node.position.y}px)`,
-      backgroundColor: 'white',
-      outline: '1px solid pink',
+      color: colors.text.white,
+      backgroundColor: colors.background.default,
+      outline: `2px solid ${typeColor}`,
     }
 
     const nameStyle: React.CSSProperties = {
       textAlign: 'center',
-      fontSize: '24px'
+      fontSize: '24px',
+      color: typeColor
+    }
+
+    const labelStyle: React.CSSProperties = {
+      color: colors.text.dim,
     }
 
     const inputStyle: React.CSSProperties = {
       outline: 'none',
+      backgroundColor: colors.background.default,
       width: 'auto',
       margin: '8px',
-      borderBottom: '1px solid black',
+      borderBottom: `1px solid ${typeColor}`,
     }
 
     const closeStyle: React.CSSProperties = {
       gridArea: 'close',
-      transform: 'scale(1.2)',
-      color: 'black',
+      transform: 'scale(1.4)',
+      marginLeft: '10px',
+      marginTop: '4px',
+      color: typeColor,
       cursor: 'pointer'
     }
 
@@ -117,7 +129,7 @@ class NodeView extends React.Component<Props> {
           <div style={{ gridArea: 'params' }}>
             <div style={nameStyle}>{node.name}</div>
             {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <label>{param.name}</label>
+              <label style={labelStyle}>{param.name}</label>
               <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
             </div>)}
           </div>

@@ -8,6 +8,7 @@ import { isServer, uid } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { countConnections, canConnect } from '@editor/connector'
 import { state, isSrc } from '@editor/connector'
+import { colors, colorOfValueType } from '@editor/colors'
 import store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
@@ -32,14 +33,22 @@ class ConnectorView extends React.Component<Props> {
     return this.isHovering || this.connectorState === 'hot' || this.connectorState === 'pending'
   }
 
+  @computed get valueColor() {
+    return colors.types[colorOfValueType(this.props.connector.type)]
+  }
+
   @computed get fillColor(): string {
+    const connectionState = countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
     return {
-      'hot': this.isHovering ? 'blue': 'red',
+      'hot': {
+        'empty': this.isHovering ? this.valueColor.hover : this.valueColor.highlight,
+        'connected': this.isHovering ? this.valueColor.hover : this.valueColor.default
+      }[connectionState],
       'default': {
-        'empty': (this.isHovering && !store.pendingConnector) ? 'blue': 'transparent',
-        'connected': 'blue'
-      }[countConnections(this.props.connector) > 0 ? 'connected' : 'empty'],
-      'pending': 'blue'
+        'empty': (this.isHovering && !store.pendingConnector) ? this.valueColor.default: 'transparent',
+        'connected': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight : this.valueColor.default,
+      }[connectionState],
+      'pending': this.valueColor.default
     }[this.connectorState]
   }
 
@@ -174,7 +183,7 @@ class ConnectorView extends React.Component<Props> {
         opacity: 0.9,
         lineHeight: `${CONNECTOR_SIZE}px`,
         fontSize: '30px',
-        backgroundColor: 'white'
+        color: colors.text.white
       } : {
         display: 'none'
       }
@@ -184,8 +193,8 @@ class ConnectorView extends React.Component<Props> {
     }
 
     const arrow = ['input', 'output'].includes(this.props.connector.function)
-      ? <DownArrow fill={this.fillColor} stroke="blue" size={CONNECTOR_SIZE} />
-      : <RightArrow fill={this.fillColor} stroke="blue" size={CONNECTOR_SIZE} />
+      ? <DownArrow fill={this.fillColor} stroke={this.valueColor.default} size={CONNECTOR_SIZE} />
+      : <RightArrow fill={this.fillColor} stroke={this.valueColor.default} size={CONNECTOR_SIZE} />
 
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
