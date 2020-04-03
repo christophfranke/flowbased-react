@@ -37,16 +37,29 @@ class NodeView extends React.Component<Props> {
   }
 
   handleSelection() {
-    if (this.props['keys'].Shift) {
+    const keys = this.props['keys']
+    const relevantNodes = keys.Control
+      ? store.getSubtree(this.props.node)
+      : [this.props.node]
+
+    if (keys.Shift) {
       if (this.isSelected) {
-        store.selectedNodes = store.selectedNodes.filter(node => node !== this.props.node)
+        // remove relevant nodes from selection
+        store.selectedNodes = store.selectedNodes
+          .filter(node => !relevantNodes.includes(node))
       } else {
-        store.selectedNodes.push(this.props.node)
+        // add relevant nodes to selection
+        store.selectedNodes = store.selectedNodes
+          .concat(relevantNodes.filter(node => !store.selectedNodes.includes(node)))
       }
-    } else if(this.props['keys'].Control) {
-      store.selectedNodes = store.getSubtree(this.props.node)
-    } else {
-      store.selectedNodes = [this.props.node]
+    } else {    
+      if (!this.isSelected) {
+        store.selectedNodes = relevantNodes
+      }
+
+      if (this.isSelected && relevantNodes.length > 1) {
+        store.selectedNodes = relevantNodes
+      }
     }
   }
 
