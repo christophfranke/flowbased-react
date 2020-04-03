@@ -23,6 +23,7 @@ export function colorOfValueType(valueType: string) {
 
 export const colors = {
   connections: 'pink',
+  selectionRectangle: 'rgba(255, 192, 203, 0.5)',
   nodeList: {
     input: {
       color: 'white',

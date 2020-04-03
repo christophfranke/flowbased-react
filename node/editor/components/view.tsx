@@ -6,6 +6,7 @@ import normalizeWheel from 'normalize-wheel';
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
 import { createRandomNode } from '@editor/node'
+import { colors } from '@editor/colors'
 
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
@@ -32,6 +33,27 @@ class EditorView extends React.Component {
   @observable mouse: Mouse = {}
   @observable nodeListPosition: Vector | null = null
   @observable keys = {}
+  @observable selectionRectangle: Rectangle | null = null
+  @computed get drawableSelectionRectangle(): Rectangle | null {
+    if (!this.selectionRectangle) {
+      return null
+    }
+
+    const rect = this.selectionRectangle
+    return {
+      x: rect.width < 0
+        ? rect.width + rect.x
+        : rect.x,
+      y: rect.height < 0
+        ? rect.height + rect.y
+        : rect.y,
+      width: Math.abs(rect.width),
+      height: Math.abs(rect.height)
+    }
+
+    return this.selectionRectangle
+  }
+
   @computed get isPanningMode() {
     return !!this.keys[' ']
   }
@@ -48,7 +70,7 @@ class EditorView extends React.Component {
     return matrix
   }
 
-  private mouseDownOffset: Vector
+  private mouseDownOffset: Vector | null = null
   private rootRef = React.createRef<HTMLDivElement>()
 
   windowToView(input: Vector): Vector {
@@ -110,22 +132,42 @@ class EditorView extends React.Component {
   }
 
   handleLeftMouseDown = e => {
-    if (this.isPanningMode) {    
-      this.mouseDownOffset = {
-        x: this.offset.x - e.clientX / this.scale,
-        y: this.offset.y - e.clientY / this.scale
-      }
-      window.addEventListener('mousemove', this.handleMouseMove)
-      window.addEventListener('mouseup', this.handleMouseUp)
-    }
+    window.addEventListener('mousemove', this.handleMouseMove)
+    window.addEventListener('mouseup', this.handleMouseUp)
   }
 
   handleMouseMove = e => {
-    this.offset.x = this.mouseDownOffset.x + e.clientX / this.scale
-    this.offset.y = this.mouseDownOffset.y + e.clientY / this.scale
+    if (this.isPanningMode) {
+      this.selectionRectangle = null
+      if (!this.mouseDownOffset) {
+        this.mouseDownOffset = {
+          x: this.offset.x - e.clientX / this.scale,
+          y: this.offset.y - e.clientY / this.scale
+        }
+      }
+
+      this.offset.x = this.mouseDownOffset.x + e.clientX / this.scale
+      this.offset.y = this.mouseDownOffset.y + e.clientY / this.scale
+    } else {
+      this.mouseDownOffset = null
+      if (!this.selectionRectangle) {
+        const position = this.clientToWindow({ x: e.clientX, y: e.clientY })
+        this.selectionRectangle = {
+          ...position,
+          width: 0,
+          height: 0
+        }        
+      }
+
+      const position = this.clientToWindow({ x: e.clientX, y: e.clientY })
+      this.selectionRectangle.width = position.x - this.selectionRectangle.x
+      this.selectionRectangle.height = position.y - this.selectionRectangle.y
+    }
   }
 
   handleMouseUp = e => {
+    this.mouseDownOffset = null
+    this.selectionRectangle = null
     window.removeEventListener('mousemove', this.handleMouseMove)
     window.removeEventListener('mousemove', this.handleMouseUp)
   }
@@ -212,6 +254,12 @@ class EditorView extends React.Component {
     const nodeList = this.nodeListPosition
       ? <NodeList onComplete={this.handleNodeCreated} style={nodeListStyle} position={this.windowToView(this.nodeListPosition)} />
       : null
+
+    const selectionRectangle = this.selectionRectangle ? <svg style={{ overflow: 'visible', position: 'absolute' }}>
+      <g fill="none" stroke={colors.selectionRectangle} strokeWidth="1">
+        <rect {...this.drawableSelectionRectangle} />
+      </g>
+    </svg> : null
 
     return <div
       ref={this.rootRef}
