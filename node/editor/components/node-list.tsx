@@ -36,6 +36,12 @@ class NodeList extends React.Component<Props> {
     this.props.onComplete()
   }
 
+  handleClick = (e, factory) => {
+    e.preventDefault()
+    e.stopPropagation()
+    this.create(factory)
+  }
+
   handleKeyDown = e => {
     if (e.key === 'Esc' || e.key === 'Escape') {
       e.preventDefault()
@@ -122,7 +128,7 @@ class NodeList extends React.Component<Props> {
             this.selected = index
           }
 
-          return <li key={item.name} onClick={() => this.create(item.create)} style={itemStyle} onMouseOver={mouseOver}>
+          return <li key={item.name} onClick={(e) => this.handleClick(e, item.create)} style={itemStyle} onMouseOver={mouseOver}>
             <span style={nameStyle}>{item.name}</span>
             <span style={{ fontStyle: 'italic' }}>{item.type}</span>
           </li>

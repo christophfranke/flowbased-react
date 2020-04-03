@@ -21,6 +21,6 @@ export default (props: Props) => {
   }
 
   return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-    <polygon points={`${u.x}, ${u.y} ${v.x}, ${v.y} ${w.x}, ${w.y}`} fill={props.fill} stroke={props.stroke} />
+    <polygon points={`${u.x}, ${u.y} ${v.x}, ${v.y} ${w.x}, ${w.y}`} fill={props.fill} stroke={props.stroke}strokeWidth="2" />
   </svg>
 }

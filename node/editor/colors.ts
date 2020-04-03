@@ -40,18 +40,19 @@ export const colors = {
   },
   types: {
     render: {
-      default: 'rgb(167, 0, 209)',
+      default: 'rgb(148, 7, 184)',
       highlight: 'rgb(255, 0, 200)',
       hover: 'white'
     },
     value: {
-      default: 'rgb(0, 188, 209)',
+      default: 'rgb(12, 163, 194)',
       highlight: 'rgb(28, 255, 255)',
       hover: 'white'
     }
   },
   background: {
-    default: 'rgba(35, 35, 35, 0.8)'
+    default: 'rgba(35, 35, 35, 0.8)',
+    selected: 'rgba(60, 60, 60, 0.8)'
   },
   text: {
     white: 'white',

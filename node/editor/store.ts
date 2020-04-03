@@ -9,6 +9,7 @@ class Store {
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
+  @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
   @computed get connectors(): Connector[] {
     return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
@@ -43,6 +44,15 @@ class Store {
   uid(): number {
     this.currentId += 1
     return this.currentId
+  }
+
+  @observable nodeMap = {}
+  getNodeById(id: number): Node | undefined {
+    if (!this.nodeMap[id]) {
+      this.nodeMap[id] = this.nodes.find(node => node.id === id)
+    }
+
+    return this.nodeMap[id]
   }
 
   @observable nodeOfConnectorMap = {}

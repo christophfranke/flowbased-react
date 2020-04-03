@@ -48,7 +48,7 @@ class ConnectorView extends React.Component<Props> {
         'empty': (this.isHovering && !store.pendingConnector) ? this.valueColor.default: 'transparent',
         'connected': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight : this.valueColor.default,
       }[connectionState],
-      'pending': this.valueColor.default
+      'pending': this.valueColor.hover
     }[this.connectorState]
   }
 

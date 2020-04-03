@@ -31,6 +31,10 @@ class EditorView extends React.Component {
   @observable dimensions: Rectangle
   @observable mouse: Mouse = {}
   @observable nodeListPosition: Vector | null = null
+  @observable keys = {}
+  @computed get isPanningMode() {
+    return !!this.keys[' ']
+  }
 
   @computed get transformString() {
     return `scale(${this.scale}) translate(${this.offset.x}px, ${this.offset.y}px)`
@@ -82,8 +86,11 @@ class EditorView extends React.Component {
   }
 
   handleClick = () => {
-    store.pendingConnector = null
-    this.nodeListPosition = null
+    if (!this.isPanningMode) {    
+      store.pendingConnector = null
+      store.selectedNodes = []
+      this.nodeListPosition = null
+    }
   }
 
   handleRightMouseDown = e => {
@@ -103,12 +110,14 @@ class EditorView extends React.Component {
   }
 
   handleLeftMouseDown = e => {
-    this.mouseDownOffset = {
-      x: this.offset.x - e.clientX / this.scale,
-      y: this.offset.y - e.clientY / this.scale
+    if (this.isPanningMode) {    
+      this.mouseDownOffset = {
+        x: this.offset.x - e.clientX / this.scale,
+        y: this.offset.y - e.clientY / this.scale
+      }
+      window.addEventListener('mousemove', this.handleMouseMove)
+      window.addEventListener('mouseup', this.handleMouseUp)
     }
-    window.addEventListener('mousemove', this.handleMouseMove)
-    window.addEventListener('mouseup', this.handleMouseUp)
   }
 
   handleMouseMove = e => {
@@ -137,6 +146,15 @@ class EditorView extends React.Component {
     }
   }
 
+  handleKeydown = e => {
+    console.log(e.key)
+    this.keys[e.key] = true
+  }
+
+  handleKeyup = e => {
+    this.keys[e.key] = false
+  }
+
   updateDimensions = () => {    
     const rect = this.rootRef.current && this.rootRef.current.getBoundingClientRect()
     if (rect) {    
@@ -154,6 +172,8 @@ class EditorView extends React.Component {
     window.addEventListener('contextmenu', this.preventDefault)
     window.addEventListener('wheel', this.preventDefault, { passive: false })
     window.addEventListener('resize', this.updateDimensions)
+    window.addEventListener('keydown', this.handleKeydown)
+    window.addEventListener('keyup', this.handleKeyup)
     store.initialize()
   }
 
@@ -161,13 +181,17 @@ class EditorView extends React.Component {
     window.removeEventListener('contextmenu', this.preventDefault)
     window.removeEventListener('wheel', this.preventDefault)
     window.removeEventListener('resize', this.updateDimensions)
+    window.removeEventListener('keydown', this.handleKeydown)
+    window.removeEventListener('keyup', this.handleKeyup)
   }
 
   render() {
     const outerStyle: React.CSSProperties = {
       height: '100%',
       width: '100%',
-      backgroundColor: this.backgroundColor
+      userSelect: 'none',
+      backgroundColor: this.backgroundColor,
+      cursor: this.isPanningMode ? 'grab' : 'auto'
     }
     const innerStyle: React.CSSProperties = {
       position: 'absolute',
@@ -199,7 +223,7 @@ class EditorView extends React.Component {
       onMouseOut={this.handleMouseOut}
       onClick={this.handleClick}
      >
-      <Provider mouse={this.mouse}>
+      <Provider mouse={this.mouse} keys={this.keys}>
         <div style={innerStyle}>
           <Connections />
           {store.nodes.map(node => <NodeView key={node.id} node={node} />)}
