@@ -3,6 +3,8 @@ import { observer } from 'mobx-react'
 
 import { Node, RenderProps } from '@engine/types'
 
+const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
+
 const allowedFirst = 'abcdefghijklmnopqrstuvwxyz'.split('')
 const allowed = 'abcdefghijklmnopqrstuvwxyz1234567890'.split('')
 const sanitize = tag => {
@@ -27,7 +29,7 @@ export default observer((props: RenderProps) => {
   }
 
   if (isValid(Tag)) {
-    return React.Children.count(props.children) > 0
+    return React.Children.count(props.children) > 0 && !voidElements.includes(Tag)
       ? <Tag {...tagProps}>{props.children}</Tag>
       : <Tag {...tagProps} />
   }
