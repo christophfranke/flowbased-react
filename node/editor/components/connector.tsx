@@ -28,6 +28,10 @@ class ConnectorView extends React.Component<Props> {
   @computed get connectorState(): ConnectorState {
     return state(this.props.connector)
   }
+
+  @computed get connectionsState(): string {
+    return countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
+  }
   
   @computed get showTitle(): boolean {
     return this.isHovering || this.connectorState === 'hot' || this.connectorState === 'pending'
@@ -38,18 +42,25 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get fillColor(): string {
-    const connectionState = countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
     return {
       'hot': {
         'empty': this.isHovering ? this.valueColor.hover : this.valueColor.highlight,
         'connected': this.isHovering ? this.valueColor.hover : this.valueColor.default
-      }[connectionState],
+      }[this.connectionsState],
       'default': {
-        'empty': (this.isHovering && !store.pendingConnector) ? this.valueColor.default: 'transparent',
+        'empty': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight: 'transparent',
         'connected': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight : this.valueColor.default,
-      }[connectionState],
+      }[this.connectionsState],
       'pending': this.valueColor.hover
     }[this.connectorState]
+  }
+
+  @computed get cursor(): string {
+    if (this.isHovering && store.pendingConnector && this.connectorState !== 'hot') {
+      return 'not-allowed'
+    }
+
+    return 'pointer'
   }
 
   consume = e => {
@@ -149,7 +160,7 @@ class ConnectorView extends React.Component<Props> {
 
   render () {
     const style: React.CSSProperties = {
-      cursor: 'pointer',
+      cursor: this.cursor,
       width: `${CONNECTOR_SIZE}px`,
       height: `${CONNECTOR_SIZE}px`,
       borderRadius: '50%',
