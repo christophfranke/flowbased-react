@@ -47,6 +47,8 @@ class NodeView extends React.Component<Props> {
       } else {
         store.selectedNodes.push(this.props.node)
       }
+    } else if(this.props['keys'].Control) {
+      store.selectedNodes = store.getSubtree(this.props.node)
     }
   }
 

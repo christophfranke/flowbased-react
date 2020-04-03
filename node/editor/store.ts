@@ -55,6 +55,30 @@ class Store {
     return this.nodeMap[id]
   }
 
+  getChildren(node: Node): Node[] {
+    return this.connections
+      .filter(connection => this.nodeOfConnector(connection.to) === node)
+      .filter(connection => this.nodeOfConnector(connection.from))
+      .map(connection => this.nodeOfConnector(connection.from) || node)
+  }
+
+  getSubtree(node: Node): Node[] {
+    const visited = {
+      [node.id]: true
+    }
+    const result = [node]
+
+    const childrenOfNode = (current: Node): Node[] => {    
+      const children = this.getChildren(current).filter(child => !visited[child.id])
+      return [current].concat(flatten(children.map(child => {
+        visited[child.id] = true
+        return childrenOfNode(child)
+      })))
+    }
+
+    return childrenOfNode(node)
+  }
+
   @observable nodeOfConnectorMap = {}
   nodeOfConnector(connector: Connector): Node | undefined {
     if (!this.nodeOfConnectorMap[connector.id]) {

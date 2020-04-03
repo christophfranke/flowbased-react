@@ -147,7 +147,6 @@ class EditorView extends React.Component {
   }
 
   handleKeydown = e => {
-    console.log(e.key)
     this.keys[e.key] = true
   }
 
