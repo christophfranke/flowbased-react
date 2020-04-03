@@ -28,6 +28,13 @@ export function subtract(v: Vector, w: Vector): Vector {
   }  
 }
 
+export function round(v: Vector): Vector {
+  return {
+    x: Math.round(v.x),
+    y: Math.round(v.y)
+  }
+}
+
 export function product(v: Vector, w?: Vector) {
   return v.x * (w || v).x + v.y * (w || v).y
 }

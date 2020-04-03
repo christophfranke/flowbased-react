@@ -34,10 +34,6 @@ class NodeView extends React.Component<Props> {
   handleClick = e => {
     e.preventDefault()
     e.stopPropagation()
-
-    if (!this.props['keys'].Shift) {
-      store.selectedNodes = [this.props.node]
-    }
   }
 
   handleSelection() {
@@ -49,6 +45,8 @@ class NodeView extends React.Component<Props> {
       }
     } else if(this.props['keys'].Control) {
       store.selectedNodes = store.getSubtree(this.props.node)
+    } else {
+      store.selectedNodes = [this.props.node]
     }
   }
 

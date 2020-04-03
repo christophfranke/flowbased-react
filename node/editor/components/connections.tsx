@@ -2,7 +2,7 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
-import { Connection, Node, Connector } from '@editor/types'
+import { Connection, Node, Connector, Vector } from '@editor/types'
 import { colors } from '@editor/colors'
 
 import * as LA from '@editor/la'
@@ -11,30 +11,68 @@ import store from '@editor/store'
 
 const BEZIER_DISTANCE = 150
 
+interface Props {
+  connection: Connection
+}
+
 @observer
-class Connections extends React.Component {
-  path(connection: Connection): string {
-    const fromNode = store.nodeOfConnector(connection.from)
-    const toNode = store.nodeOfConnector(connection.to)
+class ConnectionPath extends React.Component<Props> {
+  @computed get offset(): Vector | null {
+    const fromNode = store.nodeOfConnector(this.props.connection.from)
+    if (fromNode && this.props.connection.from.position) {
+       return LA.add(fromNode.position, this.props.connection.from.position)
+    }
 
-    if (fromNode && toNode && connection.from.position && connection.to.position) {
-      const fromCoords = LA.add(fromNode.position, connection.from.position)
-      const toCoords = LA.add(toNode.position, connection.to.position)
+    return null
+  }
 
-      const diff = LA.subtract(toCoords, fromCoords)
-      const minFactor = Math.min(LA.distance(diff), BEZIER_DISTANCE)
-      const fromFactor = Math.max(minFactor, LA.product(diff, connection.from.direction))
-      const toFactor = Math.max(minFactor, LA.product(diff, connection.to.direction))
-  
-      const middle1 = LA.madd(fromCoords, fromFactor, connection.from.direction)
-      const middle2 = LA.madd(toCoords, toFactor, connection.to.direction)
+  @computed get diff(): Vector | null {
+    const toNode = store.nodeOfConnector(this.props.connection.to)
+    if (toNode && this.props.connection.to.position) {
+      const toCoords = LA.add(toNode.position, this.props.connection.to.position)
+      if (this.offset) {
+        return LA.subtract(toCoords, this.offset)
+      }
+    }
 
-      return `M${fromCoords.x} ${fromCoords.y} C${middle1.x} ${middle1.y} ${middle2.x} ${middle2.y} ${toCoords.x} ${toCoords.y}`
+    return null
+  }
+
+  @computed get transform(): string {
+    if (this.offset) {
+      const o = LA.round(this.offset)
+      return `translate(${o.x}px, ${o.y}px)`
+    }
+
+    return 'none'
+  }
+
+  @computed get d(): string {
+    if (this.offset && this.diff) {    
+      const minFactor = Math.min(LA.distance(this.diff), BEZIER_DISTANCE)
+      const fromFactor = Math.max(minFactor, LA.product(this.diff, this.props.connection.from.direction))
+      const toFactor = Math.max(minFactor, LA.product(this.diff, this.props.connection.to.direction))
+
+      const middle1 = LA.scale(fromFactor, this.props.connection.from.direction)
+      const middle2 = LA.madd(this.diff, toFactor, this.props.connection.to.direction)
+
+      const o = LA.round(this.offset)
+      const v2 = LA.round(middle1)
+      const v3 = LA.round(middle2)
+      const v4 = LA.round(this.diff)
+      return `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`    
     }
 
     return ''
   }
 
+  render() {
+    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform' }}/>
+  }
+}
+
+@observer
+class Connections extends React.Component {
   render() {
     const style: React.CSSProperties = {
       position: 'absolute',
@@ -46,7 +84,7 @@ class Connections extends React.Component {
 
     return <svg style={style}>
       <g stroke={colors.connections} strokeWidth="2" fill="none">
-        {store.connections.map(connection => <path key={connection.id} d={this.path(connection)} />)}
+        {store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
       </g>
     </svg>
   }
