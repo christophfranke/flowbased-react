@@ -34,23 +34,31 @@ class NodeView extends React.Component<Props> {
   handleClick = e => {
     e.preventDefault()
     e.stopPropagation()
+
+    if (!this.props['keys'].Shift) {
+      store.selectedNodes = [this.props.node]
+    }
+  }
+
+  handleSelection() {
     if (this.props['keys'].Shift) {
       if (this.isSelected) {
         store.selectedNodes = store.selectedNodes.filter(node => node !== this.props.node)
       } else {
         store.selectedNodes.push(this.props.node)
       }
-    } else if (!this.isSelected) {
-      store.selectedNodes = [this.props.node]
     }
   }
 
+
   startDrag(position: Vector) {
     this.offset = LA.subtract(position, this.props.node.position)
-    this.relativePositions = store.selectedNodes.reduce((obj, node) => ({
-      ...obj,
-      [node.id]: LA.subtract(node.position, this.props.node.position)
-    }), {})
+    this.relativePositions = store.selectedNodes
+      .filter(node => node !== this.props.node)
+      .reduce((obj, node) => ({
+        ...obj,
+        [node.id]: LA.subtract(node.position, this.props.node.position)
+      }), {})
   }
 
   moveDrag(position: Vector) {
@@ -66,6 +74,8 @@ class NodeView extends React.Component<Props> {
   handleMouseDown = e => {
     e.preventDefault()
     e.stopPropagation()
+
+    this.handleSelection()
 
     const mouse = this.props['mouse'].position
     if (mouse) {
