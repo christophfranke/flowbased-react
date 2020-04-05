@@ -29,13 +29,14 @@ class EditorView extends React.Component {
   backgroundColor = colors.background.editor
   dispose: IReactionDisposer
 
+  initialSelection: Node[] | null
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
   @observable dimensions: Rectangle
   @observable mouse: Mouse = {}
   @observable nodeListPosition: Vector | null = null
-  @observable keys = {}
+  @observable keys: { [key: string]: boolean } = {}
   @observable selectionRectangle: Rectangle | null = null
 
   @computed get drawableSelectionRectangle(): Rectangle | null {
@@ -226,10 +227,24 @@ class EditorView extends React.Component {
 
   selectWithRectangle = () => {
     if (this.drawableSelectionRectangle) {
+      if (!this.initialSelection) {
+        this.initialSelection = store.selectedNodes
+      }
       const rectangle: Rectangle = this.windowToViewRectangle(this.drawableSelectionRectangle)
       const selected = store.nodes.filter(node => node.boundingBox)
         .filter(node => LA.intersects(rectangle, node.boundingBox!))
-      store.selectedNodes = selected
+
+      if (this.keys.Shift) {
+        const stillSelected = this.initialSelection.filter(node => !selected.includes(node))
+        const freshSelected = selected.filter(node => !this.initialSelection!.includes(node))
+        store.selectedNodes = stillSelected.concat(freshSelected)
+      } else {
+        store.selectedNodes = selected
+      }
+    } else {
+      if (this.initialSelection) {
+        this.initialSelection = null
+      }
     }
   }
 
