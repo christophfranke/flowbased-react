@@ -137,11 +137,11 @@ class EditorView extends React.Component {
     if (!this.isPanningMode) {
       store.pendingConnector = null
       this.nodeListPosition = null
-    }
-    if (this.selectionRectangle) {
-      this.selectionRectangle = null
-    } else {
-      store.selectedNodes = []
+      if (this.selectionRectangle) {
+        this.selectionRectangle = null
+      } else {
+        store.selectedNodes = []
+      }
     }
   }
 
