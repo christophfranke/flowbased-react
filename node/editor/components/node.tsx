@@ -8,6 +8,7 @@ import * as LA from '@editor/la'
 import store from '@editor/store'
 import ConnectorView from '@editor/components/connector'
 import { colors, colorOfNodeType } from '@editor/colors'
+import { isServer } from '@editor/util'
 
 interface Props {
   node: Node
@@ -22,6 +23,7 @@ const NODE_PADDING = 5
 @inject('mouse', 'keys')
 @observer
 class NodeView extends React.Component<Props> {
+  nodeRef = React.createRef<HTMLDivElement>()
   offset: Vector
   relativePositions: {
     [id: number]: Vector
@@ -121,7 +123,22 @@ class NodeView extends React.Component<Props> {
     e.stopPropagation()
   }
 
+  updatePosition = () => {
+    if (this.nodeRef.current) {
+      this.props.node.boundingBox = {
+        x: this.props.node.position.x,
+        y: this.props.node.position.y,
+        width: this.nodeRef.current.offsetWidth,
+        height: this.nodeRef.current.offsetHeight
+      }
+    }
+  }
+
   render() {
+    if (!isServer) {
+      requestAnimationFrame(this.updatePosition)
+    }
+
     const { node } = this.props
     const typeColor = colors.types[colorOfNodeType(node.type)][this.isSelected ? 'highlight': 'default']
 
@@ -181,7 +198,7 @@ class NodeView extends React.Component<Props> {
         1fr min-content 1fr`
     }
 
-    return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick}>
+    return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
             {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}

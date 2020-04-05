@@ -44,6 +44,7 @@ export interface Node {
   type: Engine.NodeType
   params: Parameter<string>[]
   position: Vector
+  boundingBox?: Rectangle
   connectors: {
     input: Connector[]
     output: Connector[]

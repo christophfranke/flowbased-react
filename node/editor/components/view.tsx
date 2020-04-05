@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, computed,  } from 'mobx'
+import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import { observer, Provider } from 'mobx-react'
 import normalizeWheel from 'normalize-wheel';
 
@@ -7,6 +7,7 @@ import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/t
 import { uid } from '@editor/util'
 import { createRandomNode } from '@editor/node'
 import { colors } from '@editor/colors'
+import * as LA from '@editor/la'
 
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
@@ -25,7 +26,9 @@ const MIN_ZOOM = 0.1
 
 @observer
 class EditorView extends React.Component {
-  backgroundColor = 'rgb(15, 15, 15)'
+  backgroundColor = colors.background.editor
+  dispose: IReactionDisposer
+
   @observable points: Vector[] = []
   @observable scale: number = 1
   @observable offset: Vector = { x: 0, y: 0}
@@ -34,6 +37,7 @@ class EditorView extends React.Component {
   @observable nodeListPosition: Vector | null = null
   @observable keys = {}
   @observable selectionRectangle: Rectangle | null = null
+
   @computed get drawableSelectionRectangle(): Rectangle | null {
     if (!this.selectionRectangle) {
       return null
@@ -50,8 +54,6 @@ class EditorView extends React.Component {
       width: Math.abs(rect.width),
       height: Math.abs(rect.height)
     }
-
-    return this.selectionRectangle
   }
 
   @computed get isPanningMode() {
@@ -72,6 +74,29 @@ class EditorView extends React.Component {
 
   private mouseDownOffset: Vector | null = null
   private rootRef = React.createRef<HTMLDivElement>()
+
+  windowToViewRectangle(input: Rectangle): Rectangle {
+    const topLeft = {
+      x: input.x,
+      y: input.y
+    }
+    const bottomRight = {
+      x: input.x + input.width,
+      y: input.y + input.height
+    }
+
+    const transformed = {
+      topLeft: this.windowToView(topLeft),
+      bottomRight: this.windowToView(bottomRight)
+    }
+
+    return {
+      x: transformed.topLeft.x,
+      y: transformed.topLeft.y,
+      width: transformed.bottomRight.x - transformed.topLeft.x,
+      height: transformed.bottomRight.y - transformed.topLeft.y
+    }
+  }
 
   windowToView(input: Vector): Vector {
     const point = new DOMPoint(input.x, input.y)
@@ -108,10 +133,14 @@ class EditorView extends React.Component {
   }
 
   handleClick = () => {
-    if (!this.isPanningMode) {    
+    if (!this.isPanningMode) {
       store.pendingConnector = null
-      store.selectedNodes = []
       this.nodeListPosition = null
+    }
+    if (this.selectionRectangle) {
+      this.selectionRectangle = null
+    } else {
+      store.selectedNodes = []
     }
   }
 
@@ -167,7 +196,6 @@ class EditorView extends React.Component {
 
   handleMouseUp = e => {
     this.mouseDownOffset = null
-    this.selectionRectangle = null
     window.removeEventListener('mousemove', this.handleMouseMove)
     window.removeEventListener('mousemove', this.handleMouseUp)
   }
@@ -196,6 +224,15 @@ class EditorView extends React.Component {
     this.keys[e.key] = false
   }
 
+  selectWithRectangle = () => {
+    if (this.drawableSelectionRectangle) {
+      const rectangle: Rectangle = this.windowToViewRectangle(this.drawableSelectionRectangle)
+      const selected = store.nodes.filter(node => node.boundingBox)
+        .filter(node => LA.intersects(rectangle, node.boundingBox!))
+      store.selectedNodes = selected
+    }
+  }
+
   updateDimensions = () => {    
     const rect = this.rootRef.current && this.rootRef.current.getBoundingClientRect()
     if (rect) {    
@@ -215,6 +252,7 @@ class EditorView extends React.Component {
     window.addEventListener('resize', this.updateDimensions)
     window.addEventListener('keydown', this.handleKeydown)
     window.addEventListener('keyup', this.handleKeyup)
+    this.dispose = autorun(this.selectWithRectangle)
     store.initialize()
   }
 
@@ -224,6 +262,7 @@ class EditorView extends React.Component {
     window.removeEventListener('resize', this.updateDimensions)
     window.removeEventListener('keydown', this.handleKeydown)
     window.removeEventListener('keyup', this.handleKeyup)
+    this.dispose()
   }
 
   render() {
@@ -277,6 +316,7 @@ class EditorView extends React.Component {
           <PendingConnections />
         </div>
         {nodeList}
+        {selectionRectangle}
       </Provider>
     </div>
   }
