@@ -3,9 +3,7 @@ import { observable, computed } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
 import { Vector } from '@editor/types'
-import { nodeList } from '@editor/node'
 import { colors } from '@editor/colors'
-import store from '@editor/store'
 
 
 interface Props {
@@ -16,11 +14,14 @@ interface Props {
 
 const MAX_ITEMS = 6
 
+@inject('store')
 @observer
 class NodeList extends React.Component<Props> {
+  store = this.props['store']
+  inputRef = React.createRef<HTMLInputElement>()
+
   @observable searchString = ''
   @observable selected = 0
-  inputRef = React.createRef<HTMLInputElement>()
   
   @computed get selectedShown() {
     return Math.min(this.selected, this.filteredNodeList.length - 1)
@@ -28,11 +29,11 @@ class NodeList extends React.Component<Props> {
 
   @computed get filteredNodeList() {
     const regex = new RegExp(this.searchString.split('').join('.*'), 'i')
-    return nodeList.filter(node => !!node.name.match(regex)).slice(0, MAX_ITEMS)
+    return this.store.node.nodeList.filter(node => !!node.name.match(regex)).slice(0, MAX_ITEMS)
   }
 
   create = factory => {
-    store.nodes.push(factory(this.props.position))
+    this.store.nodes.push(factory(this.props.position))
     this.props.onComplete()
   }
 

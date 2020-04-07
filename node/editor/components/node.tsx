@@ -5,7 +5,6 @@ import { observer, inject } from 'mobx-react'
 import { Node, Vector } from '@editor/types'
 
 import * as LA from '@editor/la'
-import store from '@editor/store'
 import ConnectorView from '@editor/components/connector'
 import { colors, colorOfNodeType } from '@editor/colors'
 import { isServer } from '@editor/util'
@@ -20,9 +19,10 @@ const DESCRIPTION_HEIGHT = 20
 const DESCRIPTION_WIDTH = 100
 const NODE_PADDING = 5
 
-@inject('mouse', 'keys')
+@inject('mouse', 'keys', 'store')
 @observer
 class NodeView extends React.Component<Props> {
+  store = this.props['store']
   nodeRef = React.createRef<HTMLDivElement>()
   offset: Vector
   relativePositions: {
@@ -30,7 +30,7 @@ class NodeView extends React.Component<Props> {
   }
 
   @computed get isSelected(): boolean {
-    return store.selectedNodes.includes(this.props.node)
+    return this.store.selectedNodes.includes(this.props.node)
   }
 
   handleClick = e => {
@@ -41,26 +41,26 @@ class NodeView extends React.Component<Props> {
   handleSelection() {
     const keys = this.props['keys']
     const relevantNodes = keys.Control
-      ? store.getSubtree(this.props.node)
+      ? this.store.getSubtree(this.props.node)
       : [this.props.node]
 
     if (keys.Shift) {
       if (this.isSelected) {
         // remove relevant nodes from selection
-        store.selectedNodes = store.selectedNodes
+        this.store.selectedNodes = this.store.selectedNodes
           .filter(node => !relevantNodes.includes(node))
       } else {
         // add relevant nodes to selection
-        store.selectedNodes = store.selectedNodes
-          .concat(relevantNodes.filter(node => !store.selectedNodes.includes(node)))
+        this.store.selectedNodes = this.store.selectedNodes
+          .concat(relevantNodes.filter(node => !this.store.selectedNodes.includes(node)))
       }
     } else {    
       if (!this.isSelected) {
-        store.selectedNodes = relevantNodes
+        this.store.selectedNodes = relevantNodes
       }
 
       if (this.isSelected && relevantNodes.length > 1) {
-        store.selectedNodes = relevantNodes
+        this.store.selectedNodes = relevantNodes
       }
     }
   }
@@ -68,7 +68,7 @@ class NodeView extends React.Component<Props> {
 
   startDrag(position: Vector) {
     this.offset = LA.subtract(position, this.props.node.position)
-    this.relativePositions = store.selectedNodes
+    this.relativePositions = this.store.selectedNodes
       .filter(node => node !== this.props.node)
       .reduce((obj, node) => ({
         ...obj,
@@ -79,7 +79,7 @@ class NodeView extends React.Component<Props> {
   moveDrag(position: Vector) {
     this.props.node.position = LA.subtract(position, this.offset)
     Object.entries(this.relativePositions).forEach(([id, position]) => {
-      const node = store.getNodeById(Number(id))
+      const node = this.store.getNodeById(Number(id))
       if (node) {
         node.position = LA.add(position, this.props.node.position)
       }
@@ -116,7 +116,7 @@ class NodeView extends React.Component<Props> {
   handleDelete = e => {
     e.stopPropagation()
     e.preventDefault()
-    store.deleteNode(this.props.node)
+    this.store.deleteNode(this.props.node)
   }
 
   stop = e => {

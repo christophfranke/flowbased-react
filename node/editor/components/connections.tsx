@@ -1,22 +1,24 @@
 import React from 'react'
 import { observable, computed } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, inject } from 'mobx-react'
 
 import { Connection, Node, Connector, Vector } from '@editor/types'
+import Store from '@editor/store'
 import { colors } from '@editor/colors'
 
 import * as LA from '@editor/la'
-
-import store from '@editor/store'
 
 interface Props {
   connection: Connection
 }
 
+@inject('store')
 @observer
 class ConnectionPath extends React.Component<Props> {
+  store: Store = this.props['store']
+
   @computed get offset(): Vector | null {
-    const fromNode = store.nodeOfConnector(this.props.connection.from)
+    const fromNode = this.store.nodeOfConnector(this.props.connection.from)
     if (fromNode && this.props.connection.from.position) {
        return LA.add(fromNode.position, this.props.connection.from.position)
     }
@@ -25,7 +27,7 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   @computed get diff(): Vector | null {
-    const toNode = store.nodeOfConnector(this.props.connection.to)
+    const toNode = this.store.nodeOfConnector(this.props.connection.to)
     if (toNode && this.props.connection.to.position) {
       const toCoords = LA.add(toNode.position, this.props.connection.to.position)
       if (this.offset) {
@@ -67,8 +69,11 @@ class ConnectionPath extends React.Component<Props> {
   }
 }
 
+@inject('store')
 @observer
 class Connections extends React.Component {
+  store: Store = this.props['store']
+
   render() {
     const style: React.CSSProperties = {
       position: 'absolute',
@@ -80,7 +85,7 @@ class Connections extends React.Component {
 
     return <svg style={style}>
       <g stroke={colors.connections} strokeWidth="2" fill="none">
-        {store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
+        {this.store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
       </g>
     </svg>
   }

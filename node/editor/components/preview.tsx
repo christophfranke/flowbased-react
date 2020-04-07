@@ -1,22 +1,26 @@
 import React from 'react'
 import { observable, computed } from 'mobx'
-import { observer } from 'mobx-react'
+import { observer, inject } from 'mobx-react'
 
-import { Node } from '@editor/types'
-import store from '@editor/store'
-
+import { Node, Connection } from '@editor/types'
 import Translator from '@shared/translator'
 
 import { render } from '@engine/render'
 
-
+@inject('store')
 @observer
 class Preview extends React.Component {
+  store: {
+    nodes: Node[]
+    connections: Connection[]
+  } = this.props['store']
+
   ref = React.createRef<HTMLDivElement>()
+
   @computed get preview(): Node | undefined {
-    return store.nodes.find(node => node.type === 'Preview')
+    return this.store.nodes.find(node => node.type === 'Preview')
   }
-  translator = new Translator(store)
+  translator = new Translator(this.store)
 
   componentDidMount() {
     if (this.ref.current) {    

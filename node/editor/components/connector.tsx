@@ -4,10 +4,8 @@ import { observer, inject } from 'mobx-react'
 
 import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/types'
 
-import { isServer, uid } from '@editor/util'
+import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
-import { countConnections, canConnect } from '@editor/connector'
-import { state, isSrc } from '@editor/connector'
 import { colors, colorOfValueType } from '@editor/colors'
 import store from '@editor/store'
 
@@ -20,17 +18,20 @@ interface Props {
 
 const CONNECTOR_SIZE = 40
 
+@inject('store')
 @observer
 class ConnectorView extends React.Component<Props> {
+  store = this.props['store']
+
   @observable isHovering = false
   private ref = React.createRef<HTMLDivElement>()
   
   @computed get connectorState(): ConnectorState {
-    return state(this.props.connector)
+    return this.store.state(this.props.connector)
   }
 
   @computed get connectionsState(): string {
-    return countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
+    return this.store.countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
   }
   
   @computed get showTitle(): boolean {
@@ -48,15 +49,15 @@ class ConnectorView extends React.Component<Props> {
         'connected': this.isHovering ? this.valueColor.hover : this.valueColor.default
       }[this.connectionsState],
       'default': {
-        'empty': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight: 'transparent',
-        'connected': (this.isHovering && !store.pendingConnector) ? this.valueColor.highlight : this.valueColor.default,
+        'empty': (this.isHovering && !this.store.pendingConnector) ? this.valueColor.highlight: 'transparent',
+        'connected': (this.isHovering && !this.store.pendingConnector) ? this.valueColor.highlight : this.valueColor.default,
       }[this.connectionsState],
       'pending': this.valueColor.hover
     }[this.connectorState]
   }
 
   @computed get cursor(): string {
-    if (this.isHovering && store.pendingConnector && this.connectorState !== 'hot') {
+    if (this.isHovering && this.store.pendingConnector && this.connectorState !== 'hot') {
       return 'not-allowed'
     }
 
@@ -68,32 +69,32 @@ class ConnectorView extends React.Component<Props> {
   }
 
   connect() {
-    if (store.pendingConnector) {
-      const from = isSrc(store.pendingConnector)
-        ? store.pendingConnector
+    if (this.store.pendingConnector) {
+      const from = this.store.connector.isSrc(this.store.pendingConnector)
+        ? this.store.pendingConnector
         : this.props.connector
-      const to = isSrc(store.pendingConnector)
+      const to = this.store.connector.isSrc(this.store.pendingConnector)
         ? this.props.connector
-        : store.pendingConnector
+        : this.store.pendingConnector
 
       const connection: Connection = {
-        id: uid(),
+        id: this.store.uid(),
         from,
         to
       }
 
-      store.connections.push(connection)
+      this.store.connections.push(connection)
     }
   }
 
   unconnect(): Connector | undefined {
-    const connection = store.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+    const connection = this.store.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
     if (connection) {
       const other = connection.from === this.props.connector
         ? connection.to
         : connection.from
 
-      store.connections = store.connections.filter(con => con !== connection)
+      this.store.connections = this.store.connections.filter(con => con !== connection)
 
       return other
     }
@@ -112,35 +113,35 @@ class ConnectorView extends React.Component<Props> {
     e.preventDefault()
     e.stopPropagation()
 
-    if (store.pendingConnector) {
-      if (state(this.props.connector) === 'hot') {
-        if (countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.mode)) {
+    if (this.store.pendingConnector) {
+      if (this.store.connector.state(this.props.connector) === 'hot') {
+        if (this.store.connector.countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.mode)) {
           this.connect()
-          store.pendingConnector = this.unconnect() || null
+          this.store.pendingConnector = this.unconnect() || null
           return
         }
 
         this.connect()
-        store.pendingConnector = null    
+        this.store.pendingConnector = null    
         return
       }
       return
     }
 
-    if (countConnections(this.props.connector) > 0) {
+    if (this.store.connector.countConnections(this.props.connector) > 0) {
       if (['duplicate', 'single'].includes(this.props.connector.mode)) {
-        store.pendingConnector = this.unconnect() || null
+        this.store.pendingConnector = this.unconnect() || null
         return
       }
 
       if (this.props.connector.mode === 'multiple') {
-        store.pendingConnector = this.props.connector
+        this.store.pendingConnector = this.props.connector
       }
 
       return
     }
 
-    store.pendingConnector = this.props.connector    
+    this.store.pendingConnector = this.props.connector    
   }
 
   updatePosition = () => {

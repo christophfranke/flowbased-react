@@ -1,11 +1,15 @@
-import { observable, computed, autorun } from 'mobx'
-import { Connection, Node, Connector } from '@editor/types'
-import { cloneConnector, countConnections } from '@editor/connector'
+import { observable, computed, autorun, action } from 'mobx'
+import { Connection, Node, Connector, ConnectorState } from '@editor/types'
 import { sync, load } from '@editor/local-storage-sync'
 
-import { flatten } from '@editor/util'
+import ConnectorFunctions from '@editor/store/connector'
+import NodeFunctions from '@editor/store/node'
+
+import { flatten } from '@shared/util'
 
 class Store {
+  connector: ConnectorFunctions
+  node: NodeFunctions
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
@@ -15,30 +19,42 @@ class Store {
     return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
   }
 
-  initialize() {
-    this.nodes = load(['editor', 'nodes']) || []
+  constructor() {
+    this.connector = new ConnectorFunctions(this)
+    this.node = new NodeFunctions(this)
 
-    // the connectors map reassures that strict equality comparisions
-    // work because two connections with the same id will be the same objects
-    const connectorsMap = this.connectors.reduce((obj, connector) => ({
-      ...obj,
-      [connector.id]: connector
-    }), {})
+    autorun(this.addInputConnectors)
+  }
 
-    // take the connectors from the map
-    const connections = load(['editor', 'connections']) || []
-    this.connections = connections.map(connection => ({
-      ...connection,
-      from: connectorsMap[connection.from.id],
-      to: connectorsMap[connection.to.id]
-    }))
+  static createFromLocalStorage(): Store {
+    const store = new Store()
+    action(() => {    
+      store.nodes = load(['editor', 'nodes']) || []
 
-    this.currentId = load(['editor', 'uid']) || 0
+      // the connectors map reassures that strict equality comparisions
+      // work because two connections with the same id will be the same objects
+      const connectorsMap = store.connectors.reduce((obj, connector) => ({
+        ...obj,
+        [connector.id]: connector
+      }), {})
+
+      // take the connectors from the map
+      const connections = load(['editor', 'connections']) || []
+      store.connections = connections.map(connection => ({
+        ...connection,
+        from: connectorsMap[connection.from.id],
+        to: connectorsMap[connection.to.id]
+      }))
+
+      store.currentId = load(['editor', 'uid']) || 0
+    })
 
     // autosave immediately
-    sync(['editor', 'connections'], this, 'connections')
-    sync(['editor', 'nodes'], this, 'nodes')
-    sync(['editor', 'uid'], this, 'currentId')
+    sync(['editor', 'connections'], store, 'connections')
+    sync(['editor', 'nodes'], store, 'nodes')
+    sync(['editor', 'uid'], store, 'currentId')
+
+    return store
   }
 
   uid(): number {
@@ -112,18 +128,14 @@ class Store {
       && node.connectors.input[0].mode === 'duplicate')
   }
 
+
   addInputConnectors = () => {
     this.nodesWithDuplicateSetting
-      .filter(node => node.connectors.input.every(connector => countConnections(connector) > 0))
+      .filter(node => node.connectors.input.every(connector => this.connector.countConnections(connector) > 0))
       .forEach(node => {        
-        node.connectors.input.push(cloneConnector(node.connectors.input[0]))
+        node.connectors.input.push(this.connector.cloneConnector(node.connectors.input[0]))
       })
   }
 }
 
-const store = new Store()
-
-autorun(store.addInputConnectors)
-// autorun(store.removeInputConnectors)
-
-export default store
+export default Store

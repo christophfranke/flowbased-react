@@ -1,10 +1,9 @@
 import React from 'react'
 import { observable, computed, autorun, IReactionDisposer } from 'mobx'
-import { observer, Provider } from 'mobx-react'
+import { observer, inject, Provider } from 'mobx-react'
 import normalizeWheel from 'normalize-wheel';
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
-import { uid } from '@editor/util'
 import { colors } from '@editor/colors'
 import * as LA from '@editor/la'
 
@@ -12,8 +11,6 @@ import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
 import Connections from '@editor/components/connections'
 import NodeList from '@editor/components/node-list'
-
-import store from '@editor/store'
 
 
 const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
@@ -23,10 +20,12 @@ const RIGHT_MOUSE_BUTTON = 2
 const MAX_ZOOM = 2
 const MIN_ZOOM = 0.1
 
+@inject('store')
 @observer
 class EditorView extends React.Component {
   backgroundColor = colors.background.editor
   dispose: IReactionDisposer
+  store = this.props['store']
 
   initialSelection: Node[] | null
   @observable points: Vector[] = []
@@ -134,12 +133,12 @@ class EditorView extends React.Component {
 
   handleClick = () => {
     if (!this.isPanningMode) {
-      store.pendingConnector = null
+      this.store.pendingConnector = null
       this.nodeListPosition = null
       if (this.selectionRectangle) {
         this.selectionRectangle = null
       } else {
-        store.selectedNodes = []
+        this.store.selectedNodes = []
       }
     }
   }
@@ -223,7 +222,7 @@ class EditorView extends React.Component {
   handleKeyup = e => {
     this.keys[e.key] = false
     if (e.target === document.body && e.key === 'Backspace') {
-      store.deleteNodes(store.selectedNodes)
+      this.store.deleteNodes(this.store.selectedNodes)
     }
   }
 
@@ -232,18 +231,18 @@ class EditorView extends React.Component {
   selectWithRectangle = () => {
     if (this.drawableSelectionRectangle) {
       if (!this.initialSelection) {
-        this.initialSelection = store.selectedNodes
+        this.initialSelection = this.store.selectedNodes
       }
       const rectangle: Rectangle = this.windowToViewRectangle(this.drawableSelectionRectangle)
-      const selected = store.nodes.filter(node => node.boundingBox)
+      const selected = this.store.nodes.filter(node => node.boundingBox)
         .filter(node => LA.intersects(rectangle, node.boundingBox!))
 
       if (this.keys.Shift) {
-        const stillSelected = this.initialSelection.filter(node => !selected.includes(node))
+        const stillSelected = this.initialSelection!.filter(node => !selected.includes(node))
         const freshSelected = selected.filter(node => !this.initialSelection!.includes(node))
-        store.selectedNodes = stillSelected.concat(freshSelected)
+        this.store.selectedNodes = stillSelected.concat(freshSelected)
       } else {
-        store.selectedNodes = selected
+        this.store.selectedNodes = selected
       }
     } else {
       if (this.initialSelection) {
@@ -273,7 +272,6 @@ class EditorView extends React.Component {
     window.addEventListener('keyup', this.handleKeyup)
     window.addEventListener('keypress', this.handleKeypress)
     this.dispose = autorun(this.selectWithRectangle)
-    store.initialize()
   }
 
   componentWillUnmount() {
@@ -333,7 +331,7 @@ class EditorView extends React.Component {
       <Provider mouse={this.mouse} keys={this.keys}>
         <div style={innerStyle}>
           <Connections />
-          {store.nodes.map(node => <NodeView key={node.id} node={node} />)}
+          {this.store.nodes.map(node => <NodeView key={node.id} node={node} />)}
           <PendingConnections />
         </div>
         {nodeList}

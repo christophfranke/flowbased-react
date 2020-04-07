@@ -2,33 +2,20 @@ import React from 'react'
 import fetch from 'isomorphic-fetch'
 import Link from 'next/link'
 
-import { autorun } from 'mobx'
-import { createTransformer, computedFn } from 'mobx-utils'
 
-interface Props {
-  data: Data
-}
-
-interface Data {
-  hello: string  
-}
-
-
-const Home = (props: Props) => {
-  return <div>
-    <Link href="/editor">
-      <button>Start editor</button>
+const Home = () => {
+  const buttonClasses = "p-5 my-3 mx-10 border border-black"
+  return <div className="flex justify-center flex-col content-center w-screen h-screen">
+    <Link href="/editor/split">
+      <button className={buttonClasses}>Start editor in split screen</button>
+    </Link>
+    <Link href="/editor/preview">
+      <button className={buttonClasses}>Start preview</button>
+    </Link>
+    <Link href="/editor/nodes">
+      <button className={buttonClasses}>Start editor without preview</button>
     </Link>
   </div>
 }
-
-// Home.getInitialProps = async (): Promise<Props> => {
-//   const result = await fetch('http://localhost:3000/api')
-//   const data = await result.json() as Data
-
-//   return {
-//     data
-//   }
-// }
 
 export default Home

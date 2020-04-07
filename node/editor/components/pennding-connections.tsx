@@ -6,18 +6,18 @@ import * as LA from '@editor/la'
 
 import { Node, Connector, Mouse } from '@editor/types'
 import { colors } from '@editor/colors'
-import store from '@editor/store'
 
 
 const BEZIER_DISTANCE = 100
 
-@inject('mouse')
+@inject('mouse', 'store')
 @observer
 class PendingConnections extends React.Component {
   mouse: Mouse = this.props['mouse']
+  store = this.props['store']
 
   path(connector: Connector): string {
-    const node = store.nodeOfConnector(connector)
+    const node = this.store.nodeOfConnector(connector)
     const start = LA.add(node!.position, connector.position!)
     const end = this.mouse.position!
 
@@ -29,7 +29,7 @@ class PendingConnections extends React.Component {
   }
 
   render () {
-    if (!this.mouse.position || !store.pendingConnector) {
+    if (!this.mouse.position || !this.store.pendingConnector) {
       return null
     }
 
@@ -42,7 +42,7 @@ class PendingConnections extends React.Component {
 
     return <svg style={style}>
       <g stroke={colors.connections} strokeWidth="2" fill="none">
-        <path key={store.pendingConnector.id} d={this.path(store.pendingConnector)} />
+        <path key={this.store.pendingConnector.id} d={this.path(this.store.pendingConnector)} />
       </g>
     </svg>
   }
