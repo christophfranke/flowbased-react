@@ -5,7 +5,6 @@ import normalizeWheel from 'normalize-wheel';
 
 import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/types'
 import { uid } from '@editor/util'
-import { createRandomNode } from '@editor/node'
 import { colors } from '@editor/colors'
 import * as LA from '@editor/la'
 

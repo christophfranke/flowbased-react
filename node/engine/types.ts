@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type ValueType = 'Element' | 'Text' | 'Pair' | 'List' | 'Object' | 'Nothing'
+export type ValueType = 'Element' | 'String' | 'Pair' | 'List' | 'Object' | 'Nothing'
 export interface Connection {
   readonly id: number
   readonly node: Node
@@ -14,7 +14,7 @@ export interface Params<T> {
 export interface Properties {
   [key: string]: any
 }
-export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'Text' | 'Object' | 'Pair' | 'List'
+export type NodeType = 'Preview' | 'Blank' | 'Tag' | 'String' | 'Object' | 'Pair' | 'List'
 export interface Node {
   readonly id: number
   readonly type: NodeType

@@ -17,8 +17,8 @@
 // }), {})
 
 // export default Nodes
-import TextRender from '@engine/nodes/text/render'
-import TextValue from '@engine/nodes/text/value'
+import StringRender from '@engine/nodes/string/render'
+import StringValue from '@engine/nodes/string/value'
 import PairRender from '@engine/nodes/pair/render'
 import PairValue from '@engine/nodes/pair/value'
 import TagRender from '@engine/nodes/tag/render'
@@ -26,11 +26,12 @@ import TagValue from '@engine/nodes/tag/value'
 import BlankRender from '@engine/nodes/blank/render'
 import BlankValue from '@engine/nodes/blank/value'
 import ObjectValue from '@engine/nodes/object/value'
+import ListDebug from '@engine/nodes/list/debug'
 import ListValue from '@engine/nodes/list/value'
 export default {
-  Text: {
-    render: TextRender,
-    value: TextValue
+  String: {
+    render: StringRender,
+    value: StringValue
   },
   Pair: {
     render: PairRender,

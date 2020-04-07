@@ -43,6 +43,10 @@ export function distance(v: Vector, w?: Vector) {
   return Math.sqrt(product(v, w))
 }
 
+export function normalize(v: Vector): Vector {
+  return scale(1 / distance(v), v)
+}
+
 export function rotate90(v: Vector): Vector {
   return {
     x: -v.y,

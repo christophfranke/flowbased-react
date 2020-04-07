@@ -9,8 +9,6 @@ import * as LA from '@editor/la'
 
 import store from '@editor/store'
 
-const BEZIER_DISTANCE = 150
-
 interface Props {
   connection: Connection
 }
@@ -49,18 +47,16 @@ class ConnectionPath extends React.Component<Props> {
 
   @computed get d(): string {
     if (this.offset && this.diff) {    
-      const minFactor = Math.min(LA.distance(this.diff), BEZIER_DISTANCE)
-      const fromFactor = Math.max(minFactor, LA.product(this.diff, this.props.connection.from.direction))
-      const toFactor = Math.max(minFactor, LA.product(this.diff, this.props.connection.to.direction))
-
-      const middle1 = LA.scale(fromFactor, this.props.connection.from.direction)
-      const middle2 = LA.madd(this.diff, toFactor, this.props.connection.to.direction)
+      const distance = LA.distance(this.diff)
+      const middle1 = LA.scale(distance / 2, this.props.connection.from.direction)
+      const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.direction)
 
       const o = LA.round(this.offset)
       const v2 = LA.round(middle1)
       const v3 = LA.round(middle2)
       const v4 = LA.round(this.diff)
       return `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`    
+      // return `M0 0 L${v2.x} ${v2.y} L${v3.x} ${v3.y} L${v4.x} ${v4.y}`    
     }
 
     return ''

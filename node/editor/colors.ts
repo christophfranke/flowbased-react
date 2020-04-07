@@ -3,7 +3,7 @@ export function colorOfNodeType(nodeType: string) {
     Preview: 'render',
     Tag: 'render',
     Blank: 'value',
-    Text: 'value',
+    String: 'value',
     Object: 'value',
     Pair: 'value',
     List: 'value'
@@ -13,7 +13,7 @@ export function colorOfNodeType(nodeType: string) {
 export function colorOfValueType(valueType: string) {
   return {
     Element: 'render',
-    Text: 'value',
+    String: 'value',
     Pair: 'value',
     List: 'value',
     Object: 'value',

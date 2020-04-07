@@ -22,9 +22,9 @@ export const nodeList = [{
   type: 'Value',
   create: createPairNode
 }, {
-  name: 'Text',
+  name: 'String',
   type: 'Value',
-  create: createTextNode
+  create: createStringNode
 }, {
   name: 'HTML Element',
   type: 'Render',
@@ -61,7 +61,7 @@ export function createListNode(position: Vector): Node {
     position,
     type: 'List',
     connectors: {
-      input: [createValueInput('Text')],
+      input: [createValueInput('String')],
       output: [createValueOutput('List')],
       properties: []
     }
@@ -129,28 +129,21 @@ export function createTagNode(position: Vector): Node {
   }
 }
 
-export function createTextNode(position: Vector): Node {
+export function createStringNode(position: Vector): Node {
   return {
     id: uid(),
-    name: 'Text',
+    name: 'String',
     params: [{
       name: '',
-      key: 'text',
+      key: 'value',
       value: ''
     }],
     position,
-    type: 'Text',
+    type: 'String',
     connectors: {
       input: [],
-      output: [createValueOutput('Text')],
+      output: [createValueOutput('String')],
       properties: []
     }
   }
-}
-
-export function createRandomNode(position: Vector): Node {
-  const factories = [createTagNode, createTextNode, createPairNode, createObjectNode, createListNode]
-  const func = factories[Math.floor(Math.random() * factories.length)]
-
-  return func(position)
 }
