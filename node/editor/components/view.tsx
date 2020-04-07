@@ -222,7 +222,7 @@ class EditorView extends React.Component {
 
   handleKeyup = e => {
     this.keys[e.key] = false
-    if (e.key === 'Backspace') {
+    if (e.target === document.body && e.key === 'Backspace') {
       store.deleteNodes(store.selectedNodes)
     }
   }

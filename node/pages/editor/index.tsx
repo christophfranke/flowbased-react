@@ -2,7 +2,7 @@ import React from 'react'
 
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
-import Preview from '@engine/components/preview'
+import Preview from '@editor/components/preview'
 
 export default () => {
   return <div>
