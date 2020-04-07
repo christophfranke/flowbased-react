@@ -93,6 +93,12 @@ class Store {
     return flatten(Object.values(node.connectors))
   }
 
+  deleteNodes(nodes: Node[]) {
+    nodes.forEach(node => {
+      this.deleteNode(node)
+    })
+  }
+
   deleteNode(node: Node) {
     const connectors = this.connectorsOfNode(node)
     this.connections = this.connections

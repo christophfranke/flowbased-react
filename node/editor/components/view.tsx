@@ -223,7 +223,12 @@ class EditorView extends React.Component {
 
   handleKeyup = e => {
     this.keys[e.key] = false
+    if (e.key === 'Backspace') {
+      store.deleteNodes(store.selectedNodes)
+    }
   }
+
+  handleKeypress = e => {}
 
   selectWithRectangle = () => {
     if (this.drawableSelectionRectangle) {
@@ -267,6 +272,7 @@ class EditorView extends React.Component {
     window.addEventListener('resize', this.updateDimensions)
     window.addEventListener('keydown', this.handleKeydown)
     window.addEventListener('keyup', this.handleKeyup)
+    window.addEventListener('keypress', this.handleKeypress)
     this.dispose = autorun(this.selectWithRectangle)
     store.initialize()
   }
@@ -277,6 +283,7 @@ class EditorView extends React.Component {
     window.removeEventListener('resize', this.updateDimensions)
     window.removeEventListener('keydown', this.handleKeydown)
     window.removeEventListener('keyup', this.handleKeyup)
+    window.removeEventListener('keypress', this.handleKeypress)
     this.dispose()
   }
 
