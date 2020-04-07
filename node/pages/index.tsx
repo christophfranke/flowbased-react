@@ -2,6 +2,9 @@ import React from 'react'
 import fetch from 'isomorphic-fetch'
 import Link from 'next/link'
 
+import { autorun } from 'mobx'
+import { createTransformer, computedFn } from 'mobx-utils'
+
 interface Props {
   data: Data
 }
@@ -9,6 +12,7 @@ interface Props {
 interface Data {
   hello: string  
 }
+
 
 const Home = (props: Props) => {
   return <div>

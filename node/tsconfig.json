@@ -25,6 +25,7 @@
       "@middleware/*": ["middleware/*"],
       "@engine/*": ["engine/*"],
       "@editor/*": ["editor/*"],
+      "@shared/*": ["shared/*"],
       "@store/*": ["store/*"],
       "@pages/*": ["pages/*"],
       "@css/*": ["css/*"]
