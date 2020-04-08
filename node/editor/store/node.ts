@@ -1,11 +1,4 @@
 import { Node, Vector } from '@editor/types'
-import {
-  createRenderInput,
-  createRenderOutput,
-  createValueInput,
-  createValueOutput,
-  createProperty
-} from '@editor/connector'
 
 import Store from '@editor/store'
 
@@ -42,7 +35,7 @@ export default class NodeFunctions {
   }]
 
   createPreviewNode(position: Vector): Node {
-    const input = createRenderInput()
+    const input = this.store.connector.createRenderInput()
     input.mode = 'single'
 
     return {
@@ -67,8 +60,8 @@ export default class NodeFunctions {
       position,
       type: 'List',
       connectors: {
-        input: [createValueInput('String')],
-        output: [createValueOutput('List')],
+        input: [this.store.connector.createValueInput('String')],
+        output: [this.store.connector.createValueOutput('List')],
         properties: []
       }
     }
@@ -82,8 +75,8 @@ export default class NodeFunctions {
       type: 'Object',
       position,
       connectors: {
-        input: [createValueInput('Pair')],
-        output: [createValueOutput('Object')],
+        input: [this.store.connector.createValueInput('Pair')],
+        output: [this.store.connector.createValueOutput('Object')],
         properties: []
       }
     }
@@ -106,7 +99,7 @@ export default class NodeFunctions {
       type: 'Pair',
       connectors: {
         input: [],
-        output: [createValueOutput('Pair')],
+        output: [this.store.connector.createValueOutput('Pair')],
         properties: []
       }
     }
@@ -124,12 +117,12 @@ export default class NodeFunctions {
       position,
       type: 'Tag',
       connectors: {
-        input: [createRenderInput()],
-        output: [createRenderOutput()],
+        input: [this.store.connector.createRenderInput()],
+        output: [this.store.connector.createRenderOutput()],
         properties: [
-          createProperty('classList', 'List'),
-          createProperty('style', 'Object'),
-          createProperty('props', 'Object')
+          this.store.connector.createProperty('classList', 'List'),
+          this.store.connector.createProperty('style', 'Object'),
+          this.store.connector.createProperty('props', 'Object')
         ]
       }
     }
@@ -148,7 +141,7 @@ export default class NodeFunctions {
       type: 'String',
       connectors: {
         input: [],
-        output: [createValueOutput('String')],
+        output: [this.store.connector.createValueOutput('String')],
         properties: []
       }
     }

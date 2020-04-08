@@ -14,7 +14,6 @@ class Translator {
   editor: EditorGraph
   constructor(editor: EditorGraph) {
     this.editor = editor
-    console.log('constructor', this.editor.connections)
   }
 
   @transformer

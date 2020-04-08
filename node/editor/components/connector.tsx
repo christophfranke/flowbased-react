@@ -7,7 +7,7 @@ import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/typ
 import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { colors, colorOfValueType } from '@editor/colors'
-import store from '@editor/store'
+import Store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
 import RightArrow from '@editor/components/right-arrow'
@@ -21,17 +21,17 @@ const CONNECTOR_SIZE = 40
 @inject('store')
 @observer
 class ConnectorView extends React.Component<Props> {
-  store = this.props['store']
+  store: Store = this.props['store']
 
   @observable isHovering = false
   private ref = React.createRef<HTMLDivElement>()
   
   @computed get connectorState(): ConnectorState {
-    return this.store.state(this.props.connector)
+    return this.store.connector.state(this.props.connector)
   }
 
   @computed get connectionsState(): string {
-    return this.store.countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
+    return this.store.connector.countConnections(this.props.connector) > 0 ? 'connected' : 'empty'
   }
   
   @computed get showTitle(): boolean {

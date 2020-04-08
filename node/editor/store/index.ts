@@ -1,6 +1,6 @@
 import { observable, computed, autorun, action } from 'mobx'
 import { Connection, Node, Connector, ConnectorState } from '@editor/types'
-import { sync, load } from '@editor/local-storage-sync'
+import { sync, load } from '@shared/local-storage-sync'
 
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
@@ -28,26 +28,24 @@ class Store {
 
   static createFromLocalStorage(): Store {
     const store = new Store()
-    action(() => {    
-      store.nodes = load(['editor', 'nodes']) || []
+    store.nodes = load(['editor', 'nodes']) || []
 
-      // the connectors map reassures that strict equality comparisions
-      // work because two connections with the same id will be the same objects
-      const connectorsMap = store.connectors.reduce((obj, connector) => ({
-        ...obj,
-        [connector.id]: connector
-      }), {})
+    // the connectors map reassures that strict equality comparisions
+    // work because two connections with the same id will be the same objects
+    const connectorsMap = store.connectors.reduce((obj, connector) => ({
+      ...obj,
+      [connector.id]: connector
+    }), {})
 
-      // take the connectors from the map
-      const connections = load(['editor', 'connections']) || []
-      store.connections = connections.map(connection => ({
-        ...connection,
-        from: connectorsMap[connection.from.id],
-        to: connectorsMap[connection.to.id]
-      }))
+    // take the connectors from the map
+    const connections = load(['editor', 'connections']) || []
+    store.connections = connections.map(connection => ({
+      ...connection,
+      from: connectorsMap[connection.from.id],
+      to: connectorsMap[connection.to.id]
+    }))
 
-      store.currentId = load(['editor', 'uid']) || 0
-    })
+    store.currentId = load(['editor', 'uid']) || 0
 
     // autosave immediately
     sync(['editor', 'connections'], store, 'connections')
