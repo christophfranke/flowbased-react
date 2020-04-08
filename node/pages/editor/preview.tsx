@@ -15,13 +15,9 @@ const store = typeof window !== 'undefined'
 class EditorPreview extends React.Component {
   render() {
     if (store) {    
-      return <div>
-        <Provider store={store}>
-          <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-            <Preview  />
-          </Viewport>
-        </Provider>
-      </div>
+      return <Provider store={store}>
+        <Preview  />
+      </Provider>
     }
 
     return <div>This component cannot be rendered on the server</div>
