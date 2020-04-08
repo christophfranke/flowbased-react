@@ -39,7 +39,8 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get valueColor() {
-    return colors.types[colorOfValueType(this.props.connector.type)]
+    console.warn('Value Color not implemented')
+    return colors.types['render']
   }
 
   @computed get fillColor(): string {

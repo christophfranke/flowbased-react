@@ -7,7 +7,7 @@ import { transformer } from '@shared/util'
 
 export default (Component) => {
   @observer
-  class ObserverComponent extends React.Component<NodeProps> {
+  class RenderComponent extends React.Component<NodeProps> {
     @transformer
     getChild(childNode: Node) {
       return render(childNode, [...this.props.parents, this.props.node])
@@ -35,5 +35,5 @@ export default (Component) => {
     }
   }
 
-  return ObserverComponent
+  return RenderComponent
 }

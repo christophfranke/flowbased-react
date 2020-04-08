@@ -1,10 +1,16 @@
 import React from 'react'
 
-export type ValueType = 'Element' | 'String' | 'Pair' | 'List' | 'Object' | 'Number' | 'Nothing'
+type ValueBaseType = 'Element' | 'String' | 'Boolean' | 'Array' | 'Object' | 'Number' | 'Pair' | 'Unresolved' | 'Null'
+export interface ValueType {
+  display: string
+  name: ValueBaseType,
+  params: {
+    [key: string]: ValueType
+  }
+}
 export interface Connection {
   readonly id: number
   readonly node: Node
-  readonly type: ValueType
   readonly key: string
 }
 

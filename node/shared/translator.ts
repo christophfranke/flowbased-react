@@ -44,8 +44,7 @@ class Translator {
     return {
       id: editorConnection.id,
       node: this.getNode(node),
-      key: editorConnection.to.name,
-      type: editorConnection.from.type
+      key: editorConnection.to.name
     }
   }
 

@@ -26,15 +26,8 @@ export default class ConnectorFunctions {
   }
 
   valuesAreCompatible(src: Connector, dest: Connector): boolean {
-    if (dest.type === 'Element') {
-      return true
-    }
-
-    if (src.type === dest.type) {
-      return true
-    }
-
-    return false
+    console.warn('values compatilble not implemented')
+    return true
   }
 
   isSrc(connector: Connector): boolean {
@@ -75,17 +68,6 @@ export default class ConnectorFunctions {
     return this.getConnections(connector).length
   }
 
-  createProperty(name: string, type: ValueType): Connector {
-    return {
-      id: this.store.uid(),
-      mode: 'single',
-      function: 'property',
-      name,
-      type,
-      direction: { x: -1, y: 0 }
-    }
-  }
-
   cloneConnector(src: Connector) {
     return {
       ...src,
@@ -98,7 +80,6 @@ export default class ConnectorFunctions {
       id: this.store.uid(),
       mode: 'duplicate',
       function: 'input',
-      type: 'Element',
       name: 'input',
       direction: { x: 0, y: -1 }
     }
@@ -110,29 +91,36 @@ export default class ConnectorFunctions {
       mode: 'multiple',
       name: 'output',
       function: 'output',
-      type: 'Element',
       direction: { x: 0, y: 1 }
     }
   }
 
-  createValueInput(type: ValueType): Connector {
+  createProperty(name: string): Connector {
     return {
       id: this.store.uid(),
+      mode: 'single',
+      function: 'property',
+      name,
+      direction: { x: -1, y: 0 }
+    }
+  }
+
+  createValueInput(name: string): Connector {
+    return {
+      id: this.store.uid(),
+      name,
       mode: 'duplicate',
       function: 'input',
-      type,
-      name: type,
       direction: { x: 0, y: -1 }
     }
   }
 
-  createValueOutput(type: ValueType): Connector {
+  createValueOutput(): Connector {
     return {
       id: this.store.uid(),
       mode: 'multiple',
-      name: type,
+      name: 'output',
       function: 'output',
-      type,
       direction: { x: 0, y: 1 }
     }
   }

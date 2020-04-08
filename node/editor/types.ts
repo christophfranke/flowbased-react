@@ -27,7 +27,6 @@ export interface Connector {
   name: string
   mode: ConnectorMode
   function: ConnectorFunction
-  type: ValueType
   direction: Vector
   position?: Vector
 }
