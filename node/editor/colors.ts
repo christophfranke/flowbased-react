@@ -2,7 +2,8 @@ export function colorOfNodeType(nodeType: string) {
   return {
     Preview: 'render',
     Tag: 'render',
-    Value: 'value',
+    Primitive: 'value',
+    List: 'value',
   }[nodeType]
 }
 

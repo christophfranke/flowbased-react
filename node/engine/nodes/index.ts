@@ -1,21 +1,43 @@
+import React from 'react'
+import { Node, RenderProps } from '@engine/types'
 import RenderTag from '@engine/nodes/tag/render'
-import RenderValue from '@engine/nodes/value/render'
 import RenderPreview from '@engine/nodes/preview/render'
-import RawValue from '@engine/nodes/value/value'
+import PrimitiveValue from '@engine/nodes/primitive/value'
+import ListValue from '@engine/nodes/list/value'
 
-const NoValue = () => null
+export interface ValueResolver {
+  resolve: (node: Node) => any
+  type: 'Value'
+}
 
-export default {
-  Value: {
-    render: RenderValue,
-    value: RawValue
+type ReactComponent = React.Component<RenderProps>
+type ReactFunction = (props: RenderProps) => React.ReactElement
+
+interface ReactComponentResolver {
+  resolve: ReactComponent | ReactFunction
+  type: 'React.Component'
+}
+
+interface Nodes {
+  [key: string]: ValueResolver | ReactComponentResolver
+}
+const Nodes: Nodes = {
+  Primitive: {
+    resolve: PrimitiveValue,
+    type: 'Value'
+  },
+  List: {
+    resolve: ListValue,
+    type: 'Value'
   },
   Tag: {
-    render: RenderTag,
-    value: NoValue
+    resolve: RenderTag,
+    type: 'React.Component'
   },
   Preview: {
-    render: RenderPreview,
-    value: NoValue
+    resolve: RenderPreview,
+    type: 'React.Component'
   }
 }
+
+export default Nodes

@@ -3,10 +3,12 @@ import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
 import { RenderProps, NodeProps, Node } from '@engine/types'
 import { render, value } from '@engine/render'
+import { transformer } from '@shared/util'
 
 export default (Component) => {
   @observer
   class ObserverComponent extends React.Component<NodeProps> {
+    @transformer
     getChild(childNode: Node) {
       return render(childNode, [...this.props.parents, this.props.node])
     }

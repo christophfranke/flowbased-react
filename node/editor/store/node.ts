@@ -54,7 +54,7 @@ export default class NodeFunctions {
       name: 'List',
       params: [],
       position,
-      type: 'Value',
+      type: 'List',
       connectors: {
         input: [this.store.connector.createValueInput('String')],
         output: [this.store.connector.createValueOutput('List')],
@@ -68,7 +68,7 @@ export default class NodeFunctions {
       id: this.store.uid(),
       name: 'Object',
       params: [],
-      type: 'Value',
+      type: 'Primitive',
       position,
       connectors: {
         input: [this.store.connector.createValueInput('Pair')],
@@ -92,7 +92,7 @@ export default class NodeFunctions {
         value: ''
       }],
       position,
-      type: 'Value',
+      type: 'Primitive',
       connectors: {
         input: [],
         output: [this.store.connector.createValueOutput('Pair')],
@@ -134,7 +134,7 @@ export default class NodeFunctions {
         value: ''
       }],
       position,
-      type: 'Value',
+      type: 'Primitive',
       connectors: {
         input: [],
         output: [this.store.connector.createValueOutput('String')],
@@ -153,7 +153,7 @@ export default class NodeFunctions {
         value: ''
       }],
       position,
-      type: 'Value',
+      type: 'Primitive',
       connectors: {
         input: [],
         output: [this.store.connector.createValueOutput('Number')],
