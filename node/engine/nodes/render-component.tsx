@@ -7,12 +7,8 @@ import { render, value } from '@engine/render'
 export default (Component) => {
   @observer
   class ObserverComponent extends React.Component<NodeProps> {
-    @observable childMap = {}
-    getChild(node: Node) {
-      if (!this.childMap[node.id]) {
-        this.childMap[node.id] = render(node, [...this.props.parents, this.props.node])
-      }
-      return this.childMap[node.id]
+    getChild(childNode: Node) {
+      return render(childNode, [...this.props.parents, this.props.node])
     }
 
     @computed get children() {
