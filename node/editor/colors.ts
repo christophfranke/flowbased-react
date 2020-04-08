@@ -4,6 +4,7 @@ export function colorOfNodeType(nodeType: string) {
     Tag: 'render',
     Blank: 'value',
     String: 'value',
+    Number: 'value',
     Object: 'value',
     Pair: 'value',
     List: 'value'
@@ -14,6 +15,7 @@ export function colorOfValueType(valueType: string) {
   return {
     Element: 'render',
     String: 'value',
+    Number: 'value',
     Pair: 'value',
     List: 'value',
     Object: 'value',

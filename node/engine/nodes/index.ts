@@ -33,6 +33,10 @@ export default {
     render: StringRender,
     value: StringValue
   },
+  Number: {
+    render: StringRender,
+    value: StringValue
+  },
   Pair: {
     render: PairRender,
     value: PairValue

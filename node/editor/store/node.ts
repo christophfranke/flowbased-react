@@ -10,20 +10,16 @@ export default class NodeFunctions {
 
   nodeList = [{
     name: 'List',
-    type: 'Transform',
-    create: this.createListNode.bind(this)
-  }, {
-    name: 'Object',
-    type: 'Transform',
-    create: this.createObjectNode.bind(this)
-  }, {
-    name: 'Pair',
     type: 'Value',
-    create: this.createPairNode.bind(this)
+    create: this.createListNode.bind(this)
   }, {
     name: 'String',
     type: 'Value',
     create: this.createStringNode.bind(this)
+  }, {
+    name: 'Number',
+    type: 'Value',
+    create: this.createNumberNode.bind(this)
   }, {
     name: 'HTML Element',
     type: 'Render',
@@ -146,4 +142,22 @@ export default class NodeFunctions {
       }
     }
   }
-}
+
+  createNumberNode(position: Vector): Node {
+    return {
+      id: this.store.uid(),
+      name: 'Number',
+      params: [{
+        name: '',
+        key: 'value',
+        value: ''
+      }],
+      position,
+      type: 'Number',
+      connectors: {
+        input: [],
+        output: [this.store.connector.createValueOutput('Number')],
+        properties: []
+      }
+    }
+  }}
