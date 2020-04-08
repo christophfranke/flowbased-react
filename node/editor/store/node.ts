@@ -54,10 +54,10 @@ export default class NodeFunctions {
       name: 'List',
       params: [],
       position,
-      type: 'List',
+      type: 'Array',
       connectors: {
-        input: [this.store.connector.createValueInput('String')],
-        output: [this.store.connector.createValueOutput('List')],
+        input: [this.store.connector.createValueInput()],
+        output: [this.store.connector.createValueOutput()],
         properties: []
       }
     }
@@ -68,11 +68,11 @@ export default class NodeFunctions {
       id: this.store.uid(),
       name: 'Object',
       params: [],
-      type: 'Primitive',
+      type: 'Object',
       position,
       connectors: {
-        input: [this.store.connector.createValueInput('Pair')],
-        output: [this.store.connector.createValueOutput('Object')],
+        input: [this.store.connector.createValueInput()],
+        output: [this.store.connector.createValueOutput()],
         properties: []
       }
     }
@@ -86,16 +86,12 @@ export default class NodeFunctions {
         name: 'Key',
         key: 'key',
         value: ''
-      }, {
-        name: 'Value',
-        key: 'value',
-        value: ''
       }],
       position,
-      type: 'Primitive',
+      type: 'Pair',
       connectors: {
-        input: [],
-        output: [this.store.connector.createValueOutput('Pair')],
+        input: [this.store.connector.createValueInput({ mode: 'single' })],
+        output: [this.store.connector.createValueOutput()],
         properties: []
       }
     }
@@ -116,9 +112,9 @@ export default class NodeFunctions {
         input: [this.store.connector.createRenderInput()],
         output: [this.store.connector.createRenderOutput()],
         properties: [
-          this.store.connector.createProperty('classList', 'List'),
-          this.store.connector.createProperty('style', 'Object'),
-          this.store.connector.createProperty('props', 'Object')
+          this.store.connector.createProperty('classList'),
+          this.store.connector.createProperty('style'),
+          this.store.connector.createProperty('props')
         ]
       }
     }
@@ -134,14 +130,15 @@ export default class NodeFunctions {
         value: ''
       }],
       position,
-      type: 'Primitive',
+      type: 'String',
       connectors: {
         input: [],
-        output: [this.store.connector.createValueOutput('String')],
+        output: [this.store.connector.createValueOutput()],
         properties: []
       }
     }
   }
+
 
   createNumberNode(position: Vector): Node {
     return {
@@ -153,11 +150,31 @@ export default class NodeFunctions {
         value: ''
       }],
       position,
-      type: 'Primitive',
+      type: 'Number',
       connectors: {
         input: [],
-        output: [this.store.connector.createValueOutput('Number')],
+        output: [this.store.connector.createValueOutput()],
         properties: []
       }
     }
-  }}
+  }
+
+  createBooleanNode(position: Vector): Node {
+    return {
+      id: this.store.uid(),
+      name: 'Number',
+      params: [{
+        name: '',
+        key: 'value',
+        value: ''
+      }],
+      position,
+      type: 'Boolean',
+      connectors: {
+        input: [],
+        output: [this.store.connector.createValueOutput()],
+        properties: []
+      }
+    }
+  }
+}

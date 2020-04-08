@@ -140,7 +140,8 @@ class NodeView extends React.Component<Props> {
     }
 
     const { node } = this.props
-    const typeColor = colors.types[colorOfNodeType(node.type)][this.isSelected ? 'highlight': 'default']
+    console.warn('reimplement colors')
+    const typeColor = colors.types['render'][this.isSelected ? 'highlight': 'default']
 
     const height = 2 * CONNECTOR_SIZE + DESCRIPTION_HEIGHT + 2 * NODE_PADDING
     const width = Math.max(

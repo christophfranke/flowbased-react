@@ -35,6 +35,7 @@ interface Nodes {
   [key: string]: ValueResolver | ReactComponentResolver
 }
 
+export type CoreNode = 'String' | 'Number' | 'Boolean' | 'Array' | 'Object' | 'Pair' | 'Tag' | 'Preview'
 const Nodes: Nodes = {
   String: {
     resolve: (node: Node) => node.params.value,

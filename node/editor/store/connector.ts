@@ -105,13 +105,14 @@ export default class ConnectorFunctions {
     }
   }
 
-  createValueInput(name: string): Connector {
+  createValueInput(override = {}): Connector {
     return {
       id: this.store.uid(),
-      name,
+      name: 'input',
       mode: 'duplicate',
       function: 'input',
-      direction: { x: 0, y: -1 }
+      direction: { x: 0, y: -1 },
+      ...override
     }
   }
 

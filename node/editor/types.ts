@@ -40,7 +40,7 @@ export interface Parameter<T> {
 export interface Node {
   id: number
   name: string
-  type: Engine.NodeType
+  type: Engine.CoreNode
   params: Parameter<string>[]
   position: Vector
   boundingBox?: Rectangle

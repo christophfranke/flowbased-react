@@ -65,7 +65,7 @@ class Translator {
 
     return {
       id: editorNode.id,
-      type: editorNode.type,
+      name: editorNode.type,
       get params() {
         return editorNode.params.reduce((obj, {key, value}) => ({
           ...obj,

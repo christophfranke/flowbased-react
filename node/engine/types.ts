@@ -1,4 +1,5 @@
 import React from 'react'
+import * as Nodes from '@engine/nodes'
 
 type ValueBaseType = 'Element' | 'String' | 'Boolean' | 'Array' | 'Object' | 'Number' | 'Pair' | 'Unresolved' | 'Null'
 export interface ValueType {
@@ -20,10 +21,11 @@ export interface Params<T> {
 export interface Properties {
   [key: string]: any
 }
-export type NodeType = 'Primitive' | 'List' | 'Tag' | 'Preview'
+
+export type CoreNode = Nodes.CoreNode
 export interface Node {
   readonly id: number
-  readonly type: NodeType
+  readonly name: CoreNode
   readonly params: Params<string>
   connections: {
     readonly input: Connection[]
