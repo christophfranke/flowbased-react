@@ -20,6 +20,12 @@ export function type(node: Node): ValueType {
   return Nodes[node.name].type.output(node)
 }
 
+export function expectedType(node: Node, key = ''): ValueType | undefined {
+  return key
+    ? Nodes[node.name].type.properties[key](node)
+    : Nodes[node.name].type.input && Nodes[node.name].type.input!(node)
+}
+
 let currentRenderId = 0
 function getRenderKey(): number {
   currentRenderId += 1

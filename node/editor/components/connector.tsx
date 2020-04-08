@@ -2,11 +2,13 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Connector, ConnectorState, Connection, Vector, Node } from '@editor/types'
+import { Connector, ConnectorState, Connection, Vector, Node, ValueType } from '@editor/types'
 
 import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { colors, colorOfValueType } from '@editor/colors'
+import { describe } from '@shared/type-display'
+import { type, expectedType } from '@engine/render'
 import Store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
@@ -63,6 +65,39 @@ class ConnectorView extends React.Component<Props> {
     }
 
     return 'pointer'
+  }
+
+  @computed get type(): ValueType | undefined {
+    const editorNode = this.store.nodeOfConnector(this.props.connector)
+    if (editorNode) {
+      const node = this.store.translated.getNode(editorNode)
+      if (this.props.connector.function === 'output') {
+        return type(node)
+      }
+      if (this.props.connector.function === 'input') {
+        return expectedType(node)
+      }
+      if (this.props.connector.function === 'property') {
+        return expectedType(node, this.props.connector.name)
+      }
+    }
+
+    return undefined
+  }
+
+  @computed get typeDisplay(): string {
+    return this.type ? describe(this.type) : 'Unknown'
+  }
+
+  @computed get nameDisplay(): string {
+    if (this.props.connector.name === 'input') {
+      return 'in'
+    }
+    if (this.props.connector.name === 'output') {
+      return 'out'
+    }
+
+    return this.props.connector.name
   }
 
   consume = e => {
@@ -185,7 +220,7 @@ class ConnectorView extends React.Component<Props> {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y !== 0) {
-      positioning['transform'] = 'translateY(-10px) rotate(-50deg)'
+      positioning['transform'] = 'translate(-10px, -70px) rotate(-50deg)'
     }
 
     const titleStyle: React.CSSProperties = this.showTitle
@@ -196,6 +231,7 @@ class ConnectorView extends React.Component<Props> {
         opacity: 0.9,
         lineHeight: `${CONNECTOR_SIZE}px`,
         fontSize: '30px',
+        whiteSpace: 'nowrap',
         color: colors.text.white
       } : {
         display: 'none'
@@ -211,7 +247,7 @@ class ConnectorView extends React.Component<Props> {
 
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
-      <div style={titleStyle}>{this.props.connector.name}</div>
+      <div style={titleStyle}>{this.nameDisplay}: {this.typeDisplay}</div>
       {arrow}
     </div>
   }

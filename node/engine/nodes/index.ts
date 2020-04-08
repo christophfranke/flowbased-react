@@ -65,11 +65,13 @@ const Nodes: Nodes = {
     resolve: (node: Node) => node.connections.input.map(connection => value(connection.node)),
     type: {
       output: (node: Node) =>
-        TypeDefinition.Array(node.connections.input.map(connection =>
-          type(connection.node)).find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved),
+        TypeDefinition.Array(node.connections.input
+          .map(connection => type(connection.node))
+          .find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved),
       input: (node: Node) =>
-        node.connections.input.map(connection =>
-          type(connection.node)).find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved,
+        node.connections.input
+          .map(connection => type(connection.node))
+          .find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved,
       properties: {}
     },
     renderFunction: 'Value'

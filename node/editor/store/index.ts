@@ -1,6 +1,7 @@
 import { observable, computed, autorun, action } from 'mobx'
 import { Connection, Node, Connector, ConnectorState } from '@editor/types'
 import { sync, load } from '@shared/local-storage-sync'
+import Translator from '@shared/translator'
 
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
@@ -19,9 +20,13 @@ class Store {
     return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
   }
 
+  translated: Translator
+
   constructor() {
     this.connector = new ConnectorFunctions(this)
     this.node = new NodeFunctions(this)
+
+    this.translated = new Translator(this)
 
     autorun(this.addInputConnectors)
   }
