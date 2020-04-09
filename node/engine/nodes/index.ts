@@ -115,7 +115,7 @@ const Nodes: Nodes = {
     resolve: RenderTag,
     type: {
       output: () => TypeDefinition.Element,
-      input: () => TypeDefinition.Element,
+      input: () => TypeDefinition.Unresolved,
       properties: {
         props: () => TypeDefinition.Object({}),
         style: () => TypeDefinition.Object({}),

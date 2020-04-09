@@ -27,6 +27,10 @@ class ConnectorView extends React.Component<Props> {
 
   @observable isHovering = false
   private ref = React.createRef<HTMLDivElement>()
+
+  @computed get connections(): Connection[] {
+    return this.store.connector.getConnections(this.props.connector)
+  }
   
   @computed get connectorState(): ConnectorState {
     return this.store.connector.state(this.props.connector)
@@ -74,6 +78,16 @@ class ConnectorView extends React.Component<Props> {
       if (this.props.connector.function === 'output') {
         return type(node)
       }
+
+      if (['input', 'property'].includes(this.props.connector.function)) {        
+        if (this.connections.length === 1) {
+          const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
+          if (otherEditorNode) {
+            return type(this.store.translated.getNode(otherEditorNode))
+          }
+        }
+      }
+
       if (this.props.connector.function === 'input') {
         return expectedType(node)
       }
@@ -124,7 +138,7 @@ class ConnectorView extends React.Component<Props> {
   }
 
   unconnect(): Connector | undefined {
-    const connection = this.store.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+    const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
     if (connection) {
       const other = connection.from === this.props.connector
         ? connection.to
