@@ -68,9 +68,7 @@ const Nodes: Nodes = {
         TypeDefinition.Array(node.connections.input[0]
           ? type(node.connections.input[0].node)
           : TypeDefinition.Unresolved),
-      input: (node: Node) => node.connections.input[0]
-        ? type(node.connections.input[0].node)
-        : TypeDefinition.Unresolved,
+      input: (node: Node) => type(node).params.items,
       properties: {}
     },
     renderFunction: 'Value'

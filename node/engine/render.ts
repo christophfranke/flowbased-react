@@ -20,11 +20,15 @@ export function type(node: Node): ValueType {
   return Nodes[node.name].type.output(node)
 }
 
-export function expectedType(node: Node, key = ''): ValueType | undefined {
+export function expectedType(node: Node, key: string = ''): ValueType | undefined {
   return key
     ? Nodes[node.name].type.properties[key](node)
     : Nodes[node.name].type.input && Nodes[node.name].type.input!(node)
 }
+
+// export function matchType(src: Node, target: Node, key: string = ''): ValueType {
+//   return null
+// }
 
 let currentRenderId = 0
 function getRenderKey(): number {
