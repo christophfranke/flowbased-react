@@ -43,6 +43,7 @@ export function render(node: Node, parents: Node[] = []) {
   }
 
   if (renderFunction === 'Value') {
-    return value(node)
+    //TODO: Find a more decent solution
+    return JSON.stringify(value(node))
   }
 }
