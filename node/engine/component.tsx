@@ -18,7 +18,7 @@ const HOC = (Component) => {
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
     getChild(childNode: Node) {
-      const result = value(childNode, [...this.props.parents, this.props.node])
+      const result = value(childNode)
       if (type(childNode).name === 'Object') {
         return JSON.stringify(result)
       }

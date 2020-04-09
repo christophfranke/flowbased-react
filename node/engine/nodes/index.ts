@@ -88,7 +88,9 @@ const Nodes: Nodes = {
       value: node.connections.input[0] ? value(node.connections.input[0].node) : undefined
     }),
     type: {
-      output: (node: Node) => TypeDefinition.Pair(node.connections.input[0] ? unmatchedType(node.connections.input[0].node) : TypeDefinition.Unresolved),
+      output: (node: Node) => TypeDefinition.Pair(node.connections.input[0]
+        ? unmatchedType(node.connections.input[0].node)
+        : TypeDefinition.Unresolved),
       input: () => TypeDefinition.Unresolved,
       properties: {}
     }

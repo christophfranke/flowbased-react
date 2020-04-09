@@ -28,7 +28,6 @@ export default class ConnectorFunctions {
   }
 
   valuesAreCompatible(src: Connector, dest: Connector): boolean {
-    console.warn('values compatilble not implemented')
     if (src.function === 'output') {
       const srcNode = this.store.nodeOfConnector(src)
       const targetNode = this.store.nodeOfConnector(dest)
