@@ -1,6 +1,8 @@
 import { Node, Vector } from '@editor/types'
+import { CoreNode } from '@engine/types'
 
 import Store from '@editor/store'
+import Nodes from '@engine/nodes'
 
 export default class NodeFunctions {
   store: Store
@@ -9,13 +11,21 @@ export default class NodeFunctions {
   }
 
   nodeList = [{
-    name: 'List',
+    name: 'Array',
     type: 'Value',
-    create: this.createListNode.bind(this)
+    create: (position: Vector): Node => this.createNode(position, 'Array')
+  }, {
+    name: 'Object',
+    type: 'Value',
+    create: (position: Vector): Node => this.createNode(position, 'Object')
   }, {
     name: 'String',
     type: 'Value',
     create: this.createStringNode.bind(this)
+  }, {
+    name: 'Pair',
+    type: 'Value',
+    create: this.createPairNode.bind(this)
   }, {
     name: 'Number',
     type: 'Value',
@@ -30,52 +40,37 @@ export default class NodeFunctions {
     create: this.createPreviewNode.bind(this)
   }]
 
+  createNode(position: Vector, type: CoreNode): Node {
+    const Node = Nodes[type]
+    const output = {
+      'Value': this.store.connector.createValueOutput,
+      'React.Component': this.store.connector.createRenderOutput
+    }[Node.renderFunction]
+    const input = {
+      'Value': this.store.connector.createValueInput,
+      'React.Component': this.store.connector.createRenderInput
+    }[Node.renderFunction]
+    const property = this.store.connector.createProperty
+
+    return {
+      id: this.store.uid(),
+      name: type,
+      type,
+      params: [],
+      position,
+      connectors: {
+        input: Node.type.input ? [input()] : [],
+        output: [output()],
+        properties: Object.keys(Node.type.properties)
+          .map(key => property(key))
+      }
+    }
+  }
+
   createPreviewNode(position: Vector): Node {
-    const input = this.store.connector.createRenderInput()
-    input.mode = 'single'
-
-    return {
-      id: this.store.uid(),
-      name: 'Preview',
-      params: [],
-      type: 'Preview',
-      position,
-      connectors: {
-        input: [input],
-        output: [],
-        properties: []
-      }
-    }
-  }
-
-  createListNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'List',
-      params: [],
-      position,
-      type: 'Array',
-      connectors: {
-        input: [this.store.connector.createValueInput()],
-        output: [this.store.connector.createValueOutput()],
-        properties: []
-      }
-    }
-  }
-
-  createObjectNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'Object',
-      params: [],
-      type: 'Object',
-      position,
-      connectors: {
-        input: [this.store.connector.createValueInput()],
-        output: [this.store.connector.createValueOutput()],
-        properties: []
-      }
-    }
+    const node = this.createNode(position, 'Preview')
+    node.connectors.input[0].mode = 'single'
+    return node
   }
 
   createPairNode(position: Vector): Node {

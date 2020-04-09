@@ -91,13 +91,13 @@ class ConnectorView extends React.Component<Props> {
 
   @computed get nameDisplay(): string {
     if (this.props.connector.name === 'input') {
-      return 'in'
+      return this.typeDisplay
     }
     if (this.props.connector.name === 'output') {
-      return 'out'
+      return this.typeDisplay
     }
 
-    return this.props.connector.name
+    return `${this.props.connector.name}: ${this.typeDisplay}`
   }
 
   consume = e => {
@@ -220,7 +220,7 @@ class ConnectorView extends React.Component<Props> {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y !== 0) {
-      positioning['transform'] = 'translate(-10px, -70px) rotate(-50deg)'
+      positioning['transform'] = 'translate(-5px, -40px) rotate(-50deg)'
     }
 
     const titleStyle: React.CSSProperties = this.showTitle
@@ -247,7 +247,7 @@ class ConnectorView extends React.Component<Props> {
 
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
-      <div style={titleStyle}>{this.nameDisplay}: {this.typeDisplay}</div>
+      <div style={titleStyle}>{this.nameDisplay}</div>
       {arrow}
     </div>
   }

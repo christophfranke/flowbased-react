@@ -75,7 +75,7 @@ export default class ConnectorFunctions {
     }
   }
 
-  createRenderInput(): Connector {
+  createRenderInput = (): Connector => {
     return {
       id: this.store.uid(),
       mode: 'duplicate',
@@ -85,7 +85,7 @@ export default class ConnectorFunctions {
     }
   }
 
-  createRenderOutput(): Connector {
+  createRenderOutput = (): Connector => {
     return {
       id: this.store.uid(),
       mode: 'multiple',
@@ -95,7 +95,7 @@ export default class ConnectorFunctions {
     }
   }
 
-  createProperty(name: string): Connector {
+  createProperty = (name: string): Connector => {
     return {
       id: this.store.uid(),
       mode: 'single',
@@ -105,7 +105,7 @@ export default class ConnectorFunctions {
     }
   }
 
-  createValueInput(override = {}): Connector {
+  createValueInput = (override = {}): Connector => {
     return {
       id: this.store.uid(),
       name: 'input',
@@ -116,7 +116,7 @@ export default class ConnectorFunctions {
     }
   }
 
-  createValueOutput(): Connector {
+  createValueOutput = (): Connector => {
     return {
       id: this.store.uid(),
       mode: 'multiple',

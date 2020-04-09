@@ -7,7 +7,7 @@ export function describe(type: ValueType): string {
         const key = match.substring(1, match.length - 1)
         if (!key) {
           return "{ " 
-            + Object.entries(type.params).map(([key, type]) => `key: ${describe(type)}`).join(', ')
+            + Object.entries(type.params).map(([key, type]) => `${key}: ${describe(type)}`).join(', ')
             + " }"
         } else if (type.params[key]) {
           return describe(type.params[key])

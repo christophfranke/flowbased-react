@@ -65,13 +65,12 @@ const Nodes: Nodes = {
     resolve: (node: Node) => node.connections.input.map(connection => value(connection.node)),
     type: {
       output: (node: Node) =>
-        TypeDefinition.Array(node.connections.input
-          .map(connection => type(connection.node))
-          .find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved),
-      input: (node: Node) =>
-        node.connections.input
-          .map(connection => type(connection.node))
-          .find(type => type !== TypeDefinition.Unresolved) || TypeDefinition.Unresolved,
+        TypeDefinition.Array(node.connections.input[0]
+          ? type(node.connections.input[0].node)
+          : TypeDefinition.Unresolved),
+      input: (node: Node) => node.connections.input[0]
+        ? type(node.connections.input[0].node)
+        : TypeDefinition.Unresolved,
       properties: {}
     },
     renderFunction: 'Value'
@@ -79,12 +78,22 @@ const Nodes: Nodes = {
   Object: {
     resolve: (node: Node) => node.connections.input
       .map(connection => value(connection.node))
+      .filter(pair => pair.key)
       .reduce((obj, pair) => ({
         ...obj,
         [pair.key]: pair.value
-      })),
+      }), {}),
     type: {
-      output: () => TypeDefinition.Object({}),
+      output: (node: Node) => TypeDefinition.Object(node.connections.input
+        .map(connection => ({
+          key: value(connection.node).key,
+          type: type(connection.node).params.value
+        }))
+        .filter(pair => pair.key)
+        .reduce((obj, pair) => ({
+          ...obj,
+          [pair.key]: pair.type
+        }), {})),
       input: () => TypeDefinition.Pair(TypeDefinition.Unresolved),
       properties: {}
     },
