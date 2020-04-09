@@ -63,3 +63,9 @@ export const Mismatch: ValueType = {
   name: 'Mismatch',
   params: {}
 }
+
+export const Circular: ValueType = {
+  display: 'Circular Dependency',
+  name: 'Circular',
+  params: {}
+}

@@ -5,7 +5,7 @@ import * as TypeDefinition from '@engine/type-definition'
 
 import Tag from '@engine/nodes/tag'
 import Preview from '@engine/nodes/preview'
-import renderComponent from '@engine/nodes/render-component'
+import component from '@engine/component'
 
 export interface Resolver {  
   type: {
@@ -94,7 +94,7 @@ const Nodes: Nodes = {
     }
   },
   Tag: {
-    resolve: (node: Node) => renderComponent(node, Tag),
+    resolve: (node: Node) => component(node, Tag),
     type: {
       output: () => TypeDefinition.Element,
       input: () => TypeDefinition.Unresolved,
@@ -106,7 +106,7 @@ const Nodes: Nodes = {
     }
   },
   Preview: {
-    resolve: (node: Node) => renderComponent(node, Preview),
+    resolve: (node: Node) => component(node, Preview),
     type: {
       output: () => TypeDefinition.Null,
       input: () => TypeDefinition.Element,

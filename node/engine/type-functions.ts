@@ -12,7 +12,7 @@ export function create(name: ValueBaseType, args?: any): ValueType {
 }
 
 export function isGeneric(name: ValueBaseType): boolean {
-  return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null'].includes(name)
+  return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Circular'].includes(name)
 }
 
 export function isMismatch(type: ValueType): boolean {

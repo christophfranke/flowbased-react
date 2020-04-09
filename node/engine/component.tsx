@@ -2,7 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
 import { RenderProps, NodeProps, Node } from '@engine/types'
-import { render, value } from '@engine/render'
+import { value, type } from '@engine/render'
 import { transformer } from '@shared/util'
 import Nodes from '@engine/nodes'
 
@@ -18,7 +18,12 @@ const HOC = (Component) => {
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
     getChild(childNode: Node) {
-      return render(childNode, [...this.props.parents, this.props.node])
+      const result = value(childNode, [...this.props.parents, this.props.node])
+      if (type(childNode).name === 'Object') {
+        return JSON.stringify(result)
+      }
+
+      return result
     }
 
     @computed get children() {
