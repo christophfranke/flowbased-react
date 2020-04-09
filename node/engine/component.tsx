@@ -3,6 +3,7 @@ import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
 import { RenderProps, NodeProps, Node } from '@engine/types'
 import { value, type } from '@engine/render'
+import { contains } from '@engine/type-functions'
 import { transformer } from '@shared/util'
 import Nodes from '@engine/nodes'
 
@@ -19,7 +20,7 @@ const HOC = (Component) => {
     @transformer
     getChild(childNode: Node) {
       const result = value(childNode)
-      if (type(childNode).name === 'Object') {
+      if (contains(type(childNode), 'Object')) {
         return JSON.stringify(result)
       }
 

@@ -11,7 +11,7 @@ export function value(node: Node): any {
 }
 
 export function render(node: Node): any {
-  return value(node, reset)
+  return value(node)
 }
 
 export function unmatchedType(node: Node): ValueType {
@@ -23,7 +23,7 @@ export function type(node: Node): ValueType {
     (resultType, connection) => {
       return matchType(resultType, expectedType(connection.node, connection.key))
     },
-    unmatchedType(node, reset)
+    unmatchedType(node)
   )
 }
 

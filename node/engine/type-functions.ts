@@ -15,16 +15,20 @@ export function isGeneric(name: ValueBaseType): boolean {
   return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Circular'].includes(name)
 }
 
-export function isMismatch(type: ValueType): boolean {
-  if (type.name === 'Mismatch') {
+export function contains(type: ValueType, name: ValueBaseType): boolean {  
+  if (type.name === name) {
     return true
   }
 
-  if (Object.values(type.params).some(paramType => isMismatch(paramType))) {
+  if (Object.values(type.params).some(paramType => contains(paramType, name))) {
     return true
   }
 
   return false
+}
+
+export function isMismatch(type: ValueType): boolean {
+  return contains(type, 'Mismatch')
 }
 
 export function canMatch(src: ValueType, target: ValueType): boolean {
