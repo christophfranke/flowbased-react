@@ -85,7 +85,7 @@ const Nodes: Nodes = {
       output: (node: Node) => TypeDefinition.Object(node.connections.input
         .map(connection => ({
           key: value(connection.node).key,
-          type: unmatchedType(connection.node).params.value
+          type: unmatchedType(connection.node).params.value || TypeDefinition.Mismatch
         }))
         .filter(pair => pair.key)
         .reduce((obj, pair) => ({
