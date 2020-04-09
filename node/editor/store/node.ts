@@ -42,14 +42,6 @@ export default class NodeFunctions {
 
   createNode(position: Vector, type: CoreNode): Node {
     const Node = Nodes[type]
-    const output = {
-      'Value': this.store.connector.createValueOutput,
-      'React.Component': this.store.connector.createRenderOutput
-    }[Node.renderFunction]
-    const input = {
-      'Value': this.store.connector.createValueInput,
-      'React.Component': this.store.connector.createRenderInput
-    }[Node.renderFunction]
     const property = this.store.connector.createProperty
 
     return {
@@ -59,8 +51,8 @@ export default class NodeFunctions {
       params: [],
       position,
       connectors: {
-        input: Node.type.input ? [input()] : [],
-        output: [output()],
+        input: Node.type.input ? [this.store.connector.createInput()] : [],
+        output: [this.store.connector.createOutput()],
         properties: Object.keys(Node.type.properties)
           .map(key => property(key))
       }
@@ -86,8 +78,8 @@ export default class NodeFunctions {
       position,
       type: 'Pair',
       connectors: {
-        input: [this.store.connector.createValueInput({ mode: 'single' })],
-        output: [this.store.connector.createValueOutput()],
+        input: [this.store.connector.createInput({ mode: 'single' })],
+        output: [this.store.connector.createOutput()],
         properties: []
       }
     }
@@ -105,8 +97,8 @@ export default class NodeFunctions {
       position,
       type: 'Tag',
       connectors: {
-        input: [this.store.connector.createRenderInput()],
-        output: [this.store.connector.createRenderOutput()],
+        input: [this.store.connector.createInput()],
+        output: [this.store.connector.createOutput()],
         properties: [
           this.store.connector.createProperty('classList'),
           this.store.connector.createProperty('style'),
@@ -129,7 +121,7 @@ export default class NodeFunctions {
       type: 'String',
       connectors: {
         input: [],
-        output: [this.store.connector.createValueOutput()],
+        output: [this.store.connector.createOutput()],
         properties: []
       }
     }
@@ -149,7 +141,7 @@ export default class NodeFunctions {
       type: 'Number',
       connectors: {
         input: [],
-        output: [this.store.connector.createValueOutput()],
+        output: [this.store.connector.createOutput()],
         properties: []
       }
     }
@@ -168,7 +160,7 @@ export default class NodeFunctions {
       type: 'Boolean',
       connectors: {
         input: [],
-        output: [this.store.connector.createValueOutput()],
+        output: [this.store.connector.createOutput()],
         properties: []
       }
     }

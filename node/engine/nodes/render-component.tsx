@@ -4,8 +4,16 @@ import { computed, observable } from 'mobx'
 import { RenderProps, NodeProps, Node } from '@engine/types'
 import { render, value } from '@engine/render'
 import { transformer } from '@shared/util'
+import Nodes from '@engine/nodes'
 
-export default (Component) => {
+let currentRenderId = 0
+function getRenderKey(): number {
+  currentRenderId += 1
+  return currentRenderId
+}
+
+
+const HOC = (Component) => {
   @observer
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
@@ -36,4 +44,9 @@ export default (Component) => {
   }
 
   return RenderComponent
+}
+
+export default function(node: Node, Component: React.ComponentType<RenderProps>): any {
+  const parents = []
+  return React.createElement(HOC(Component), { node, parents, key: getRenderKey() })
 }

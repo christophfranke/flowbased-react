@@ -3,8 +3,9 @@ import { Node, RenderProps, ValueType } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
 import * as TypeDefinition from '@engine/type-definition'
 
-import RenderTag from '@engine/nodes/tag/render'
-import RenderPreview from '@engine/nodes/preview/render'
+import Tag from '@engine/nodes/tag'
+import Preview from '@engine/nodes/preview'
+import renderComponent from '@engine/nodes/render-component'
 
 export interface Resolver {  
   type: {
@@ -14,25 +15,14 @@ export interface Resolver {
       [key: string]: TypeResolver
     }
   },
-}
-
-export interface ValueResolver extends Resolver {
   resolve: (node: Node) => any
-  renderFunction: 'Value'
 }
-
-type ReactComponent = React.Component<RenderProps>
-type ReactFunction = (props: RenderProps) => React.ReactElement
 type TypeResolver = (node: Node) => ValueType
 
-interface ReactComponentResolver extends Resolver {
-  resolve: ReactComponent | ReactFunction
-  renderFunction: 'React.Component'
-}
 
 
 interface Nodes {
-  [key: string]: ValueResolver | ReactComponentResolver
+  [key: string]: Resolver
 }
 
 export type CoreNode = 'String' | 'Number' | 'Boolean' | 'Array' | 'Object' | 'Pair' | 'Tag' | 'Preview'
@@ -42,24 +32,21 @@ const Nodes: Nodes = {
     type: {
       output: () => TypeDefinition.String,
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Number: {
     resolve: (node: Node) => node.params.value,
     type: {
       output: () => TypeDefinition.Number,
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Boolean: {
     resolve: (node: Node) => node.params.value,
     type: {
       output: () => TypeDefinition.Boolean,
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Array: {
     resolve: (node: Node) => node.connections.input.map(connection => value(connection.node)),
@@ -70,8 +57,7 @@ const Nodes: Nodes = {
           : TypeDefinition.Unresolved),
       input: (node: Node) => type(node).params.items || TypeDefinition.Mismatch,
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Object: {
     resolve: (node: Node) => node.connections.input
@@ -94,8 +80,7 @@ const Nodes: Nodes = {
         }), {})),
       input: () => TypeDefinition.Pair(TypeDefinition.Unresolved),
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Pair: {
     resolve: (node: Node) => ({
@@ -106,11 +91,10 @@ const Nodes: Nodes = {
       output: (node: Node) => TypeDefinition.Pair(node.connections.input[0] ? unmatchedType(node.connections.input[0].node) : TypeDefinition.Unresolved),
       input: () => TypeDefinition.Unresolved,
       properties: {}
-    },
-    renderFunction: 'Value'
+    }
   },
   Tag: {
-    resolve: RenderTag,
+    resolve: (node: Node) => renderComponent(node, Tag),
     type: {
       output: () => TypeDefinition.Element,
       input: () => TypeDefinition.Unresolved,
@@ -119,17 +103,15 @@ const Nodes: Nodes = {
         style: () => TypeDefinition.Object({}),
         classList: () => TypeDefinition.Array(TypeDefinition.String)
       }
-    },
-    renderFunction: 'React.Component'
+    }
   },
   Preview: {
-    resolve: RenderPreview,
+    resolve: (node: Node) => renderComponent(node, Preview),
     type: {
       output: () => TypeDefinition.Null,
       input: () => TypeDefinition.Element,
       properties: {}
-    },
-    renderFunction: 'React.Component'
+    }
   }
 }
 

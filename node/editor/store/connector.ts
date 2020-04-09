@@ -88,17 +88,18 @@ export default class ConnectorFunctions {
     }
   }
 
-  createRenderInput = (): Connector => {
+  createInput = (overrides = {}): Connector => {
     return {
       id: this.store.uid(),
       mode: 'duplicate',
       function: 'input',
       name: 'input',
-      direction: { x: 0, y: -1 }
+      direction: { x: 0, y: -1 },
+      ...overrides
     }
   }
 
-  createRenderOutput = (): Connector => {
+  createOutput = (): Connector => {
     return {
       id: this.store.uid(),
       mode: 'multiple',
@@ -115,27 +116,6 @@ export default class ConnectorFunctions {
       function: 'property',
       name,
       direction: { x: -1, y: 0 }
-    }
-  }
-
-  createValueInput = (override = {}): Connector => {
-    return {
-      id: this.store.uid(),
-      name: 'input',
-      mode: 'duplicate',
-      function: 'input',
-      direction: { x: 0, y: -1 },
-      ...override
-    }
-  }
-
-  createValueOutput = (): Connector => {
-    return {
-      id: this.store.uid(),
-      mode: 'multiple',
-      name: 'output',
-      function: 'output',
-      direction: { x: 0, y: 1 }
     }
   }
 }

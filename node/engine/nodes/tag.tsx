@@ -19,21 +19,27 @@ const sanitize = tag => {
 }
 const isValid = tag => !!tag
 
-export default observer((props: RenderProps) => {
-  const Tag = sanitize(props.params['tag'])
-  const tagProps = {
-    ...(props.properties.props || {}),
-    style: props.properties.style,
-  }
-  if (props.properties.classList) {
-    tagProps.className = props.properties.classList.join(' ')
-  }
+@observer
+class Tag extends React.Component<RenderProps> {
+  render() {
+    const props = this.props
+    const TagName = sanitize(props.params['tag'])
+    const tagProps = {
+      ...(props.properties.props || {}),
+      style: props.properties.style,
+    }
+    if (props.properties.classList) {
+      tagProps.className = props.properties.classList.join(' ')
+    }
 
-  if (isValid(Tag)) {
-    return React.Children.count(props.children) > 0 && !voidElements.includes(Tag)
-      ? <Tag {...tagProps}>{props.children}</Tag>
-      : <Tag {...tagProps} />
-  }
+    if (isValid(TagName)) {
+      return React.Children.count(props.children) > 0 && !voidElements.includes(TagName)
+        ? <TagName {...tagProps}>{props.children}</TagName>
+        : <TagName {...tagProps} />
+    }
 
-  return <>{props.children}</>
-})
+    return <>{props.children}</>
+  }
+}
+
+export default Tag
