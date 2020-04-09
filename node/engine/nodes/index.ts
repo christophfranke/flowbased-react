@@ -68,7 +68,7 @@ const Nodes: Nodes = {
         TypeDefinition.Array(node.connections.input[0]
           ? unmatchedType(node.connections.input[0].node)
           : TypeDefinition.Unresolved),
-      input: (node: Node) => type(node).params.items,
+      input: (node: Node) => type(node).params.items || TypeDefinition.Mismatch,
       properties: {}
     },
     renderFunction: 'Value'
