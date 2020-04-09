@@ -6,7 +6,7 @@ import Translator from '@shared/translator'
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
 
-import { flatten } from '@shared/util'
+import { flatten, transformer } from '@shared/util'
 
 class Store {
   connector: ConnectorFunctions
@@ -65,15 +65,12 @@ class Store {
     return this.currentId
   }
 
-  @observable nodeMap = {}
+  @transformer
   getNodeById(id: number): Node | undefined {
-    if (!this.nodeMap[id]) {
-      this.nodeMap[id] = this.nodes.find(node => node.id === id)
-    }
-
-    return this.nodeMap[id]
+    return this.nodes.find(node => node.id === id)
   }
 
+  @transformer
   getChildren(node: Node): Node[] {
     return this.connections
       .filter(connection => this.nodeOfConnector(connection.to) === node)
@@ -81,6 +78,7 @@ class Store {
       .map(connection => this.nodeOfConnector(connection.from) || node)
   }
 
+  @transformer
   getSubtree(node: Node): Node[] {
     const visited = {
       [node.id]: true
@@ -98,26 +96,25 @@ class Store {
     return childrenOfNode(node)
   }
 
-  @observable nodeOfConnectorMap = {}
+  @transformer
   nodeOfConnector(connector: Connector): Node | undefined {
-    if (!this.nodeOfConnectorMap[connector.id]) {
-      this.nodeOfConnectorMap[connector.id] = this.nodes.find(node => this.connectorsOfNode(node)
-        .some(con => con === connector))      
-    }
-    
-    return this.nodeOfConnectorMap[connector.id]
+    return this.nodes.find(node => this.connectorsOfNode(node)
+      .some(con => con === connector))      
   }
 
+  @transformer
   connectorsOfNode(node: Node): Connector[] {
     return flatten(Object.values(node.connectors))
   }
 
+  @action
   deleteNodes(nodes: Node[]) {
     nodes.forEach(node => {
       this.deleteNode(node)
     })
   }
 
+  @action
   deleteNode(node: Node) {
     const connectors = this.connectorsOfNode(node)
     this.connections = this.connections
@@ -130,7 +127,6 @@ class Store {
       node.connectors.input.length > 0
       && node.connectors.input[0].mode === 'duplicate')
   }
-
 
   addInputConnectors = () => {
     this.nodesWithDuplicateSetting

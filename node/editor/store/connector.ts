@@ -4,6 +4,7 @@ import { Connector, Connection, ConnectorState, ValueType, Node } from '@editor/
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
+import { transformer } from '@shared/util'
 
 export default class ConnectorFunctions {
   store: Store
@@ -42,6 +43,7 @@ export default class ConnectorFunctions {
     return false
   }
 
+  @transformer
   isSrc(connector: Connector): boolean {
     return ['action', 'output'].includes(connector.function)
   }
@@ -61,6 +63,7 @@ export default class ConnectorFunctions {
       && this.valuesAreCompatible(src, dest)
   }
 
+  @transformer
   state(connector: Connector): ConnectorState {
     if (this.store.pendingConnector) {
       if (this.store.pendingConnector === connector) {
@@ -74,11 +77,13 @@ export default class ConnectorFunctions {
     return 'default'
   }
 
+  @transformer
   getConnections(connector: Connector): Connection[] {
     return this.store.connections
       .filter(connection => connection.from === connector || connection.to === connector)
   }
 
+  @transformer
   countConnections(connector: Connector): number {
     return this.getConnections(connector).length
   }
