@@ -35,7 +35,7 @@ export function matchType(src: ValueType, target: ValueType): ValueType {
     }
 
     if (name === 'Pair') {
-      return create('Array', matchType(src.params.value, target.params.value))
+      return create('Pair', matchType(src.params.value, target.params.value))
     }
 
     if (name === 'Object') {
@@ -55,7 +55,7 @@ export function matchType(src: ValueType, target: ValueType): ValueType {
         .reduce((obj, { key, type }) => ({
           ...obj,
           [key]: type
-        }))
+        }), {})
 
        return create('Object', params)
     }
