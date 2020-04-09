@@ -20,7 +20,7 @@ const HOC = (Component) => {
     @transformer
     getChild(childNode: Node) {
       const result = value(childNode)
-      if (contains(type(childNode), 'Object')) {
+      if (contains(type(childNode), 'Object') || contains(type(childNode), 'Pair')) {
         return JSON.stringify(result)
       }
 
