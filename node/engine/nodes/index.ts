@@ -1,6 +1,6 @@
 import React from 'react'
 import { Node, RenderProps, ValueType } from '@engine/types'
-import { value, type } from '@engine/render'
+import { value, type, unmatchedType } from '@engine/render'
 import * as TypeDefinition from '@engine/type-definition'
 
 import RenderTag from '@engine/nodes/tag/render'
@@ -66,7 +66,7 @@ const Nodes: Nodes = {
     type: {
       output: (node: Node) =>
         TypeDefinition.Array(node.connections.input[0]
-          ? type(node.connections.input[0].node)
+          ? unmatchedType(node.connections.input[0].node)
           : TypeDefinition.Unresolved),
       input: (node: Node) => type(node).params.items,
       properties: {}
@@ -85,7 +85,7 @@ const Nodes: Nodes = {
       output: (node: Node) => TypeDefinition.Object(node.connections.input
         .map(connection => ({
           key: value(connection.node).key,
-          type: type(connection.node).params.value
+          type: unmatchedType(connection.node).params.value
         }))
         .filter(pair => pair.key)
         .reduce((obj, pair) => ({
@@ -103,7 +103,7 @@ const Nodes: Nodes = {
       value: node.connections.input[0] ? value(node.connections.input[0].node) : undefined
     }),
     type: {
-      output: (node: Node) => TypeDefinition.Pair(node.connections.input[0] ? type(node.connections.input[0].node) : TypeDefinition.Unresolved),
+      output: (node: Node) => TypeDefinition.Pair(node.connections.input[0] ? unmatchedType(node.connections.input[0].node) : TypeDefinition.Unresolved),
       input: () => TypeDefinition.Unresolved,
       properties: {}
     },

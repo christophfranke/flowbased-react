@@ -70,6 +70,7 @@ export default class NodeFunctions {
   createPreviewNode(position: Vector): Node {
     const node = this.createNode(position, 'Preview')
     node.connectors.input[0].mode = 'single'
+    node.connectors.output = []
     return node
   }
 

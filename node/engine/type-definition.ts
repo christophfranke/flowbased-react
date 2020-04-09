@@ -57,3 +57,9 @@ export const Null: ValueType = {
   name: 'Null',
   params: {}
 }
+
+export const Mismatch: ValueType = {
+  display: 'Mismatch',
+  name: 'Mismatch',
+  params: {}
+}

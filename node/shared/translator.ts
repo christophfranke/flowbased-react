@@ -34,9 +34,18 @@ class Translator {
   }
 
   @transformer
-  getConnection(editorConnection: Editor.Connection): Connection {
+  getConnectionFrom(editorConnection: Editor.Connection) {
+    return this.getConnection(editorConnection, 'from')
+  }
+  @transformer
+  getConnectionTo(editorConnection: Editor.Connection) {
+    return this.getConnection(editorConnection, 'to')
+  }
+
+  private getConnection(editorConnection: Editor.Connection, otherKey: 'from' | 'to'): Connection {
     const id = editorConnection.id
-    const node = this.nodeOfConnector(editorConnection.from)
+    const connector = editorConnection[otherKey]
+    const node = this.nodeOfConnector(connector)
     if (!node) {
       throw new Error('Cannot find node of connector')
     }
@@ -44,24 +53,34 @@ class Translator {
     return {
       id: editorConnection.id,
       node: this.getNode(node),
-      key: editorConnection.to.name
+      key: editorConnection.to.name === 'input'
+        ? ''
+        : editorConnection.to.name
     }
   }
 
   @transformer
-  getConnectionsOfConnectors(connectorGroup: Editor.Connector[]): Connection[] {
-    const result = flatten(connectorGroup.map(connector => this.getConnections(connector)))
-      .map(editorConnection => this.getConnection(editorConnection))
+  getConnectionsOfConnectorsForInputs(connectorGroup: Editor.Connector[]): Connection[] {
+    return this.getConnectionsOfConnectors(connectorGroup, 'from')
+  }
+  @transformer
+  getConnectionsOfConnectorsForOutput(connectorGroup: Editor.Connector[]): Connection[] {
+    return this.getConnectionsOfConnectors(connectorGroup, 'to')
+  }
 
-    return result
+  private getConnectionsOfConnectors(connectorGroup: Editor.Connector[], otherKey: 'from' | 'to'): Connection[] {
+    return flatten(connectorGroup.map(connector => this.getConnections(connector)))
+      .map(editorConnection => otherKey === 'from'
+        ? this.getConnectionFrom(editorConnection)
+        : this.getConnectionTo(editorConnection))
   }
 
   @transformer
   getNode(editorNode: Editor.Node): Node {
     const id = editorNode.id
-    const inputs = () => this.getConnectionsOfConnectors(editorNode.connectors.input)
-    const outputs = () => this.getConnectionsOfConnectors(editorNode.connectors.output)
-    const properties = () => this.getConnectionsOfConnectors(editorNode.connectors.properties)
+    const inputs = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.input)
+    const properties = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.properties)
+    const outputs = () => this.getConnectionsOfConnectorsForOutput(editorNode.connectors.output)
 
     return {
       id: editorNode.id,

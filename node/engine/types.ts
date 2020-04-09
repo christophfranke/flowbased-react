@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Nodes from '@engine/nodes'
 
-type ValueBaseType = 'Element' | 'String' | 'Boolean' | 'Array' | 'Object' | 'Number' | 'Pair' | 'Unresolved' | 'Null'
+export type ValueBaseType = 'Element' | 'String' | 'Boolean' | 'Array' | 'Object' | 'Number' | 'Pair' | 'Unresolved' | 'Null' | 'Mismatch'
 export interface ValueType {
   display: string
   name: ValueBaseType,
