@@ -47,7 +47,7 @@ export const Unresolved: ValueType = {
 }
 
 export const Element: ValueType = {
-  display: 'Element',
+  display: 'Html',
   name: 'Element',
   params: {}
 }

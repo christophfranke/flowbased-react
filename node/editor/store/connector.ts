@@ -2,6 +2,8 @@ import { computed } from 'mobx'
 
 import { Connector, Connection, ConnectorState, ValueType } from '@editor/types'
 import Store from '@editor/store'
+import { type, expectedType } from '@engine/render'
+import { canMatch } from '@engine/type-functions'
 
 export default class ConnectorFunctions {
   store: Store
@@ -27,7 +29,18 @@ export default class ConnectorFunctions {
 
   valuesAreCompatible(src: Connector, dest: Connector): boolean {
     console.warn('values compatilble not implemented')
-    return true
+    if (src.function === 'output') {
+      const srcNode = this.store.nodeOfConnector(src)
+      const targetNode = this.store.nodeOfConnector(dest)
+      if (srcNode && targetNode) {
+        const srcType = type(this.store.translated.getNode(srcNode))
+        const targetKey = dest.name === 'input' ? '' : dest.name
+        const targetType = expectedType(this.store.translated.getNode(targetNode), targetKey)
+        return canMatch(srcType, targetType)
+      }
+    }
+
+    return false
   }
 
   isSrc(connector: Connector): boolean {
