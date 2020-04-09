@@ -1,6 +1,6 @@
 import { computed } from 'mobx'
 
-import { Connector, Connection, ConnectorState, ValueType } from '@editor/types'
+import { Connector, Connection, ConnectorState, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
@@ -46,13 +46,16 @@ export default class ConnectorFunctions {
     return ['action', 'output'].includes(connector.function)
   }
 
+  willProduceLoop(src?: Node, dest?: Node): boolean {
+    return !!src && !!dest && this.store.getSubtree(src).includes(dest)
+  }
 
   canConnect(pending: Connector, possiblyHot: Connector): boolean {
     const src = this.isSrc(pending) ? pending : possiblyHot
     const dest = this.isSrc(possiblyHot) ? pending : possiblyHot
-    
+
     return src !== dest
-      && this.store.nodeOfConnector(src) !== this.store.nodeOfConnector(dest)
+      && !this.willProduceLoop(this.store.nodeOfConnector(src), this.store.nodeOfConnector(dest))
       && !(src.mode === 'multiple' && dest.mode === 'multiple')
       && this.functionsAreCompatible(src, dest)
       && this.valuesAreCompatible(src, dest)
