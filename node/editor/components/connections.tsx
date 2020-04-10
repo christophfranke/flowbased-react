@@ -4,7 +4,8 @@ import { observer, inject } from 'mobx-react'
 
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
-import { colors } from '@editor/colors'
+import { colors, colorOfType } from '@editor/colors'
+import { type } from '@engine/render'
 
 import * as LA from '@editor/la'
 
@@ -17,10 +18,22 @@ interface Props {
 class ConnectionPath extends React.Component<Props> {
   store: Store = this.props['store']
 
+  @computed get fromNode(): Node | undefined {
+    return this.store.nodeOfConnector(this.props.connection.from)
+  }
+
+  @computed get color(): string {
+    if (this.fromNode) {    
+      const node = this.store.translated.getNode(this.fromNode)
+      return colorOfType(type(node)).default
+    }
+
+    return ''
+  }
+
   @computed get offset(): Vector | null {
-    const fromNode = this.store.nodeOfConnector(this.props.connection.from)
-    if (fromNode && this.props.connection.from.position) {
-       return LA.add(fromNode.position, this.props.connection.from.position)
+    if (this.fromNode && this.props.connection.from.position) {
+       return LA.add(this.fromNode.position, this.props.connection.from.position)
     }
 
     return null
@@ -64,7 +77,7 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   render() {
-    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform' }}/>
+    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform' }} stroke={this.color}/>
   }
 }
 
@@ -83,7 +96,7 @@ class Connections extends React.Component {
     }
 
     return <svg style={style}>
-      <g stroke={colors.connections} strokeWidth="2" fill="none">
+      <g strokeWidth="2" fill="none">
         {this.store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
       </g>
     </svg>
