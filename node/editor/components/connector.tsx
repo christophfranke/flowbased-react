@@ -238,7 +238,11 @@ class ConnectorView extends React.Component<Props> {
       width: `${CONNECTOR_SIZE}px`,
       height: `${CONNECTOR_SIZE}px`,
       borderRadius: '50%',
-      position: 'relative'
+      position: 'relative',
+    }
+
+    if (this.isHovering) {
+      style.zIndex = 1
     }
 
 
@@ -256,11 +260,18 @@ class ConnectorView extends React.Component<Props> {
     if (this.props.connector.direction.y < 0) {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
     }
+    if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {    
+      if (this.props.connector.direction.y < 0) {
+        positioning['transformOrigin'] = 'bottom left'
+        positioning['transform'] = `translateX(${CONNECTOR_SIZE}px) rotate(-90deg)`
+        positioning['padding'] = '0'
+        positioning['border'] = 'none'
+      }
+    }
 
     const titleStyle: React.CSSProperties = this.showTitle
       ? {
         position: 'absolute',
-        ...positioning,
         pointerEvents: 'none',
         opacity: 0.9,
         padding: '20px',
@@ -268,7 +279,10 @@ class ConnectorView extends React.Component<Props> {
         lineHeight: `${CONNECTOR_SIZE}px`,
         fontSize: '30px',
         whiteSpace: 'nowrap',
-        color: colors.text.white
+        color: colors.text.white,
+        border: `2px solid ${this.fillColor}`,
+        borderRadius: '8px',
+        ...positioning,
       } : {
         display: 'none'
       }
