@@ -253,19 +253,23 @@ class ConnectorView extends React.Component<Props> {
     }
     if (this.props.connector.direction.x < 0) {
       positioning['right'] = `${CONNECTOR_SIZE + margin}px`
+      if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {
+        positioning['padding'] = '0'
+        positioning['border'] = 'none'
+        positioning['color'] = colors.text.mediumDim
+      }
     }
     if (this.props.connector.direction.y > 0) {
       positioning['top'] = `${CONNECTOR_SIZE + margin}px`
     }
     if (this.props.connector.direction.y < 0) {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
-    }
-    if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {    
-      if (this.props.connector.direction.y < 0) {
+      if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {
         positioning['transformOrigin'] = 'bottom left'
         positioning['transform'] = `translateX(${CONNECTOR_SIZE}px) rotate(-90deg)`
         positioning['padding'] = '0'
         positioning['border'] = 'none'
+        positioning['color'] = colors.text.mediumDim
       }
     }
 
@@ -275,7 +279,7 @@ class ConnectorView extends React.Component<Props> {
         pointerEvents: 'none',
         opacity: 0.9,
         padding: '20px',
-        backgroundColor: 'rgba(30, 30, 30, 0.7)',
+        backgroundColor: colors.background.default,
         lineHeight: `${CONNECTOR_SIZE}px`,
         fontSize: '30px',
         whiteSpace: 'nowrap',

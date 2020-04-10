@@ -72,10 +72,11 @@ export const colors = {
   background: {
     default: 'rgba(35, 35, 35, 0.8)',
     selected: 'rgba(60, 60, 60, 0.8)',
-    editor: 'rgb(15, 15, 15)'
+    editor: 'rgb(15, 15, 15)',
   },
   text: {
     white: 'white',
+    mediumDim: 'rgb(170, 130, 140)',
     dim: 'rgb(100, 100, 100)'
   }
 }
