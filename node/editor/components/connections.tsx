@@ -58,7 +58,6 @@ class ConnectionPath extends React.Component<Props> {
       const v3 = LA.round(middle2)
       const v4 = LA.round(this.diff)
       return `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`    
-      // return `M0 0 L${v2.x} ${v2.y} L${v3.x} ${v3.y} L${v4.x} ${v4.y}`    
     }
 
     return ''
