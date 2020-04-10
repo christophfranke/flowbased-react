@@ -1,22 +1,27 @@
-export function colorOfNodeType(nodeType: string) {
-  return {
-    Preview: 'render',
-    Tag: 'render',
-    Primitive: 'value',
-    List: 'value',
-  }[nodeType]
+import { ValueType } from '@editor/types'
+
+interface ColorMap {
+  default: string
+  highlight: string
+  hover: string
 }
 
-export function colorOfValueType(valueType: string) {
-  return {
+export function colorOfType(type: ValueType): ColorMap {
+  const key = {
+    Number: 'primitive',
+    String: 'primitive',
+    Boolean: 'primitive',
+    Pair: 'primitive',
+    Null: 'primitive',
+    Array: 'complex',
+    Object: 'complex',
+    Unresolved: 'unresolved',
     Element: 'render',
-    String: 'value',
-    Number: 'value',
-    Pair: 'value',
-    List: 'value',
-    Object: 'value',
-    Nothing: 'value'
-  }[valueType]
+    Unknown: 'error',
+    Mismatch: 'error'
+  }[type.name]
+
+  return colors.types[key]
 }
 
 export const colors = {
@@ -25,7 +30,7 @@ export const colors = {
   nodeList: {
     input: {
       color: 'white',
-      background: 'rgba(255,192,203, 0.5)'
+      background: 'rgba(255, 192, 203, 0.5)'
     },
     text: {
       selected: 'black',
@@ -43,9 +48,24 @@ export const colors = {
       highlight: 'rgb(255, 0, 200)',
       hover: 'white'
     },
-    value: {
+    primitive: {
       default: 'rgb(12, 163, 194)',
       highlight: 'rgb(28, 255, 255)',
+      hover: 'white'
+    },
+    complex: {
+      default: 'rgb(12, 163, 194)',
+      highlight: 'rgb(28, 255, 255)',
+      hover: 'white'
+    },
+    error: {
+      default: 'rgb(176, 0, 0)',
+      highlight: 'rgb(232, 44, 44)',
+      hover: 'white'
+    },
+    unresolved: {
+      default: 'rgb(255, 192, 203)',
+      highlight: 'rgb(255, 222, 235)',
       hover: 'white'
     }
   },

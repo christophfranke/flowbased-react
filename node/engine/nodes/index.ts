@@ -110,7 +110,7 @@ const Nodes: Nodes = {
   Preview: {
     resolve: (node: Node) => component(node, Preview),
     type: {
-      output: () => TypeDefinition.Null,
+      output: () => TypeDefinition.Unresolved,
       input: () => TypeDefinition.Element,
       properties: {}
     }

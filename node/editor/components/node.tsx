@@ -2,12 +2,14 @@ import React from 'react'
 import { computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Node, Vector } from '@editor/types'
+import { Node, Vector, ValueType } from '@editor/types'
 
 import * as LA from '@editor/la'
 import ConnectorView from '@editor/components/connector'
-import { colors, colorOfNodeType } from '@editor/colors'
+import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
+import Store from '@editor/store'
+import { type } from '@engine/render'
 
 interface Props {
   node: Node
@@ -22,7 +24,7 @@ const NODE_PADDING = 5
 @inject('mouse', 'keys', 'store')
 @observer
 class NodeView extends React.Component<Props> {
-  store = this.props['store']
+  store: Store = this.props['store']
   nodeRef = React.createRef<HTMLDivElement>()
   offset: Vector
   relativePositions: {
@@ -31,6 +33,10 @@ class NodeView extends React.Component<Props> {
 
   @computed get isSelected(): boolean {
     return this.store.selectedNodes.includes(this.props.node)
+  }
+
+  @computed get type(): ValueType {
+    return type(this.store.translated.getNode(this.props.node))
   }
 
   handleClick = e => {
@@ -140,8 +146,7 @@ class NodeView extends React.Component<Props> {
     }
 
     const { node } = this.props
-    console.warn('reimplement colors')
-    const typeColor = colors.types['render'][this.isSelected ? 'highlight': 'default']
+    const typeColor = colorOfType(this.type)[this.isSelected ? 'highlight': 'default']
 
     const height = 2 * CONNECTOR_SIZE + DESCRIPTION_HEIGHT + 2 * NODE_PADDING
     const width = Math.max(

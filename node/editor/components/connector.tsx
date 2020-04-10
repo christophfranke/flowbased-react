@@ -6,10 +6,11 @@ import { Connector, ConnectorState, Connection, Vector, Node, ValueType } from '
 
 import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
-import { colors, colorOfValueType } from '@editor/colors'
+import { colors, colorOfType } from '@editor/colors'
 import { describe } from '@shared/type-display'
 import { type, expectedType } from '@engine/render'
 import Store from '@editor/store'
+import * as TypeDefinition from '@engine/type-definition'
 
 import DownArrow from '@editor/components/down-arrow'
 import RightArrow from '@editor/components/right-arrow'
@@ -45,8 +46,7 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get valueColor() {
-    console.warn('Value Color not implemented')
-    return colors.types['render']
+    return colorOfType(this.type || TypeDefinition.Unknown)
   }
 
   @computed get fillColor(): string {
@@ -71,7 +71,7 @@ class ConnectorView extends React.Component<Props> {
     return 'pointer'
   }
 
-  @computed get type(): ValueType | undefined {
+  @computed get type(): ValueType {
     const editorNode = this.store.nodeOfConnector(this.props.connector)
     if (editorNode) {
       const node = this.store.translated.getNode(editorNode)
@@ -96,11 +96,11 @@ class ConnectorView extends React.Component<Props> {
       }
     }
 
-    return undefined
+    return TypeDefinition.Unknown
   }
 
   @computed get typeDisplay(): string {
-    return this.type ? describe(this.type) : 'Unknown'
+    return describe(this.type)
   }
 
   @computed get nameDisplay(): string {

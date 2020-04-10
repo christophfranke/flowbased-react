@@ -12,7 +12,7 @@ export function create(name: ValueBaseType, args?: any): ValueType {
 }
 
 export function isGeneric(name: ValueBaseType): boolean {
-  return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Circular'].includes(name)
+  return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
 }
 
 export function contains(type: ValueType, name: ValueBaseType): boolean {  
