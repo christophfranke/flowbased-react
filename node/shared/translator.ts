@@ -11,7 +11,7 @@ interface EditorGraph {
 }
 
 class Translator {
-  editor: EditorGraph
+  @observable editor: EditorGraph
   constructor(editor: EditorGraph) {
     this.editor = editor
   }
@@ -19,7 +19,7 @@ class Translator {
   @transformer
   getConnections(connector: Editor.Connector): Editor.Connection[] {
     return this.editor.connections
-      .filter(connection => connection.from === connector || connection.to === connector)
+      .filter(connection => connection.from.id === connector.id || connection.to.id === connector.id)
   }
 
   @transformer
@@ -30,7 +30,7 @@ class Translator {
   @transformer
   nodeOfConnector(connector: Editor.Connector): Editor.Node | undefined {
     return this.editor.nodes.find(node => Translator.connectorsOfNode(node)
-      .some(con => con === connector))      
+      .some(con => con.id === connector.id))      
   }
 
   @transformer

@@ -31,33 +31,38 @@ class Store {
     autorun(this.addInputConnectors)
   }
 
+  static syncedInstance: Store
   static createFromLocalStorage(): Store {
-    const store = new Store()
-    store.nodes = load(['editor', 'nodes']) || []
+    if (!Store.syncedInstance) {
+      const store = new Store()
+      store.nodes = load(['editor', 'nodes']) || []
 
-    // the connectors map reassures that strict equality comparisions
-    // work because two connections with the same id will be the same objects
-    const connectorsMap = store.connectors.reduce((obj, connector) => ({
-      ...obj,
-      [connector.id]: connector
-    }), {})
+      // the connectors map reassures that strict equality comparisions
+      // work because two connections with the same id will be the same objects
+      const connectorsMap = store.connectors.reduce((obj, connector) => ({
+        ...obj,
+        [connector.id]: connector
+      }), {})
 
-    // take the connectors from the map
-    const connections = load(['editor', 'connections']) || []
-    store.connections = connections.map(connection => ({
-      ...connection,
-      from: connectorsMap[connection.from.id],
-      to: connectorsMap[connection.to.id]
-    }))
+      // take the connectors from the map
+      const connections = load(['editor', 'connections']) || []
+      store.connections = connections.map(connection => ({
+        ...connection,
+        from: connectorsMap[connection.from.id],
+        to: connectorsMap[connection.to.id]
+      }))
 
-    store.currentId = load(['editor', 'uid']) || 0
+      store.currentId = load(['editor', 'uid']) || 0
 
-    // autosave immediately
-    sync(['editor', 'connections'], store, 'connections')
-    sync(['editor', 'nodes'], store, 'nodes')
-    sync(['editor', 'uid'], store, 'currentId')
+      // autosave immediately
+      sync(['editor', 'connections'], store, 'connections')
+      sync(['editor', 'nodes'], store, 'nodes')
+      sync(['editor', 'uid'], store, 'currentId')
 
-    return store
+      Store.syncedInstance = store
+    }
+
+    return Store.syncedInstance
   }
 
   uid(): number {

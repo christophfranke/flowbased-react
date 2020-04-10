@@ -5,7 +5,6 @@ import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
 
 import Store from '@editor/store'
-
 const syncedStore = Store.createFromLocalStorage()
 
 @observer
