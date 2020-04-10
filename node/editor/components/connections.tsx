@@ -6,6 +6,7 @@ import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
 import { type } from '@engine/render'
+import { transformer } from '@shared/util'
 
 import * as LA from '@editor/la'
 
@@ -22,13 +23,14 @@ class ConnectionPath extends React.Component<Props> {
     return this.store.nodeOfConnector(this.props.connection.from)
   }
 
-  @computed get color(): string {
-    if (this.fromNode) {    
-      const node = this.store.translated.getNode(this.fromNode)
-      return colorOfType(type(node)).default
-    }
+  @computed get toNode(): Node | undefined {
+    return this.store.nodeOfConnector(this.props.connection.to)
+  }
 
-    return ''
+  @transformer
+  colorOfNode(editorNode: Node): string {
+    const node = this.store.translated.getNode(editorNode)
+    return colorOfType(type(node)).default
   }
 
   @computed get offset(): Vector | null {
@@ -77,7 +79,31 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   render() {
-    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform' }} stroke={this.color}/>
+    const diff = this.diff
+    if (!diff || !this.fromNode || !this.toNode) {
+      return null
+    }
+
+    const fromColor = this.colorOfNode(this.fromNode)
+    const toColor = this.colorOfNode(this.toNode)
+
+    if (fromColor !== toColor) {    
+      const id = `gradient-${this.props.connection.id}`
+      const stroke = `url(#${id})`
+      const rotation = (diff.y > 0 ? 360 : 0) + Math.sign(diff.y) * 180 * Math.acos(LA.normalize(diff).x) / Math.PI
+
+      return <>
+        <defs>
+          <linearGradient id={id} x1="0%" x2="100%" y1="0%" y2="0%" gradientTransform={`translate(0.5, 0.5) rotate(${rotation}) translate(-0.5, -0.5)`}>
+              <stop stopColor={fromColor} offset="0%"/>
+              <stop stopColor={toColor} offset="100%"/>
+          </linearGradient>
+        </defs>    
+        <path d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke }} />
+      </>
+    }
+
+    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke: fromColor }} />
   }
 }
 
@@ -96,7 +122,7 @@ class Connections extends React.Component {
     }
 
     return <svg style={style}>
-      <g strokeWidth="2" fill="none">
+      <g strokeWidth="3" fill="none">
         {this.store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
       </g>
     </svg>
