@@ -299,7 +299,6 @@ class EditorView extends React.Component {
       transformOrigin: 'top left',
       transform: this.transformString,
       willChange: 'transform',
-      border: '1 px solid grey'
     }
 
 
