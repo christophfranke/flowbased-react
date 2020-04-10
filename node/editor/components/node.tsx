@@ -1,5 +1,5 @@
 import React from 'react'
-import { computed } from 'mobx'
+import { computed, observable } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
 import { Node, Vector, ValueType } from '@editor/types'
@@ -16,11 +16,6 @@ interface Props {
 }
 
 
-const CONNECTOR_SIZE = 15
-const DESCRIPTION_HEIGHT = 20
-const DESCRIPTION_WIDTH = 100
-const NODE_PADDING = 5
-
 @inject('mouse', 'keys', 'store')
 @observer
 class NodeView extends React.Component<Props> {
@@ -31,12 +26,22 @@ class NodeView extends React.Component<Props> {
     [id: number]: Vector
   }
 
+  @observable isCloseHovering = false
+
   @computed get isSelected(): boolean {
     return this.store.selectedNodes.includes(this.props.node)
   }
 
   @computed get type(): ValueType {
     return type(this.store.translated.getNode(this.props.node))
+  }
+
+  handleCloseMouseOver = () => {
+    this.isCloseHovering = true
+  }
+
+  handleCloseMouseOut= () => {
+    this.isCloseHovering = false
   }
 
   handleClick = e => {
@@ -148,11 +153,6 @@ class NodeView extends React.Component<Props> {
     const { node } = this.props
     const typeColor = colorOfType(this.type)[this.isSelected ? 'highlight': 'default']
 
-    const height = 2 * CONNECTOR_SIZE + DESCRIPTION_HEIGHT + 2 * NODE_PADDING
-    const width = Math.max(
-      (node.connectors.input.length + node.connectors.output.length) * CONNECTOR_SIZE,
-      DESCRIPTION_WIDTH) + 2 * NODE_PADDING
-
     const nodeStyle: React.CSSProperties = {
       padding: '10px',
       position: 'absolute',
@@ -162,7 +162,7 @@ class NodeView extends React.Component<Props> {
       transform: `translate(${this.props.node.position.x}px, ${this.props.node.position.y}px)`,
       color: colors.text.white,
       backgroundColor: colors.background[this.isSelected ? 'selected' : 'default'],
-      border: `2px solid ${typeColor}`,
+      border: `2px solid ${this.isCloseHovering ? colors.deleteNode : typeColor}`,
     }
 
     const nameStyle: React.CSSProperties = {
@@ -173,13 +173,14 @@ class NodeView extends React.Component<Props> {
 
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: '14px'
+      fontSize: '16px'
     }
 
     const inputStyle: React.CSSProperties = {
       outline: 'none',
       backgroundColor: colors.background.default,
-      width: 'auto',
+      minWidth: '200px',
+      width: '100%',
       margin: '8px',
       fontSize: '20px',
       borderBottom: `1px solid ${typeColor}`,
@@ -187,10 +188,10 @@ class NodeView extends React.Component<Props> {
 
     const closeStyle: React.CSSProperties = {
       gridArea: 'close',
-      transform: 'scale(1.4)',
+      transform: 'scale(1.7)',
       marginLeft: '10px',
       marginTop: '4px',
-      color: typeColor,
+      color: this.isCloseHovering ? colors.deleteNode : typeColor,
       cursor: 'pointer'
     }
 
@@ -198,9 +199,9 @@ class NodeView extends React.Component<Props> {
       position: 'relative',
       display: 'grid',
       gridTemplate: `
-        "x input close" auto
+        "props input close" auto
         "props params actions" auto
-        "y output z" auto /
+        "props output z" auto /
         1fr min-content 1fr`
     }
 
@@ -212,7 +213,7 @@ class NodeView extends React.Component<Props> {
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
             {node.connectors.properties.map(property => <ConnectorView key={property.id} connector={property} />)}
           </div>
-          <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24">
+          <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params' }}>

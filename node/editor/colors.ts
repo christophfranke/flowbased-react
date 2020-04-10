@@ -27,6 +27,7 @@ export function colorOfType(type: ValueType): ColorMap {
 export const colors = {
   connections: 'pink',
   selectionRectangle: 'rgba(255, 192, 203, 0.5)',
+  deleteNode: 'rgb(255, 7, 57)',
   nodeList: {
     input: {
       color: 'white',
@@ -77,6 +78,6 @@ export const colors = {
   text: {
     white: 'white',
     mediumDim: 'rgb(170, 130, 140)',
-    dim: 'rgb(100, 100, 100)'
+    dim: 'rgb(120, 120, 120)'
   }
 }
