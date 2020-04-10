@@ -23,6 +23,10 @@ export default class NodeFunctions {
     type: 'Value',
     create: this.createStringNode.bind(this)
   }, {
+    name: 'Boolean',
+    type: 'Value',
+    create: this.createBooleanNode.bind(this)
+  }, {
     name: 'Pair',
     type: 'Value',
     create: this.createPairNode.bind(this)
@@ -67,102 +71,60 @@ export default class NodeFunctions {
   }
 
   createPairNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'Pair',
-      params: [{
-        name: 'Key',
-        key: 'key',
-        value: ''
-      }],
-      position,
-      type: 'Pair',
-      connectors: {
-        input: [this.store.connector.createInput({ mode: 'single' })],
-        output: [this.store.connector.createOutput()],
-        properties: []
-      }
-    }
+    const node = this.createNode(position, 'Pair')
+    node.connectors.input[0].mode = 'single'
+    node.params = [{
+      name: 'Key',
+      key: 'key',
+      value: ''
+    }]
+
+    return node
   }
 
   createTagNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'HTML Element',
-      params: [{
-        name: 'Tag',
-        key: 'tag',
-        value: 'div'
-      }],
-      position,
-      type: 'Tag',
-      connectors: {
-        input: [this.store.connector.createInput()],
-        output: [this.store.connector.createOutput()],
-        properties: [
-          this.store.connector.createProperty('classList'),
-          this.store.connector.createProperty('style'),
-          this.store.connector.createProperty('props')
-        ]
-      }
-    }
+    const node = this.createNode(position, 'Tag')
+    node.name = 'HTML Element'
+    node.params = [{
+      name: 'Tag',
+      key: 'tag',
+      value: 'div'
+    }]
+
+    return node
   }
 
   createStringNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'String',
-      params: [{
-        name: '',
-        key: 'value',
-        value: ''
-      }],
-      position,
-      type: 'String',
-      connectors: {
-        input: [],
-        output: [this.store.connector.createOutput()],
-        properties: []
-      }
-    }
+    const node = this.createNode(position, 'String')
+    node.params = [{
+      name: '',
+      key: 'value',
+      value: ''
+    }]
+    
+    return node
   }
 
 
   createNumberNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'Number',
-      params: [{
-        name: '',
-        key: 'value',
-        value: ''
-      }],
-      position,
-      type: 'Number',
-      connectors: {
-        input: [],
-        output: [this.store.connector.createOutput()],
-        properties: []
-      }
-    }
+    const node = this.createNode(position, 'Number')
+    node.params = [{
+      name: '',
+      key: 'value',
+      value: ''
+    }]
+    
+    return node
   }
 
   createBooleanNode(position: Vector): Node {
-    return {
-      id: this.store.uid(),
-      name: 'Number',
-      params: [{
-        name: '',
-        key: 'value',
-        value: ''
-      }],
-      position,
-      type: 'Boolean',
-      connectors: {
-        input: [],
-        output: [this.store.connector.createOutput()],
-        properties: []
-      }
-    }
+    const node = this.createNode(position, 'Boolean')
+    node.params = [{
+      name: '',
+      key: 'value',
+      value: ''
+    }]
+    
+    return node
   }
 }
