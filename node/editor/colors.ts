@@ -50,13 +50,13 @@ export const colors = {
       hover: 'white'
     },
     primitive: {
-      default: 'rgb(12, 163, 194)',
+      default: 'rgb(14, 201, 195)',
       highlight: 'rgb(28, 255, 255)',
       hover: 'white'
     },
     complex: {
-      default: 'rgb(12, 163, 194)',
-      highlight: 'rgb(28, 255, 255)',
+      default: 'rgb(14, 136, 201)',
+      highlight: 'rgb(54, 150, 224)',
       hover: 'white'
     },
     error: {
