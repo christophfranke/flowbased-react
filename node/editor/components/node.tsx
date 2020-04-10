@@ -151,7 +151,8 @@ class NodeView extends React.Component<Props> {
     }
 
     const { node } = this.props
-    const typeColor = colorOfType(this.type)[this.isSelected ? 'highlight': 'default']
+    const typeColorBase = colorOfType(this.type)
+    const typeColor = typeColorBase[this.isSelected ? 'highlight': 'default']
 
     const nodeStyle: React.CSSProperties = {
       padding: '10px',
@@ -163,6 +164,9 @@ class NodeView extends React.Component<Props> {
       color: colors.text.white,
       backgroundColor: colors.background[this.isSelected ? 'selected' : 'default'],
       border: `2px solid ${this.isCloseHovering ? colors.deleteNode : typeColor}`,
+      boxShadow: this.isSelected
+        ? `0 0 15px 0 ${this.isCloseHovering ? colors.deleteNode : typeColorBase.default}`
+        : 'none'
     }
 
     const nameStyle: React.CSSProperties = {
