@@ -46,7 +46,11 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get valueColor() {
-    return colorOfType(this.type || TypeDefinition.Unknown)
+    return colorOfType(this.type)
+  }
+
+  @computed get borderValueColor() {
+    return colorOfType(this.expectedType)
   }
 
   @computed get fillColor(): string {
@@ -69,6 +73,25 @@ class ConnectorView extends React.Component<Props> {
     }
 
     return 'pointer'
+  }
+
+  @computed get expectedType(): ValueType {
+    const editorNode = this.store.nodeOfConnector(this.props.connector)
+    if (editorNode) {
+      const node = this.store.translated.getNode(editorNode)
+      if (this.props.connector.function === 'output') {
+        return type(node)
+      }
+
+      if (this.props.connector.function === 'input') {
+        return expectedType(node)
+      }
+      if (this.props.connector.function === 'property') {
+        return expectedType(node, this.props.connector.name)
+      }
+    }
+
+    return TypeDefinition.Unknown
   }
 
   @computed get type(): ValueType {
@@ -233,9 +256,6 @@ class ConnectorView extends React.Component<Props> {
     if (this.props.connector.direction.y < 0) {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
     }
-    if (this.props.connector.direction.y !== 0) {
-      positioning['transform'] = 'translate(-5px, -40px) rotate(-50deg)'
-    }
 
     const titleStyle: React.CSSProperties = this.showTitle
       ? {
@@ -243,6 +263,8 @@ class ConnectorView extends React.Component<Props> {
         ...positioning,
         pointerEvents: 'none',
         opacity: 0.9,
+        padding: '20px',
+        backgroundColor: 'rgba(30, 30, 30, 0.7)',
         lineHeight: `${CONNECTOR_SIZE}px`,
         fontSize: '30px',
         whiteSpace: 'nowrap',
@@ -256,8 +278,8 @@ class ConnectorView extends React.Component<Props> {
     }
 
     const arrow = ['input', 'output'].includes(this.props.connector.function)
-      ? <DownArrow fill={this.fillColor} stroke={this.valueColor.default} size={CONNECTOR_SIZE} />
-      : <RightArrow fill={this.fillColor} stroke={this.valueColor.default} size={CONNECTOR_SIZE} />
+      ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
+      : <RightArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
 
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>

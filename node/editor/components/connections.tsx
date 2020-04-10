@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
-import { type } from '@engine/render'
+import { type, expectedType } from '@engine/render'
 import { transformer } from '@shared/util'
 
 import * as LA from '@editor/la'
@@ -25,6 +25,24 @@ class ConnectionPath extends React.Component<Props> {
 
   @computed get toNode(): Node | undefined {
     return this.store.nodeOfConnector(this.props.connection.to)
+  }
+
+  @computed get fromColor(): string {
+    if (!this.fromNode) {
+      return ''
+    }
+
+    const node = this.store.translated.getNode(this.fromNode)
+    return colorOfType(type(node)).default
+  }
+
+  @computed get toColor(): string {
+    if (!this.toNode) {
+      return ''
+    }
+
+    const node = this.store.translated.getNode(this.toNode)
+    return colorOfType(type(node)).default
   }
 
   @transformer
@@ -84,8 +102,8 @@ class ConnectionPath extends React.Component<Props> {
       return null
     }
 
-    const fromColor = this.colorOfNode(this.fromNode)
-    const toColor = this.colorOfNode(this.toNode)
+    const fromColor = this.fromColor
+    const toColor = this.toColor
 
     if (fromColor !== toColor) {    
       const id = `gradient-${this.props.connection.id}`
