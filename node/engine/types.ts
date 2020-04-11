@@ -34,6 +34,14 @@ export interface Node {
   }
 }
 
+export interface Locals {
+  [key: string]: any
+}
+export interface Scope {
+  locals: Locals,
+  parent: Scope
+}
+
 export interface RenderProps {
   children?: React.ReactChildren
   properties: Properties
@@ -42,6 +50,5 @@ export interface RenderProps {
 
 export interface NodeProps {
   key: number
-  parents: Node[]
   node: Node
 }

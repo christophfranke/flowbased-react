@@ -15,6 +15,14 @@ export default class NodeFunctions {
     type: 'Value',
     create: (position: Vector): Node => this.createNode(position, 'Array')
   }, {
+    name: 'Collect',
+    type: 'Value',
+    create: this.createCollectNode.bind(this)
+  }, {
+    name: 'Iterate',
+    type: 'Value',
+    create: this.createIterateNode.bind(this)
+  }, {
     name: 'Object',
     type: 'Value',
     create: (position: Vector): Node => this.createNode(position, 'Object')
@@ -70,6 +78,20 @@ export default class NodeFunctions {
     return node
   }
 
+  createCollectNode(position: Vector): Node {
+    const node = this.createNode(position, 'Collect')
+    node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
+  createIterateNode(position: Vector): Node {
+    const node = this.createNode(position, 'Iterate')
+    node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
   createPairNode(position: Vector): Node {
     const node = this.createNode(position, 'Pair')
     node.connectors.input[0].mode = 'single'
@@ -104,7 +126,6 @@ export default class NodeFunctions {
     
     return node
   }
-
 
   createNumberNode(position: Vector): Node {
     const node = this.createNode(position, 'Number')

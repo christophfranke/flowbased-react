@@ -1,7 +1,7 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
-import { RenderProps, NodeProps, Node } from '@engine/types'
+import { RenderProps, NodeProps, Node, Scope } from '@engine/types'
 import { value, type } from '@engine/render'
 import { contains } from '@engine/type-functions'
 import { transformer } from '@shared/util'
@@ -14,12 +14,12 @@ function getRenderKey(): number {
 }
 
 
-const HOC = (Component) => {
+const HOC = (Component, scope: Scope) => {
   @observer
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
     getChild(childNode: Node) {
-      const result = value(childNode)
+      const result = value(childNode, scope)
       if (contains(type(childNode), 'Object') || contains(type(childNode), 'Pair')) {
         return JSON.stringify(result)
       }
@@ -34,7 +34,7 @@ const HOC = (Component) => {
     @computed get properties() {
       return this.props.node.connections.properties.reduce((obj, property) => ({
         ...obj,
-        [property.key]: value(property.node)
+        [property.key]: value(property.node, scope)
       }), {})
     }
 
@@ -52,7 +52,6 @@ const HOC = (Component) => {
   return RenderComponent
 }
 
-export default function(node: Node, Component: React.ComponentType<RenderProps>): any {
-  const parents = []
-  return React.createElement(HOC(Component), { node, parents, key: getRenderKey() })
+export default function(node: Node, Component: React.ComponentType<RenderProps>, scope: Scope): any {
+  return React.createElement(HOC(Component, scope), { node, key: getRenderKey() })
 }

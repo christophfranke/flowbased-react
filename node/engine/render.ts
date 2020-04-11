@@ -1,17 +1,17 @@
 import React from 'react'
-import { Node, ValueType } from '@engine/types'
+import { Node, ValueType, Scope } from '@engine/types'
 
 import Nodes from '@engine/nodes'
 import * as TypeDefinition from '@engine/type-definition'
 import { matchType } from '@engine/type-functions'
+import { getGlobalScope } from '@engine/scopes'
 
-
-export function value(node: Node): any {
-  return Nodes[node.name].resolve(node)
+export function value(node: Node, scope: Scope): any {
+  return Nodes[node.name].resolve(node, scope)
 }
 
 export function render(node: Node): any {
-  return value(node)
+  return value(node, getGlobalScope())
 }
 
 export function unmatchedType(node: Node): ValueType {

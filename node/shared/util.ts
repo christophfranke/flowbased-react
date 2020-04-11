@@ -16,3 +16,7 @@ export function transformer(target, key, descriptor) {
 export function flatten<T>(arr: T[][]): T[] {
   return arr.reduce((result, arr) => result.concat(arr), [])
 }
+
+export function unique<T>(arr: T[]): T[] {
+  return arr.filter((value, index, self) => self.indexOf(value) === index)
+}
