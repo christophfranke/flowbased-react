@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
-import { type, expectedType, hasScopeResolver } from '@engine/render'
+import { type, expectedType, numScopeResolvers } from '@engine/render'
 import { transformer } from '@shared/util'
 
 import * as LA from '@editor/la'
@@ -45,10 +45,10 @@ class ConnectionPath extends React.Component<Props> {
     return colorOfType(type(node)).default
   }
 
-  @computed get hasScopeResolver(): boolean {
+  @computed get numScopeResolvers(): number {
     return this.fromNode
-      ? hasScopeResolver(this.store.translated.getNode(this.fromNode))
-      : false
+      ? numScopeResolvers(this.store.translated.getNode(this.fromNode))
+      : 0
   }
 
   @transformer
@@ -108,9 +108,7 @@ class ConnectionPath extends React.Component<Props> {
       return null
     }
 
-    const width = this.hasScopeResolver
-      ? 20
-      : 3
+    const width = 3 + 12 * this.numScopeResolvers
     const fromColor = this.fromColor
     const toColor = this.toColor
 

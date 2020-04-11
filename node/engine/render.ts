@@ -27,8 +27,8 @@ export function type(node: Node): ValueType {
   )
 }
 
-export function hasScopeResolver(node: Node): boolean {
-  return scopeResolvers(node, getGlobalScope()).length > 0
+export function numScopeResolvers(node: Node): number {
+  return scopeResolvers(node, getGlobalScope()).length
 }
 
 export function expectedType(node: Node, key: string = ''): ValueType {
