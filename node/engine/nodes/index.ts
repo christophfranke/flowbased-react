@@ -46,6 +46,7 @@ export type CoreNode = 'String'
   | 'Preview'
   | 'Iterate'
   | 'Collect'
+  | 'If'
 
 const Nodes: Nodes = {
   String: {
@@ -177,6 +178,27 @@ const Nodes: Nodes = {
         }), {})),
       input: () => TypeDefinition.Pair(TypeDefinition.Unresolved),
       properties: {}
+    }
+  },
+  If: {
+    resolve: (node: Node, scope: Scope) => {
+      const switchInput = node.connections.properties.find(prop => prop.key === 'switch')
+      const condition = switchInput && value(switchInput.node, scope)
+      const ifTrue = node.connections.input[0] && value(node.connections.input[0].node, scope)
+      const ifFalse = node.connections.input[1] && value(node.connections.input[1].node, scope)
+
+      return condition
+        ? ifTrue
+        : ifFalse
+    },
+    type: {
+      output: (node: Node) => node.connections.input[0]
+        ? unmatchedType(node.connections.input[0].node)
+        : TypeDefinition.Unresolved,
+      input: (node: Node) => type(node),
+      properties: {
+        switch: () => TypeDefinition.Boolean
+      }
     }
   },
   Pair: {

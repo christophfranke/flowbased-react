@@ -19,6 +19,10 @@ export default class NodeFunctions {
     type: 'Flow',
     create: this.createCollectNode.bind(this)
   }, {
+    name: 'If',
+    type: 'Flow',
+    create: this.createIfNode.bind(this)
+  }, {
     name: 'Iterate',
     type: 'Flow',
     create: this.createIterateNode.bind(this)
@@ -91,6 +95,15 @@ export default class NodeFunctions {
   createCollectNode(position: Vector): Node {
     const node = this.createNode(position, 'Collect')
     node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
+  createIfNode(position: Vector): Node {
+    const node = this.createNode(position, 'If')
+    node.connectors.input.push(this.store.connector.createInput())
+    node.connectors.input[0].mode = 'single'
+    node.connectors.input[1].mode = 'single'
 
     return node
   }
