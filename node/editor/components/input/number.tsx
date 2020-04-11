@@ -9,7 +9,7 @@ interface Props {
 }
 
 @observer
-class TextInput extends React.Component<Props> {
+class NumberInput extends React.Component<Props> {
   stop = e => {
     e.stopPropagation()
   }
@@ -33,9 +33,9 @@ class TextInput extends React.Component<Props> {
     const param = this.props.param
     return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <label style={labelStyle}>{param.name}</label>
-      <input type="text" style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
+      <input type="number" style={inputStyle} value={param.value || ''} onChange={(e) => param.value = parseFloat(e.target.value)} onMouseDown={this.stop} />
     </div>    
   }
 }
 
-export default TextInput
+export default NumberInput

@@ -11,6 +11,8 @@ import { isServer } from '@editor/util'
 import Store from '@editor/store'
 import { type } from '@engine/render'
 import TextInput from '@editor/components/input/text'
+import NumberInput from '@editor/components/input/number'
+import CheckboxInput from '@editor/components/input/checkbox'
 
 interface Props {
   node: Node
@@ -204,7 +206,15 @@ class NodeView extends React.Component<Props> {
           </svg>
           <div style={{ gridArea: 'params' }}>
             <div style={nameStyle}>{node.name}</div>
-            {node.params.map(param => <TextInput key={param.key} param={param} typeColor={typeColor} />)}
+            {node.params.map(param => {
+              if (param.type === 'number') {
+                return <NumberInput key={param.key} param={param} typeColor={typeColor} />
+              }
+              if (param.type === 'checkbox') {
+                return <CheckboxInput key={param.key} param={param} typeColor={typeColor} />
+              }
+              return <TextInput key={param.key} param={param} typeColor={typeColor} />
+            })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
             {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
