@@ -125,9 +125,6 @@ const Nodes: Nodes = {
   },
   Collect: {
     resolve: (node: Node, current: Scope) => {
-      // function flatten<T>(arr: T[][]): T[] {
-      //   return [].concat.apply([], arr)
-      // }
       const cartesian = <T>(sets: T[][]):T[][] =>
         sets.reduce((acc, set) =>
           flatten(acc.map(x => set.map(y => [ ...x, y ]))),
@@ -149,9 +146,6 @@ const Nodes: Nodes = {
       const scopes: Scope[] = cartesian(scopeEntries
         .map(entry => entry.scopes()))
         .map(scopeList => mergeScopes(scopeList))
-
-      console.log(cartesian(scopeEntries
-        .map(entry => entry.scopes())))
 
       return scopes.map(scope => value(node.connections.input[0].node, scope))
     },
