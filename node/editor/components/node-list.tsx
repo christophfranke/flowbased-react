@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, computed } from 'mobx'
+import { observable, computed, action } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
 import { Vector } from '@editor/types'
@@ -12,7 +12,7 @@ interface Props {
   position: Vector
 }
 
-const MAX_ITEMS = 6
+const MAX_ITEMS = 50
 
 @inject('store')
 @observer

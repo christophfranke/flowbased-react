@@ -75,6 +75,7 @@ export default class NodeFunctions {
     const node = this.createNode(position, 'Preview')
     node.connectors.input[0].mode = 'single'
     node.connectors.output = []
+
     return node
   }
 

@@ -29,6 +29,7 @@ class Store {
     this.translated = new Translator(this)
 
     autorun(this.addInputConnectors)
+    autorun(this.removeDuplicatePreviews)
   }
 
   static syncedInstance: Store
@@ -139,6 +140,17 @@ class Store {
       .forEach(node => {        
         node.connectors.input.push(this.connector.cloneConnector(node.connectors.input[0]))
       })
+  }
+
+  removeDuplicatePreviews = () => {
+    const previews = this.nodes.filter(node => node.name === 'Preview')
+    if (previews.length > 1) {
+      previews.reverse().forEach((preview, index) => {
+        if (index > 0) {
+          this.deleteNode(preview)
+        }
+      })
+    }
   }
 }
 
