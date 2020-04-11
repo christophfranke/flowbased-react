@@ -98,6 +98,9 @@ const Nodes: Nodes = {
       output: (node: Node) => {
         if (node.connections.input[0]) {
           const type = unmatchedType(node.connections.input[0].node)
+          if (type.name === 'Unresolved') {
+            return TypeDefinition.Unresolved
+          }
           if (type.name !== 'Array') {
             return TypeDefinition.Mismatch
           }
