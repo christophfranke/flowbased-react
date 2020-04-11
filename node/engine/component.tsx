@@ -21,6 +21,9 @@ const HOC = (Component, scope: Scope) => {
     getChild(childNode: Node) {
       const result = value(childNode, scope)
       if (contains(type(childNode), 'Object') || contains(type(childNode), 'Pair')) {
+        if (contains(type(childNode), 'Element')) {
+          return '{ Complex Object }'
+        }
         return JSON.stringify(result)
       }
 
