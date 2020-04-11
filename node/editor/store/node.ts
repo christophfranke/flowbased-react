@@ -31,6 +31,10 @@ export default class NodeFunctions {
     type: 'Primitive',
     create: this.createStringNode.bind(this)
   }, {
+    name: 'Text',
+    type: 'Primitive',
+    create: this.createTextNode.bind(this)
+  }, {
     name: 'Boolean',
     type: 'Primitive',
     create: this.createBooleanNode.bind(this)
@@ -133,6 +137,14 @@ export default class NodeFunctions {
       type: 'text'
     }]
     
+    return node
+  }
+
+  createTextNode(position: Vector): Node {
+    const node = this.createStringNode(position)
+    node.name = 'Text'
+    node.params[0].type = 'textarea'
+
     return node
   }
 

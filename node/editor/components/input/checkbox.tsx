@@ -16,9 +16,6 @@ class CheckboxInput extends React.Component<Props> {
 
   handleClick = e => {
     this.props.param.value = !this.props.param.value
-
-    // TODO: Why do we need the second render? seems like a react/mobx bug
-    // requestAnimationFrame(() => this.setState({}))
   }
 
   render() {

@@ -143,7 +143,7 @@ class Store {
   }
 
   removeDuplicatePreviews = () => {
-    const previews = this.nodes.filter(node => node.name === 'Preview')
+    const previews = this.nodes.filter(node => node.type === 'Preview')
     if (previews.length > 1) {
       previews.reverse().forEach((preview, index) => {
         if (index > 0) {
