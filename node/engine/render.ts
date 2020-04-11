@@ -4,7 +4,7 @@ import { Node, ValueType, Scope } from '@engine/types'
 import Nodes from '@engine/nodes'
 import * as TypeDefinition from '@engine/type-definition'
 import { matchType } from '@engine/type-functions'
-import { getGlobalScope, scopeResolvers } from '@engine/scopes'
+import { getGlobalScope, entries } from '@engine/scopes'
 
 export function value(node: Node, scope: Scope): any {
   return Nodes[node.name].resolve(node, scope)
@@ -28,7 +28,7 @@ export function type(node: Node): ValueType {
 }
 
 export function numScopeResolvers(node: Node): number {
-  return scopeResolvers(node, getGlobalScope()).length
+  return entries(node, getGlobalScope()).length
 }
 
 export function expectedType(node: Node, key: string = ''): ValueType {

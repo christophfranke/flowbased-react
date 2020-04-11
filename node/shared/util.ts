@@ -17,6 +17,6 @@ export function flatten<T>(arr: T[][]): T[] {
   return arr.reduce((result, arr) => result.concat(arr), [])
 }
 
-export function unique<T>(arr: T[]): T[] {
-  return arr.filter((value, index, self) => self.indexOf(value) === index)
+export function unique<T>(arr: T[], compare: (a: T, b: T) => boolean = (a, b) => a === b): T[] {
+  return arr.filter((value, index, self) => self.findIndex(other => compare(value, other)) === index)
 }

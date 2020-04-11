@@ -56,7 +56,7 @@ export const colors = {
     },
     complex: {
       default: 'rgb(14, 136, 201)',
-      highlight: 'rgb(54, 150, 224)',
+      highlight: 'rgb(64, 184, 247)',
       hover: 'white'
     },
     error: {

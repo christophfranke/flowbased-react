@@ -1,19 +1,19 @@
 import { Scope, Node, Locals } from '@engine/types'
-import Nodes, { ScopedValueResolver } from '@engine/nodes'
+import Nodes, { ScopeDescriptor } from '@engine/nodes'
 import { flatten, unique } from '@shared/util'
 
-export function childResolvers(node: Node, current: Scope): ScopedValueResolver[] {
+export function childEntries(node: Node, current: Scope): ScopeDescriptor[] {
   return unique(flatten(node.connections.input.concat(node.connections.properties)
-    .map(connection => scopeResolvers(connection.node, current))))
+    .map(connection => entries(connection.node, current))), (a, b) => a.owner == b.owner)
 }
 
-export function scopeResolvers(node: Node, current: Scope): ScopedValueResolver[] {
-  const ownScopes: ScopedValueResolver[] = Nodes[node.name].resolveWithScope
-    ? [Nodes[node.name].resolveWithScope!(node, current)]
+export function entries(node: Node, current: Scope, filter: (descriptor: ScopeDescriptor) => boolean = () => true): ScopeDescriptor[] {
+  const ownScopes: ScopeDescriptor[] = Nodes[node.name].entry
+    ? [Nodes[node.name].entry!(node, current)]
     : []
 
-  const scopeFilter = Nodes[node.name].scopeFilter || (x => x)
-  return ownScopes.concat(scopeFilter(childResolvers(node, current)))
+  const exit = Nodes[node.name].exit || (() => false)
+  return ownScopes.concat(childEntries(node, current).filter(descriptor => filter(descriptor) && !exit(descriptor)))
 }
 
 let global: Scope = {

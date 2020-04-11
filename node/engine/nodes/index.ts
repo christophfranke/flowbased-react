@@ -1,7 +1,7 @@
 import React from 'react'
 import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
-import { scopeResolvers } from '@engine/scopes'
+import { entries } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
 import { flatten } from '@shared/util'
 
@@ -17,15 +17,19 @@ export interface Resolver {
       [key: string]: TypeResolver
     }
   },
-  scopeFilter?: ScopeFilter
-  resolveWithScope?: (node: Node, scope: Scope) => ScopedValueResolver
+  entry?: ScopeEntry
+  exit?: ScopeExit
   resolve: ValueResolver
 }
 type ValueResolver = (node: Node, current: Scope) => any
 type TypeResolver = (node: Node) => ValueType
-type ScopeFilter = (childResolvers: ScopedValueResolver[]) => ScopedValueResolver[]
-export type ScopedValueResolver = (valueFn: (child: Scope) => any, parent: Scope) => any
-
+type ScopeEntry = (node: Node, current: Scope) => ScopeDescriptor
+export interface ScopeDescriptor {
+  scopes: () => Scope[]
+  owner: Node
+  type: string
+}
+type ScopeExit = (descriptor: ScopeDescriptor) => boolean
 
 
 interface Nodes {
@@ -77,23 +81,28 @@ const Nodes: Nodes = {
     }
   },
   Iterate: {
-    resolve: (node: Node, scope: Scope) => scope.locals.value,
-    resolveWithScope: (node: Node, current: Scope) => (valueFn: (child: Scope) => any, parent: Scope) => {
-      if (node.connections.input[0]) {
-        const result = value(node.connections.input[0].node, current).map((value, index) => {
-          return valueFn({
-            parent,
-            locals: {
-              value,
-              index
+    resolve: (node: Node, scope: Scope) => scope.locals[node.id] && scope.locals[node.id].value,
+    entry: (node: Node, current: Scope): ScopeDescriptor => ({
+      scopes: (): Scope[] => {
+        if (node.connections.input[0]) {
+          const result = value(node.connections.input[0].node, current).map((value, index) => {
+            return {
+              locals: {
+                [node.id]: {              
+                  value,
+                  index
+                }
+              }
             }
           })
-        })
-        return result
-      }
+          return result
+        }
 
-      return []
-    },
+        return []
+      },
+      owner: node,
+      type: 'Iterator'
+    }),
     type: {
       output: (node: Node) => {
         if (node.connections.input[0]) {
@@ -116,16 +125,31 @@ const Nodes: Nodes = {
   },
   Collect: {
     resolve: (node: Node, scope: Scope) => {
-      if (node.connections.input[0]) {
-        const resolvers = scopeResolvers(node.connections.input[0].node, scope)
-        if (resolvers.length > 0) {
-          return resolvers[0](child => value(node.connections.input[0].node, child), scope)
-        }
+      // function flatten<T>(arr: T[][]): T[] {
+      //   return [].concat.apply([], arr)
+      // }
+      const cartesian = <T>(sets: T[][]):T[][] =>
+        sets.reduce((acc, set) =>
+          flatten(acc.map(x => set.map(y => [ ...x, y ]))),
+          [[]])
+
+      const scopeEntries = entries(node, scope, entry => entry.type === 'Iterator')
+      if (scopeEntries.length === 0) {
+        return []
       }
 
-      return []
+      const mergeScopes = (scopes: Scope[]): Scope => scopes.reduce((all: Scope, scope: Scope): Scope => ({
+        ...all,
+        ...scope
+      }), { locals: {} } as Scope)
+
+      const scopes: Scope[] = cartesian(scopeEntries
+        .map(entry => entry.scopes()))
+        .map(scopeList => mergeScopes(scopeList))
+
+      return scopes.map(scope => value(node.connections.input[0].node, scope))
     },
-    scopeFilter: (childResolvers: ScopedValueResolver[]) => childResolvers.filter((child, index) => index > 0),
+    exit: (entry: ScopeDescriptor) => entry.type === 'Iterator',
     type: {
       output: (node: Node) =>
         TypeDefinition.Array(node.connections.input[0]
