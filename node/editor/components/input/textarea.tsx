@@ -34,7 +34,7 @@ class TextareaInput extends React.Component<Props> {
     const param = this.props.param
     return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <label style={labelStyle}>{param.name}</label>
-      <textarea rows={7} style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
+      <textarea rows={10} style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
     </div>    
   }
 }
