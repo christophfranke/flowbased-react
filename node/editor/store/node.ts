@@ -39,6 +39,14 @@ export default class NodeFunctions {
     type: 'Primitive',
     create: this.createTextNode.bind(this)
   }, {
+    name: 'Text List',
+    type: 'Complex',
+    create: this.createTextlistNode.bind(this)
+  }, {
+    name: 'Text Pairs',
+    type: 'Complex',
+    create: this.createTextPairsNode.bind(this)
+  }, {
     name: 'Boolean',
     type: 'Primitive',
     create: this.createBooleanNode.bind(this)
@@ -153,6 +161,32 @@ export default class NodeFunctions {
     return node
   }
 
+  createTextlistNode(position: Vector): Node {
+    const node = this.createNode(position, 'Textlist')
+    node.name = 'List'
+    node.params = [{
+      name: '',
+      key: 'value',
+      value: [],
+      type: 'textlist'
+    }]
+
+    return node
+  }
+
+  createTextPairsNode(position: Vector): Node {
+    const node = this.createNode(position, 'TextPairs')
+    node.name = 'Pairs'
+    node.params = [{
+      name: '',
+      key: 'value',
+      value: {},
+      type: 'pairs'
+    }]
+
+    return node
+  }
+
   createTextNode(position: Vector): Node {
     const node = this.createStringNode(position)
     node.name = 'Text'
@@ -166,7 +200,7 @@ export default class NodeFunctions {
     node.params = [{
       name: '',
       key: 'value',
-      value: '',
+      value: 0,
       type: 'number'
     }]
     
@@ -178,7 +212,7 @@ export default class NodeFunctions {
     node.params = [{
       name: '',
       key: 'value',
-      value: '',
+      value: false,
       type: 'checkbox'
     }]
     

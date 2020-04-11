@@ -14,6 +14,8 @@ import TextInput from '@editor/components/input/text'
 import NumberInput from '@editor/components/input/number'
 import CheckboxInput from '@editor/components/input/checkbox'
 import TextareaInput from '@editor/components/input/textarea'
+import TextlistInput from '@editor/components/input/textlist'
+import TextpairsInput from '@editor/components/input/textpairs'
 
 interface Props {
   node: Node
@@ -216,6 +218,12 @@ class NodeView extends React.Component<Props> {
               }
               if (param.type === 'textarea') {
                 return <TextareaInput key={param.key} param={param} typeColor={typeColor} />
+              }
+              if (param.type === 'textlist') {
+                return <TextlistInput key={param.key} param={param} typeColor={typeColor} />
+              }
+              if (param.type === 'pairs') {
+                return <TextpairsInput key={param.key} param={param} typeColor={typeColor} />
               }
               return <TextInput key={param.key} param={param} typeColor={typeColor} />
             })}

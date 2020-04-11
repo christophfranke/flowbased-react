@@ -47,6 +47,8 @@ export type CoreNode = 'String'
   | 'Iterate'
   | 'Collect'
   | 'If'
+  | 'Textlist'
+  | 'TextPairs'
 
 const Nodes: Nodes = {
   String: {
@@ -214,6 +216,28 @@ const Nodes: Nodes = {
       properties: {}
     }
   },
+  Textlist: {
+    resolve: (node: Node) => {
+      return node.params.value
+    },
+    type: {
+      output: () => TypeDefinition.Array(TypeDefinition.String),
+      properties: {}
+    }
+  },
+  TextPairs: {
+    resolve: (node: Node) => {
+      return { ...(node.params.value as {}) }
+    },
+    type: {
+      output: (node: Node) => TypeDefinition.Object(Object.keys(node.params.value)
+        .filter(key => key)
+        .reduce((obj, key) => ({
+          ...obj,
+          [key]: TypeDefinition.String
+        }), {})),
+      properties: {}
+    }  },
   Tag: {
     resolve: (node: Node, scope: Scope) => component(node, Tag, scope),
     type: {

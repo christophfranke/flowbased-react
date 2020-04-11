@@ -31,7 +31,7 @@ export interface Connector {
   position?: Vector
 }
 
-export type InputType = 'text' | 'number' | 'checkbox' | 'textarea' | 'taglist' | 'pairs'
+export type InputType = 'text' | 'number' | 'checkbox' | 'textarea' | 'textlist' | 'pairs'
 export interface Parameter {
   name: string
   key: string

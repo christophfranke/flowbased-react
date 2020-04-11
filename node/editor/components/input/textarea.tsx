@@ -25,6 +25,7 @@ class TextareaInput extends React.Component<Props> {
       backgroundColor: colors.background.default,
       minWidth: '400px',
       minHeight: '50px',
+      padding: '8px',
       width: '100%',
       margin: '8px',
       fontSize: '20px',
