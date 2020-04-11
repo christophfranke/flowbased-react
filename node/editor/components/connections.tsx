@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
-import { type, expectedType } from '@engine/render'
+import { type, expectedType, hasScopeResolver } from '@engine/render'
 import { transformer } from '@shared/util'
 
 import * as LA from '@editor/la'
@@ -43,6 +43,12 @@ class ConnectionPath extends React.Component<Props> {
 
     const node = this.store.translated.getNode(this.toNode)
     return colorOfType(type(node)).default
+  }
+
+  @computed get hasScopeResolver(): boolean {
+    return this.fromNode
+      ? hasScopeResolver(this.store.translated.getNode(this.fromNode))
+      : false
   }
 
   @transformer
@@ -102,6 +108,9 @@ class ConnectionPath extends React.Component<Props> {
       return null
     }
 
+    const width = this.hasScopeResolver
+      ? 20
+      : 3
     const fromColor = this.fromColor
     const toColor = this.toColor
 
@@ -117,11 +126,11 @@ class ConnectionPath extends React.Component<Props> {
               <stop stopColor={toColor} offset="100%"/>
           </linearGradient>
         </defs>    
-        <path d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke }} />
+        <path strokeWidth={width} d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke }} />
       </>
     }
 
-    return <path d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke: fromColor }} />
+    return <path strokeWidth={width} d={this.d} style={{ transform: this.transform, willChange: 'transform', stroke: fromColor }} />
   }
 }
 
@@ -140,7 +149,7 @@ class Connections extends React.Component {
     }
 
     return <svg style={style}>
-      <g strokeWidth="3" fill="none">
+      <g fill="none">
         {this.store.connections.map(connection => <ConnectionPath key={connection.id} connection={connection} />)}
       </g>
     </svg>
