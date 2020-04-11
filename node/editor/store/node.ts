@@ -12,35 +12,35 @@ export default class NodeFunctions {
 
   nodeList = [{
     name: 'Array',
-    type: 'Value',
+    type: 'Complex',
     create: (position: Vector): Node => this.createNode(position, 'Array')
   }, {
     name: 'Collect',
-    type: 'Value',
+    type: 'Flow',
     create: this.createCollectNode.bind(this)
   }, {
     name: 'Iterate',
-    type: 'Value',
+    type: 'Flow',
     create: this.createIterateNode.bind(this)
   }, {
     name: 'Object',
-    type: 'Value',
+    type: 'Complex',
     create: (position: Vector): Node => this.createNode(position, 'Object')
   }, {
     name: 'String',
-    type: 'Value',
+    type: 'Primitive',
     create: this.createStringNode.bind(this)
   }, {
     name: 'Boolean',
-    type: 'Value',
+    type: 'Primitive',
     create: this.createBooleanNode.bind(this)
   }, {
     name: 'Pair',
-    type: 'Value',
+    type: 'Primitive',
     create: this.createPairNode.bind(this)
   }, {
     name: 'Number',
-    type: 'Value',
+    type: 'Primitive',
     create: this.createNumberNode.bind(this)
   }, {
     name: 'HTML Element',
@@ -50,7 +50,12 @@ export default class NodeFunctions {
     name: 'Preview',
     type: 'Output',
     create: this.createPreviewNode.bind(this)
-  }]
+  }].sort((a, b) => {
+    if (a.type === b.type) {
+      return a.name < b.name ? -1 : 1
+    }
+    return a.type < b.type ? -1 : 1
+  })
 
   createNode(position: Vector, type: CoreNode): Node {
     const Node = Nodes[type]
@@ -99,7 +104,8 @@ export default class NodeFunctions {
     node.params = [{
       name: 'Key',
       key: 'key',
-      value: ''
+      value: '',
+      type: 'text'
     }]
 
     return node
@@ -111,7 +117,8 @@ export default class NodeFunctions {
     node.params = [{
       name: 'Tag',
       key: 'tag',
-      value: 'div'
+      value: 'div',
+      type: 'text'
     }]
 
     return node
@@ -122,7 +129,8 @@ export default class NodeFunctions {
     node.params = [{
       name: '',
       key: 'value',
-      value: ''
+      value: '',
+      type: 'text'
     }]
     
     return node
@@ -133,7 +141,8 @@ export default class NodeFunctions {
     node.params = [{
       name: '',
       key: 'value',
-      value: ''
+      value: '',
+      type: 'number'
     }]
     
     return node
@@ -144,7 +153,8 @@ export default class NodeFunctions {
     node.params = [{
       name: '',
       key: 'value',
-      value: ''
+      value: '',
+      type: 'checkbox'
     }]
     
     return node

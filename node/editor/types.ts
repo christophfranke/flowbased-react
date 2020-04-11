@@ -31,17 +31,19 @@ export interface Connector {
   position?: Vector
 }
 
-export interface Parameter<T> {
+export type InputType = 'text' | 'textarea' | 'number' | 'checkbox' | 'taglist' | 'pairs'
+export interface Parameter {
   name: string
   key: string
-  value: T
+  value: any
+  type: InputType
 }
 
 export interface Node {
   id: number
   name: string
   type: Engine.CoreNode
-  params: Parameter<string>[]
+  params: Parameter[]
   position: Vector
   boundingBox?: Rectangle
   connectors: {

@@ -10,6 +10,7 @@ import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
 import Store from '@editor/store'
 import { type } from '@engine/render'
+import TextInput from '@editor/components/input/text'
 
 interface Props {
   node: Node
@@ -130,10 +131,6 @@ class NodeView extends React.Component<Props> {
     this.store.deleteNode(this.props.node)
   }
 
-  stop = e => {
-    e.stopPropagation()
-  }
-
   updatePosition = () => {
     if (this.nodeRef.current) {
       this.props.node.boundingBox = {
@@ -175,21 +172,6 @@ class NodeView extends React.Component<Props> {
       color: typeColor
     }
 
-    const labelStyle: React.CSSProperties = {
-      color: colors.text.dim,
-      fontSize: '16px'
-    }
-
-    const inputStyle: React.CSSProperties = {
-      outline: 'none',
-      backgroundColor: colors.background.default,
-      minWidth: '200px',
-      width: '100%',
-      margin: '8px',
-      fontSize: '20px',
-      borderBottom: `1px solid ${typeColor}`,
-    }
-
     const closeStyle: React.CSSProperties = {
       gridArea: 'close',
       transform: 'scale(1.7)',
@@ -222,10 +204,7 @@ class NodeView extends React.Component<Props> {
           </svg>
           <div style={{ gridArea: 'params' }}>
             <div style={nameStyle}>{node.name}</div>
-            {node.params.map(param => <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <label style={labelStyle}>{param.name}</label>
-              <input type="text" style={inputStyle} value={param.value} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
-            </div>)}
+            {node.params.map(param => <TextInput key={param.key} param={param} typeColor={typeColor} />)}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
             {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
