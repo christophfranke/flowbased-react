@@ -2,9 +2,9 @@ import { Scope, Node, Locals } from '@engine/types'
 import Nodes, { ScopeDescriptor } from '@engine/nodes'
 import { flatten, unique } from '@shared/util'
 
-export function childEntries(node: Node, current: Scope): ScopeDescriptor[] {
+export function childEntries(node: Node, current: Scope, filter?: (descriptor: ScopeDescriptor) => boolean): ScopeDescriptor[] {
   return unique(flatten(node.connections.input.concat(node.connections.properties)
-    .map(connection => entries(connection.node, current))), (a, b) => a.owner == b.owner)
+    .map(connection => entries(connection.node, current, filter))), (a, b) => a.owner == b.owner)
 }
 
 export function entries(node: Node, current: Scope, filter: (descriptor: ScopeDescriptor) => boolean = () => true): ScopeDescriptor[] {

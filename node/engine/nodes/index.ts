@@ -1,7 +1,7 @@
 import React from 'react'
 import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
-import { entries } from '@engine/scopes'
+import { childEntries } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
 import { flatten } from '@shared/util'
 
@@ -124,7 +124,7 @@ const Nodes: Nodes = {
     }
   },
   Collect: {
-    resolve: (node: Node, scope: Scope) => {
+    resolve: (node: Node, current: Scope) => {
       // function flatten<T>(arr: T[][]): T[] {
       //   return [].concat.apply([], arr)
       // }
@@ -133,19 +133,25 @@ const Nodes: Nodes = {
           flatten(acc.map(x => set.map(y => [ ...x, y ]))),
           [[]])
 
-      const scopeEntries = entries(node, scope, entry => entry.type === 'Iterator')
+      const scopeEntries = childEntries(node, current, entry => entry.type === 'Iterator')
       if (scopeEntries.length === 0) {
         return []
       }
 
       const mergeScopes = (scopes: Scope[]): Scope => scopes.reduce((all: Scope, scope: Scope): Scope => ({
-        ...all,
-        ...scope
+        locals: {
+          ...all.locals,
+          ...scope.locals
+        },
+        parent: current
       }), { locals: {} } as Scope)
 
       const scopes: Scope[] = cartesian(scopeEntries
         .map(entry => entry.scopes()))
         .map(scopeList => mergeScopes(scopeList))
+
+      console.log(cartesian(scopeEntries
+        .map(entry => entry.scopes())))
 
       return scopes.map(scope => value(node.connections.input[0].node, scope))
     },

@@ -39,7 +39,7 @@ export interface Locals {
 }
 export interface Scope {
   locals: Locals,
-  parent: Scope
+  parent?: Scope
 }
 
 export interface RenderProps {
