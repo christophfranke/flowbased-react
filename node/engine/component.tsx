@@ -20,7 +20,8 @@ const HOC = (Component, scope: Scope) => {
     @transformer
     getChild(childNode: Node) {
       const result = value(childNode, scope)
-      if (contains(type(childNode), 'Object') || contains(type(childNode), 'Pair')) {
+      const nodeType = type(childNode)
+      if (contains(nodeType, 'Object') || contains(nodeType, 'Pair') || nodeType.name === 'Boolean') {
         if (contains(type(childNode), 'Element')) {
           return '{ Complex Object }'
         }
