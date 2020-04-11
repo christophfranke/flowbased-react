@@ -115,12 +115,14 @@ const Nodes: Nodes = {
     resolve: (node: Node, scope: Scope) => {
       if (node.connections.input[0]) {
         const resolvers = scopeResolvers(node.connections.input[0].node, scope)
-        return resolvers.map(resolver => resolver((child) => value(node.connections.input[0].node, child), scope))
+        if (resolvers.length > 0) {
+          return resolvers[0](child => value(node.connections.input[0].node, child), scope)
+        }
       }
 
       return []
     },
-    scopeFilter: () => [],
+    scopeFilter: (childResolvers: ScopedValueResolver[]) => childResolvers.filter((child, index) => index > 0),
     type: {
       output: (node: Node) =>
         TypeDefinition.Array(node.connections.input[0]
@@ -172,9 +174,9 @@ const Nodes: Nodes = {
       output: () => TypeDefinition.Element,
       input: () => TypeDefinition.Unresolved,
       properties: {
-        props: () => TypeDefinition.Object({}),
+        classList: () => TypeDefinition.Array(TypeDefinition.String),
         style: () => TypeDefinition.Object({}),
-        classList: () => TypeDefinition.Array(TypeDefinition.String)
+        props: () => TypeDefinition.Object({})
       }
     }
   },
