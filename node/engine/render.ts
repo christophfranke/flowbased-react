@@ -28,7 +28,7 @@ export function type(node: Node): ValueType {
 }
 
 export function numScopeResolvers(node: Node): number {
-  return entries(node, getGlobalScope()).length
+  return entries(node).length
 }
 
 export function expectedType(node: Node, key: string = ''): ValueType {

@@ -23,9 +23,9 @@ export interface Resolver {
 }
 type ValueResolver = (node: Node, current: Scope) => any
 type TypeResolver = (node: Node) => ValueType
-type ScopeEntry = (node: Node, current: Scope) => ScopeDescriptor
+type ScopeEntry = (node: Node) => ScopeDescriptor
 export interface ScopeDescriptor {
-  scopes: () => Scope[]
+  scopes: (current: Scope) => Scope[]
   owner: Node
   type: string
 }
@@ -82,8 +82,8 @@ const Nodes: Nodes = {
   },
   Iterate: {
     resolve: (node: Node, scope: Scope) => scope.locals[node.id] && scope.locals[node.id].value,
-    entry: (node: Node, current: Scope): ScopeDescriptor => ({
-      scopes: (): Scope[] => {
+    entry: (node: Node): ScopeDescriptor => ({
+      scopes: (current: Scope): Scope[] => {
         if (node.connections.input[0]) {
           const result = value(node.connections.input[0].node, current).map((value, index) => {
             return {
@@ -130,22 +130,32 @@ const Nodes: Nodes = {
           flatten(acc.map(x => set.map(y => [ ...x, y ]))),
           [[]])
 
-      const scopeEntries = childEntries(node, current, entry => entry.type === 'Iterator')
+      const scopeEntries = childEntries(node, entry => entry.type === 'Iterator').reverse()
       if (scopeEntries.length === 0) {
         return []
       }
 
-      const mergeScopes = (scopes: Scope[]): Scope => scopes.reduce((all: Scope, scope: Scope): Scope => ({
+      // const mergeScopes = (scopes: Scope[]): Scope => scopes.reduce((all: Scope, scope: Scope): Scope => ({
+      //   locals: {
+      //     ...all.locals,
+      //     ...scope.locals
+      //   },
+      //   parent: current
+      // }), { locals: {} } as Scope)
+
+      const mergeScopes = (scope1: Scope, scope2: Scope): Scope => ({
         locals: {
-          ...all.locals,
-          ...scope.locals
+          ...scope1.locals,
+          ...scope2.locals
         },
         parent: current
-      }), { locals: {} } as Scope)
+      })
 
-      const scopes: Scope[] = cartesian(scopeEntries
-        .map(entry => entry.scopes()))
-        .map(scopeList => mergeScopes(scopeList))
+      const scopes: Scope[] = scopeEntries.reduce((scopes, entry) => flatten(scopes.map(scope => entry.scopes(scope).map(newScope => mergeScopes(scope, newScope)))), [current])
+
+      // const scopes: Scope[] = cartesian(scopeEntries
+      //   .map(entry => entry.scopes()))
+      //   .map(scopeList => mergeScopes(scopeList))
 
       return scopes.map(scope => value(node.connections.input[0].node, scope))
     },
