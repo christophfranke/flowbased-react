@@ -135,14 +135,6 @@ const Nodes: Nodes = {
         return []
       }
 
-      // const mergeScopes = (scopes: Scope[]): Scope => scopes.reduce((all: Scope, scope: Scope): Scope => ({
-      //   locals: {
-      //     ...all.locals,
-      //     ...scope.locals
-      //   },
-      //   parent: current
-      // }), { locals: {} } as Scope)
-
       const mergeScopes = (scope1: Scope, scope2: Scope): Scope => ({
         locals: {
           ...scope1.locals,
@@ -152,11 +144,6 @@ const Nodes: Nodes = {
       })
 
       const scopes: Scope[] = scopeEntries.reduce((scopes, entry) => flatten(scopes.map(scope => entry.scopes(scope).map(newScope => mergeScopes(scope, newScope)))), [current])
-
-      // const scopes: Scope[] = cartesian(scopeEntries
-      //   .map(entry => entry.scopes()))
-      //   .map(scopeList => mergeScopes(scopeList))
-
       return scopes.map(scope => value(node.connections.input[0].node, scope))
     },
     exit: (entry: ScopeDescriptor) => entry.type === 'Iterator',
