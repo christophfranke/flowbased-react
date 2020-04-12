@@ -178,9 +178,11 @@ const Nodes: Nodes = {
     }
   },
   GetKey: {
-    resolve: (node: Node, scope: Scope) => node.connections.input[0]
-      ? value(node.connections.input[0].node, scope)[node.params.key]
-      : createEmptyValue(type(node)),
+    resolve: (node: Node, scope: Scope) => {
+      return node.connections.input[0]
+        ? value(node.connections.input[0].node, scope)[node.params.key]
+        : createEmptyValue(type(node))
+    },
     type: {
       output: (node: Node) => {
         if (node.connections.input[0] && node.params.key) {
@@ -225,7 +227,7 @@ const Nodes: Nodes = {
       key: node.params.key,
       value: node.connections.input[0]
         ? value(node.connections.input[0].node, scope)
-        : createEmptyValue(type(node))
+        : createEmptyValue(type(node).params.value)
     }),
     type: {
       output: (node: Node) => TypeDefinition.Pair(node.connections.input[0]
