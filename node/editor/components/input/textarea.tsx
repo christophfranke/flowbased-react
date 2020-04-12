@@ -14,6 +14,12 @@ class TextareaInput extends React.Component<Props> {
     e.stopPropagation()
   }
 
+  handleWheel = e => {
+    if (e.target.scrollHeight > e.target.clientHeight) {
+      e.stopPropagation()
+    }
+  }
+
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
@@ -23,6 +29,8 @@ class TextareaInput extends React.Component<Props> {
     const inputStyle: React.CSSProperties = {
       outline: 'none',
       backgroundColor: colors.background.default,
+      resize: 'none',
+      overflowY: 'auto',
       minWidth: '400px',
       minHeight: '50px',
       padding: '8px',
@@ -35,7 +43,7 @@ class TextareaInput extends React.Component<Props> {
     const param = this.props.param
     return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <label style={labelStyle}>{param.name}</label>
-      <textarea rows={10} style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
+      <textarea rows={10} style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} onWheel={this.handleWheel} />
     </div>    
   }
 }
