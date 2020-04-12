@@ -36,10 +36,10 @@ export function canMatch(src: ValueType, target: ValueType): boolean {
 }
 
 export function matchAllTypes(types: ValueType[]): ValueType {
-  return types.reduce((current, type) => matchType(type, current), TypeDefinition.Unresolved)
+  return types.reduce((current, type) => matchType(type, current, {mismatchMissingTypes: false }), TypeDefinition.Unresolved)
 }
 
-export function matchType(src: ValueType, target: ValueType): ValueType {
+export function matchType(src: ValueType, target: ValueType, config = { mismatchMissingTypes: true }): ValueType {
   if (src.name === 'Mismatch' || target.name === 'Mismatch') {
     return TypeDefinition.Mismatch
   }
@@ -67,6 +67,7 @@ export function matchType(src: ValueType, target: ValueType): ValueType {
 
     if (name === 'Object') {
       const params = Object.keys(src.params)
+      .filter(key => config.mismatchMissingTypes || target.params[key])
         .map(key => ({
           key,
           type: target.params[key]
@@ -74,7 +75,7 @@ export function matchType(src: ValueType, target: ValueType): ValueType {
             : src.params[key]
         }))
         .concat(Object.keys(target.params)
-          .filter(key => !src.params[key])
+          .filter(key => config.mismatchMissingTypes && !src.params[key])
           .map(key => ({
             key,
             type: TypeDefinition.Mismatch
