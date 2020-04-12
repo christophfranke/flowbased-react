@@ -3,7 +3,7 @@ import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
 import { childEntries } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
-import { matchAllTypes } from '@engine/type-functions'
+import { matchType, matchAllTypes, createEmptyValue } from '@engine/type-functions'
 import { flatten } from '@shared/util'
 
 import Tag from '@engine/nodes/tag'
@@ -84,7 +84,9 @@ const Nodes: Nodes = {
     }
   },
   Iterate: {
-    resolve: (node: Node, scope: Scope) => scope.locals[node.id] && scope.locals[node.id].value,
+    resolve: (node: Node, scope: Scope) => scope.locals[node.id]
+      ? scope.locals[node.id].value
+      : createEmptyValue(type(node)), // <- although this should never happen in practice
     entry: (node: Node): ScopeDescriptor => ({
       scopes: (current: Scope): Scope[] => {
         if (node.connections.input[0]) {
@@ -178,11 +180,18 @@ const Nodes: Nodes = {
   GetKey: {
     resolve: (node: Node, scope: Scope) => node.connections.input[0]
       ? value(node.connections.input[0].node, scope)[node.params.key]
-      : null,
+      : createEmptyValue(type(node)),
     type: {
-      output: (node: Node) => node.connections.input[0] && node.params.key
-        ? unmatchedType(node.connections.input[0].node).params[node.params.key] || TypeDefinition.Mismatch
-        : TypeDefinition.Unresolved,
+      output: (node: Node) => {
+        if (node.connections.input[0] && node.params.key) {
+          const inputType = unmatchedType(node.connections.input[0].node)
+          if (inputType.name !== 'Unresolved') {
+            return inputType.params[node.params.key] || TypeDefinition.Mismatch
+          }
+        }
+
+        return TypeDefinition.Unresolved
+      },
       input: (node: Node) => node.params.key
         ? TypeDefinition.Object({ [node.params.key]: type(node) })
         : TypeDefinition.Object({}),
@@ -191,27 +200,32 @@ const Nodes: Nodes = {
   },
   If: {
     resolve: (node: Node, scope: Scope) => {
-      const switchInput = node.connections.properties.find(prop => prop.key === 'switch')
-      const condition = switchInput && value(switchInput.node, scope)
-      const ifTrue = node.connections.input[0] && value(node.connections.input[0].node, scope)
-      const ifFalse = node.connections.input[1] && value(node.connections.input[1].node, scope)
-
-      return condition
-        ? ifTrue
-        : ifFalse
+      const conditionInput = node.connections.properties.find(prop => prop.key === 'condition')
+      const ifTrueInput = node.connections.input[0]
+      const ifFalseInput = node.connections.input[1]
+      
+      return conditionInput && value(conditionInput.node, scope)
+        ? (ifTrueInput 
+          ? value(ifTrueInput.node, scope)
+          : createEmptyValue(type(node)))
+        : (ifFalseInput
+          ? value(ifFalseInput.node, scope)
+          : createEmptyValue(type(node)))
     },
     type: {
       output: (node: Node) => matchAllTypes(node.connections.input.map(con => unmatchedType(con.node))),
       input: (node: Node) => type(node),
       properties: {
-        switch: () => TypeDefinition.Boolean
+        condition: () => TypeDefinition.Boolean
       }
     }
   },
   Pair: {
     resolve: (node: Node, scope: Scope) => ({
       key: node.params.key,
-      value: node.connections.input[0] ? value(node.connections.input[0].node, scope) : undefined
+      value: node.connections.input[0]
+        ? value(node.connections.input[0].node, scope)
+        : createEmptyValue(type(node))
     }),
     type: {
       output: (node: Node) => TypeDefinition.Pair(node.connections.input[0]

@@ -1,3 +1,4 @@
+import React from 'react'
 import { Node, ValueType, ValueBaseType } from '@engine/types'
 import * as TypeDefinition from '@engine/type-definition'
 import Nodes from '@engine/nodes'
@@ -92,4 +93,39 @@ export function matchType(src: ValueType, target: ValueType, config = { mismatch
   }
 
   return TypeDefinition.Mismatch
+}
+
+export function createEmptyValue(type: ValueType): any {
+  const name = type.name
+  if (name === 'Element') {
+    return React.createElement(React.Fragment)
+  }
+  if (name === 'String')  {
+    return ''
+  }
+  if (name === 'Boolean') {
+    return false
+  }
+  if (name === 'Array') {
+    return []
+  }
+  if (name === 'Object') {
+    return Object.entries(type.params).reduce((obj, [key, paramType]) => ({
+      [key]: createEmptyValue(paramType)
+    }), {})
+  }
+  if (name === 'Number') {
+    return 0
+  }
+  if (name === 'Pair') {
+    return {
+      key: '',
+      value: createEmptyValue(type.params.value)
+    }
+  }
+  if (['Unresolved', 'Null', 'Mismatch', 'Unknown'].includes(name)) {
+    return null
+  }
+
+  throw new Error(`Unknown base type ${name}`)
 }
