@@ -31,6 +31,10 @@ export default class NodeFunctions {
     type: 'Complex',
     create: (position: Vector): Node => this.createNode(position, 'Object')
   }, {
+    name: 'Get Key',
+    type: 'Complex',
+    create: this.createGetKeyNode.bind(this)
+  }, {
     name: 'String',
     type: 'Primitive',
     create: this.createStringNode.bind(this)
@@ -112,6 +116,8 @@ export default class NodeFunctions {
     node.connectors.input.push(this.store.connector.createInput())
     node.connectors.input[0].mode = 'single'
     node.connectors.input[1].mode = 'single'
+    node.connectors.input[0].display = 'True'
+    node.connectors.input[1].display = 'False'
 
     return node
   }
@@ -119,6 +125,19 @@ export default class NodeFunctions {
   createIterateNode(position: Vector): Node {
     const node = this.createNode(position, 'Iterate')
     node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
+  createGetKeyNode(position: Vector): Node {
+    const node = this.createNode(position, 'GetKey')
+    node.connectors.input[0].mode = 'single'
+    node.params = [{
+      name: 'Key',
+      key: 'key',
+      value: '',
+      type: 'text'   
+    }]
 
     return node
   }

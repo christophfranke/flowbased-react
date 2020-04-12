@@ -22,7 +22,7 @@ export interface Resolver {
   resolve: ValueResolver
 }
 type ValueResolver = (node: Node, current: Scope) => any
-type TypeResolver = (node: Node) => ValueType
+type TypeResolver = (node: Node, other?: Node) => ValueType
 type ScopeEntry = (node: Node) => ScopeDescriptor
 export interface ScopeDescriptor {
   scopes: (current: Scope) => Scope[]
@@ -49,6 +49,7 @@ export type CoreNode = 'String'
   | 'If'
   | 'Textlist'
   | 'TextPairs'
+  | 'GetKey'
 
 const Nodes: Nodes = {
   String: {
@@ -178,7 +179,23 @@ const Nodes: Nodes = {
           ...obj,
           [pair.key]: pair.type
         }), {})),
-      input: () => TypeDefinition.Pair(TypeDefinition.Unresolved),
+      input: (node, other) => other && other.params.key
+        ? TypeDefinition.Pair(type(node).params[other!.params.key])
+        : TypeDefinition.Pair(TypeDefinition.Unresolved),
+      properties: {}
+    }
+  },
+  GetKey: {
+    resolve: (node: Node, scope: Scope) => node.connections.input[0]
+      ? value(node.connections.input[0].node, scope)[node.params.key]
+      : null,
+    type: {
+      output: (node: Node) => node.connections.input[0] && node.params.key
+        ? unmatchedType(node.connections.input[0].node).params[node.params.key] || TypeDefinition.Mismatch
+        : TypeDefinition.Unresolved,
+      input: (node: Node) => node.params.key
+        ? TypeDefinition.Object({ [node.params.key]: type(node) })
+        : TypeDefinition.Object({}),
       properties: {}
     }
   },
@@ -212,7 +229,7 @@ const Nodes: Nodes = {
       output: (node: Node) => TypeDefinition.Pair(node.connections.input[0]
         ? unmatchedType(node.connections.input[0].node)
         : TypeDefinition.Unresolved),
-      input: () => TypeDefinition.Unresolved,
+      input: (node) => type(node).params.value,
       properties: {}
     }
   },

@@ -25,6 +25,7 @@ export type ConnectorMode = 'single' | 'multiple' | 'duplicate'
 export interface Connector {
   id: number
   name: string
+  display? : string
   mode: ConnectorMode
   function: ConnectorFunction
   direction: Vector

@@ -21,7 +21,7 @@ export function unmatchedType(node: Node): ValueType {
 export function type(node: Node): ValueType {
   return node.connections.output.reduce(
     (resultType, connection) => {
-      return matchType(resultType, expectedType(connection.node, connection.key))
+      return matchType(resultType, expectedType(connection.node, connection.key, node))
     },
     unmatchedType(node)
   )
@@ -31,10 +31,10 @@ export function numScopeResolvers(node: Node): number {
   return entries(node).length
 }
 
-export function expectedType(node: Node, key: string = ''): ValueType {
+export function expectedType(node: Node, key: string = '', other?: Node): ValueType {
   return key
-    ? Nodes[node.name].type.properties[key](node)
+    ? Nodes[node.name].type.properties[key](node, other)
     : (Nodes[node.name].type.input
-      ? Nodes[node.name].type.input!(node)
+      ? Nodes[node.name].type.input!(node, other)
       : TypeDefinition.Null)
 }
