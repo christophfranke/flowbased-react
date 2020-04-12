@@ -130,6 +130,11 @@ const Nodes: Nodes = {
   },
   Collect: {
     resolve: (node: Node, current: Scope) => {
+      const input = node.connections.input[0]
+      if (!input) {
+        return []
+      }
+
       const scopeEntries = childEntries(node, entry => entry.type === 'Iterator').reverse()
       const mergeScopes = (scope1: Scope, scope2: Scope): Scope => ({
         locals: {
@@ -140,7 +145,7 @@ const Nodes: Nodes = {
       })
 
       const scopes: Scope[] = scopeEntries.reduce((scopes, entry) => flatten(scopes.map(scope => entry.scopes(scope).map(newScope => mergeScopes(scope, newScope)))), [current])
-      return scopes.map(scope => value(node.connections.input[0].node, scope))
+      return scopes.map(scope => value(input.node, scope))
     },
     exit: (entry: ScopeDescriptor) => entry.type === 'Iterator',
     type: {
