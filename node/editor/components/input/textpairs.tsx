@@ -37,7 +37,7 @@ class TextListInput extends React.Component<Props> {
         .filter(({key, value }, index) => index <= firstEmptyIndex || key || value)
     }
 
-    if (this.entries.every(({ key, value }) => key && value)) {
+    if (this.entries.every(({ key, value }) => key || value)) {
       this.entries.push({ key: '', value: '' })
     }
   }
