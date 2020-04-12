@@ -3,6 +3,7 @@ import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
 import { childEntries } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
+import { matchAllTypes } from '@engine/type-functions'
 import { flatten } from '@shared/util'
 
 import Tag from '@engine/nodes/tag'
@@ -76,10 +77,8 @@ const Nodes: Nodes = {
   Array: {
     resolve: (node: Node, current: Scope) => node.connections.input.map(connection => value(connection.node, current)),
     type: {
-      output: (node: Node) =>
-        TypeDefinition.Array(node.connections.input[0]
-          ? unmatchedType(node.connections.input[0].node)
-          : TypeDefinition.Unresolved),
+      output: (node: Node) => TypeDefinition.Array(
+        matchAllTypes(node.connections.input.map(con => unmatchedType(con.node)))),
       input: (node: Node) => type(node).params.items || TypeDefinition.Mismatch,
       properties: {}
     }
@@ -202,9 +201,7 @@ const Nodes: Nodes = {
         : ifFalse
     },
     type: {
-      output: (node: Node) => node.connections.input[0]
-        ? unmatchedType(node.connections.input[0].node)
-        : TypeDefinition.Unresolved,
+      output: (node: Node) => matchAllTypes(node.connections.input.map(con => unmatchedType(con.node))),
       input: (node: Node) => type(node),
       properties: {
         switch: () => TypeDefinition.Boolean

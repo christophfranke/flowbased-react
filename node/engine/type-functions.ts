@@ -35,6 +35,10 @@ export function canMatch(src: ValueType, target: ValueType): boolean {
   return !isMismatch(matchType(src, target))
 }
 
+export function matchAllTypes(types: ValueType[]): ValueType {
+  return types.reduce((current, type) => matchType(type, current), TypeDefinition.Unresolved)
+}
+
 export function matchType(src: ValueType, target: ValueType): ValueType {
   if (src.name === 'Mismatch' || target.name === 'Mismatch') {
     return TypeDefinition.Mismatch
