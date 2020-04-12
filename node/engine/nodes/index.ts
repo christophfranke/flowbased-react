@@ -129,16 +129,7 @@ const Nodes: Nodes = {
   },
   Collect: {
     resolve: (node: Node, current: Scope) => {
-      const cartesian = <T>(sets: T[][]):T[][] =>
-        sets.reduce((acc, set) =>
-          flatten(acc.map(x => set.map(y => [ ...x, y ]))),
-          [[]])
-
       const scopeEntries = childEntries(node, entry => entry.type === 'Iterator').reverse()
-      if (scopeEntries.length === 0) {
-        return []
-      }
-
       const mergeScopes = (scope1: Scope, scope2: Scope): Scope => ({
         locals: {
           ...scope1.locals,
