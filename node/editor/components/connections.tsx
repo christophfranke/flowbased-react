@@ -79,7 +79,7 @@ class ConnectionPath extends React.Component<Props> {
 
   @computed get transform(): string {
     if (this.offset) {
-      const o = LA.round(this.offset)
+      const o = this.offset
       return `translate(${o.x}px, ${o.y}px)`
     }
 
@@ -87,15 +87,15 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   @computed get d(): string {
-    if (this.offset && this.diff) {    
+    if (this.offset && this.diff) {
       const distance = LA.distance(this.diff)
       const middle1 = LA.scale(distance / 2, this.props.connection.from.direction)
       const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.direction)
 
-      const o = LA.round(this.offset)
-      const v2 = LA.round(middle1)
-      const v3 = LA.round(middle2)
-      const v4 = LA.round(this.diff)
+      const o = this.offset
+      const v2 = middle1
+      const v3 = middle2
+      const v4 = this.diff
       return `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`    
     }
 
@@ -115,11 +115,19 @@ class ConnectionPath extends React.Component<Props> {
     if (fromColor !== toColor) {    
       const id = `gradient-${this.props.connection.id}`
       const stroke = `url(#${id})`
-      const rotation = (diff.y > 0 ? 360 : 0) + Math.sign(diff.y) * 180 * Math.acos(LA.normalize(diff).x) / Math.PI
+      const rotation = Math.sign(diff.y) * 180 * Math.acos(LA.normalize(diff).x) / Math.PI
+      const gradientProps = {
+        id,
+        x1: '0%',
+        x2: '100%',
+        y1: '0%',
+        y2: '0%',
+        gradientTransform: `translate(0.5, 0.5) rotate(${rotation}) translate(-0.5, -0.5)`
+      }
 
       return <>
         <defs>
-          <linearGradient id={id} x1="0%" x2="100%" y1="0%" y2="0%" gradientTransform={`translate(0.5, 0.5) rotate(${rotation}) translate(-0.5, -0.5)`}>
+          <linearGradient {...gradientProps}>
               <stop stopColor={fromColor} offset="0%"/>
               <stop stopColor={toColor} offset="100%"/>
           </linearGradient>
