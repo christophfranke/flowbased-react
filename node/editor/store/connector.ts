@@ -36,6 +36,7 @@ export default class ConnectorFunctions {
         const srcType = type(this.store.translated.getNode(srcNode))
         const targetKey = dest.name === 'input' ? '' : dest.name
         const targetType = expectedType(this.store.translated.getNode(targetNode), targetKey)
+
         return canMatch(srcType, targetType)
       }
     }

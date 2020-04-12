@@ -58,11 +58,17 @@ export const Null: ValueType = {
   params: {}
 }
 
-export const Mismatch: ValueType = {
-  display: 'Mismatch',
+export const Mismatch = (msg: string): ValueType => ({
+  display: 'TypeError: {msg}',
   name: 'Mismatch',
-  params: {}
-}
+  params: {
+    msg: {
+      display: msg,
+      name: 'Null',
+      params: {}
+    }
+  }
+})
 
 export const Unknown: ValueType = {
   display: 'Unknown',

@@ -3,17 +3,10 @@ import { Node, ValueType, ValueBaseType } from '@engine/types'
 import * as TypeDefinition from '@engine/type-definition'
 import Nodes from '@engine/nodes'
 import { expectedType } from '@engine/render'
-
-export function create(name: ValueBaseType, args?: any): ValueType {
-  if (!isGeneric(name)) {
-    return TypeDefinition[name] as ValueType
-  }
-
-  return (TypeDefinition[name] as (args: any) => ValueType)(args)
-}
+import { unique } from '@shared/util'
 
 export function isGeneric(name: ValueBaseType): boolean {
-  return !['String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
+  return !['Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
 }
 
 export function contains(type: ValueType, name: ValueBaseType): boolean {  
@@ -33,17 +26,21 @@ export function isMismatch(type: ValueType): boolean {
 }
 
 export function canMatch(src: ValueType, target: ValueType): boolean {
-  return !isMismatch(matchType(src, target))
+  return !isMismatch(matchInto(src, target))
 }
 
-export function matchAllTypes(types: ValueType[]): ValueType {
-  return types.reduce((current, type) => matchType(type, current, {mismatchMissingTypes: false }), TypeDefinition.Unresolved)
+function isBasic(type: ValueType): boolean {
+  return !isGeneric(type.name)
 }
 
-export function matchType(src: ValueType, target: ValueType, config = { mismatchMissingTypes: true }): ValueType {
-  if (src.name === 'Mismatch' || target.name === 'Mismatch') {
-    return TypeDefinition.Mismatch
+function matchBasic(src: ValueType, target: ValueType): ValueType | null {
+  if (src.name === 'Mismatch' && target.name === 'Mismatch') {
+    const msg = src.params.msg.display === target.params.msg.display
+      ? src.params.msg.display
+      : `${src.params.msg.display} and ${target.params.msg.display}`
+    return TypeDefinition.Mismatch(msg)
   }
+
   if (src.name === 'Unresolved') {
     return target
   }
@@ -51,48 +48,154 @@ export function matchType(src: ValueType, target: ValueType, config = { mismatch
     return src
   }
 
+  if (src.name === 'Mismatch') {
+    return src
+  }
+  if (target.name === 'Mismatch') {
+    return target
+  }
+
+  if (isBasic(src) && isBasic(target)) {
+    if (src.name === target.name) {
+      const name = src.name
+      if (TypeDefinition[name]) {
+        return TypeDefinition[name] as ValueType
+      }
+    }
+
+    return TypeDefinition.Mismatch(`${src.name} is not ${target.name} `)
+  }
+
+  return null
+}
+
+export function unionAll(types: ValueType[]): ValueType {
+  return types.reduce((result, type) => union(type, result), TypeDefinition.Unresolved)
+}
+export function union(src: ValueType, target: ValueType): ValueType {
+  const basicMatch = matchBasic(src, target)
+  if (basicMatch) {
+    return basicMatch
+  }
+
   if (src.name === target.name) {
     const name = src.name
 
-    if (!isGeneric(name)) {
-      return create(name)
-    }
-
     if (name === 'Array') {
-      return create('Array', matchType(src.params.items, target.params.items))
+      return TypeDefinition.Array(union(src.params.items, target.params.item))
     }
 
     if (name === 'Pair') {
-      return create('Pair', matchType(src.params.value, target.params.value))
+      return TypeDefinition.Pair(union(src.params.value, target.params.value))
     }
 
     if (name === 'Object') {
-      const params = Object.keys(src.params)
-      .filter(key => config.mismatchMissingTypes || target.params[key])
-        .map(key => ({
-          key,
-          type: target.params[key]
-            ? matchType(src.params[key], target.params[key])
-            : src.params[key]
-        }))
-        .concat(Object.keys(target.params)
-          .filter(key => config.mismatchMissingTypes && !src.params[key])
-          .map(key => ({
-            key,
-            type: TypeDefinition.Mismatch
-          })))
-        .reduce((obj, { key, type }) => ({
-          ...obj,
-          [key]: type
-        }), {})
+      const srcParams = Object.keys(src.params)
+      const targetParams = Object.keys(target.params)
+      const keys = unique(srcParams.concat(targetParams))
 
-       return create('Object', params)
+      const params = keys.map(key => ({
+        key,
+        type: union(
+          src.params[key] || TypeDefinition.Unresolved,
+          target.params[key] || TypeDefinition.Unresolved
+        )
+      })).reduce((obj, { key, type }) => ({
+        ...obj,
+        [key]: type
+      }), {})
+
+      return TypeDefinition.Object(params)
     }
 
     throw new Error(`Unknown generic type ${name}`)
   }
 
-  return TypeDefinition.Mismatch
+  return TypeDefinition.Mismatch(`${src.name} is not ${target.name}`)
+}
+
+export function intersectAll(types: ValueType[]): ValueType {
+  return types.reduce((result, type) => intersect(type, result), TypeDefinition.Unresolved)
+}
+export function intersect(src: ValueType, target: ValueType): ValueType {
+  const basicMatch = matchBasic(src, target)
+  if (basicMatch) {
+    return basicMatch
+  }
+
+  if (src.name === target.name) {
+    const name = src.name
+
+    if (name === 'Array') {
+      return TypeDefinition.Array(intersect(src.params.items, target.params.item))
+    }
+
+    if (name === 'Pair') {
+      return TypeDefinition.Pair(intersect(src.params.value, target.params.value))
+    }
+
+    if (name === 'Object') {
+      const srcParams = Object.keys(src.params)
+      const targetParams = Object.keys(target.params)
+      const keys = srcParams.filter(key => targetParams.includes(key))
+
+      const params = keys.map(key => ({
+        key,
+        type: intersect(src.params[key], target.params[key])
+      })).reduce((obj, { key, type }) => ({
+        ...obj,
+        [key]: type
+      }), {})
+
+      return TypeDefinition.Object(params)
+    }
+
+    throw new Error(`Unknown generic type ${name}`)
+  }
+
+  return TypeDefinition.Mismatch(`${src.name} is not ${target.name}`)
+}
+
+export function matchInto(src: ValueType, target: ValueType): ValueType {
+  const basicMatch = matchBasic(src, target)
+  if (basicMatch) {
+    return basicMatch
+  }
+
+  if (src.name === target.name) {
+    const name = src.name
+
+    if (name === 'Array') {
+      return TypeDefinition.Array(matchInto(src.params.items, target.params.items))
+    }
+
+    if (name === 'Pair') {
+      return TypeDefinition.Pair(matchInto(src.params.value, target.params.value))
+    }
+
+    if (name === 'Object') {
+      const srcParams = Object.keys(src.params)
+      const targetParams = Object.keys(target.params)
+      const keys = unique(srcParams.concat(targetParams))
+
+      const params = keys.map(key => ({
+        key,
+        type: matchInto(
+          src.params[key] || TypeDefinition.Mismatch(`Expected Object with key ${key}`),
+          target.params[key] || TypeDefinition.Unresolved
+        )
+      })).reduce((obj, { key, type }) => ({
+        ...obj,
+        [key]: type
+      }), {})
+
+      return TypeDefinition.Object(params)
+    }
+
+    throw new Error(`Unknown generic type ${name}`)
+  }
+
+  return TypeDefinition.Mismatch(`${src.name} is not ${target.name}`)
 }
 
 export function createEmptyValue(type: ValueType): any {

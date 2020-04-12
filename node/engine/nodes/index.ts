@@ -3,7 +3,7 @@ import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
 import { childEntries } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
-import { matchType, matchAllTypes, createEmptyValue } from '@engine/type-functions'
+import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { flatten } from '@shared/util'
 
 import Tag from '@engine/nodes/tag'
@@ -78,8 +78,16 @@ const Nodes: Nodes = {
     resolve: (node: Node, current: Scope) => node.connections.input.map(connection => value(connection.node, current)),
     type: {
       output: (node: Node) => TypeDefinition.Array(
-        matchAllTypes(node.connections.input.map(con => unmatchedType(con.node)))),
-      input: (node: Node) => type(node).params.items || TypeDefinition.Mismatch,
+        intersectAll(node.connections.input.map(con => unmatchedType(con.node)))),
+      input: (node: Node) => {
+        const nodeType = type(node)
+        if (nodeType.name === 'Unresolved') {
+          return TypeDefinition.Unresolved
+        }
+
+        return type(node).params.items
+          || TypeDefinition.Mismatch(`Expected Array, got ${nodeType.name}`)
+      },
       properties: {}
     }
   },
@@ -116,7 +124,7 @@ const Nodes: Nodes = {
             return TypeDefinition.Unresolved
           }
           if (type.name !== 'Array') {
-            return TypeDefinition.Mismatch
+            return TypeDefinition.Mismatch(`Expected Array, got ${type.name}`)
           }
 
           return type.params.items
@@ -153,7 +161,8 @@ const Nodes: Nodes = {
         TypeDefinition.Array(node.connections.input[0]
           ? unmatchedType(node.connections.input[0].node)
           : TypeDefinition.Unresolved),
-      input: (node: Node) => type(node).params.items || TypeDefinition.Mismatch,
+      input: (node: Node) => type(node).params.items
+        || TypeDefinition.Mismatch(`Expected Array, got ${type(node).name}`),
       properties: {}
     }
   },
@@ -169,7 +178,8 @@ const Nodes: Nodes = {
       output: (node: Node) => TypeDefinition.Object(node.connections.input
         .map(connection => ({
           key: connection.node.params.key.trim(),
-          type: unmatchedType(connection.node).params.value || TypeDefinition.Mismatch
+          type: unmatchedType(connection.node).params.value
+            || TypeDefinition.Mismatch(`Expected Pair, got ${unmatchedType(connection.node).name}`)
         }))
         .filter(pair => pair.key)
         .reduce((obj, pair) => ({
@@ -193,7 +203,8 @@ const Nodes: Nodes = {
         if (node.connections.input[0] && node.params.key) {
           const inputType = unmatchedType(node.connections.input[0].node)
           if (inputType.name !== 'Unresolved') {
-            return inputType.params[node.params.key.trim()] || TypeDefinition.Mismatch
+            return inputType.params[node.params.key.trim()]
+              || TypeDefinition.Mismatch(`Expected Object with key ${node.params.key.trim()}`)
           }
         }
 
@@ -220,7 +231,7 @@ const Nodes: Nodes = {
           : createEmptyValue(type(node)))
     },
     type: {
-      output: (node: Node) => matchAllTypes(node.connections.input.map(con => unmatchedType(con.node))),
+      output: (node: Node) => intersectAll(node.connections.input.map(con => unmatchedType(con.node))),
       input: (node: Node) => type(node),
       properties: {
         condition: () => TypeDefinition.Boolean

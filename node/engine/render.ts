@@ -4,7 +4,7 @@ import { Node, ValueType, Scope } from '@engine/types'
 
 import Nodes from '@engine/nodes'
 import * as TypeDefinition from '@engine/type-definition'
-import { matchType } from '@engine/type-functions'
+import { matchInto, unionAll } from '@engine/type-functions'
 import { getGlobalScope, entries } from '@engine/scopes'
 
 export const value = computedFn(function(node: Node, scope: Scope): any {
@@ -20,11 +20,10 @@ export const unmatchedType = computedFn(function(node: Node): ValueType {
 })
 
 export const type = computedFn(function(node: Node): ValueType {
-  return node.connections.output.reduce(
-    (resultType, connection) => {
-      return matchType(resultType, expectedType(connection.node, connection.key, node))
-    },
-    unmatchedType(node)
+  return matchInto(
+    unmatchedType(node),
+    unionAll(node.connections.output.map(
+      connection => expectedType(connection.node, connection.key, node)))
   )
 })
 
