@@ -158,21 +158,21 @@ const Nodes: Nodes = {
       .filter(pair => pair.key)
       .reduce((obj, pair) => ({
         ...obj,
-        [pair.key]: pair.value
+        [pair.key.trim()]: pair.value
       }), {}),
     type: {
       output: (node: Node) => TypeDefinition.Object(node.connections.input
         .map(connection => ({
-          key: connection.node.params.key,
+          key: connection.node.params.key.trim(),
           type: unmatchedType(connection.node).params.value || TypeDefinition.Mismatch
         }))
         .filter(pair => pair.key)
         .reduce((obj, pair) => ({
           ...obj,
-          [pair.key]: pair.type
+          [pair.key.trim()]: pair.type
         }), {})),
       input: (node, other) => other && other.params.key
-        ? TypeDefinition.Pair(type(node).params[other!.params.key])
+        ? TypeDefinition.Pair(type(node).params[other!.params.key.trim()])
         : TypeDefinition.Pair(TypeDefinition.Unresolved),
       properties: {}
     }
@@ -180,7 +180,7 @@ const Nodes: Nodes = {
   GetKey: {
     resolve: (node: Node, scope: Scope) => {
       return node.connections.input[0]
-        ? value(node.connections.input[0].node, scope)[node.params.key]
+        ? value(node.connections.input[0].node, scope)[node.params.key.trim()]
         : createEmptyValue(type(node))
     },
     type: {
@@ -188,14 +188,14 @@ const Nodes: Nodes = {
         if (node.connections.input[0] && node.params.key) {
           const inputType = unmatchedType(node.connections.input[0].node)
           if (inputType.name !== 'Unresolved') {
-            return inputType.params[node.params.key] || TypeDefinition.Mismatch
+            return inputType.params[node.params.key.trim()] || TypeDefinition.Mismatch
           }
         }
 
         return TypeDefinition.Unresolved
       },
       input: (node: Node) => node.params.key
-        ? TypeDefinition.Object({ [node.params.key]: type(node) })
+        ? TypeDefinition.Object({ [node.params.key.trim()]: type(node) })
         : TypeDefinition.Object({}),
       properties: {}
     }
@@ -224,7 +224,7 @@ const Nodes: Nodes = {
   },
   Pair: {
     resolve: (node: Node, scope: Scope) => ({
-      key: node.params.key,
+      key: node.params.key.trim(),
       value: node.connections.input[0]
         ? value(node.connections.input[0].node, scope)
         : createEmptyValue(type(node).params.value)
@@ -255,7 +255,7 @@ const Nodes: Nodes = {
         .filter(key => key)
         .reduce((obj, key) => ({
           ...obj,
-          [key]: TypeDefinition.String
+          [key.trim()]: TypeDefinition.String
         }), {})),
       properties: {}
     }  },

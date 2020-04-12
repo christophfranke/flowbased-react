@@ -1,4 +1,5 @@
 import { ValueType } from '@editor/types'
+import { isMismatch } from '@engine/type-functions'
 
 interface ColorMap {
   default: string
@@ -7,6 +8,10 @@ interface ColorMap {
 }
 
 export function colorOfType(type: ValueType): ColorMap {
+  if (isMismatch(type)) {
+    return colors.types.error
+  }
+
   const key = {
     Number: 'primitive',
     String: 'primitive',
