@@ -1,5 +1,5 @@
 import React from 'react'
-import { computed, observable } from 'mobx'
+import { computed, observable, action } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
 import { Node, Vector, ValueType } from '@editor/types'
@@ -10,12 +10,14 @@ import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
 import Store from '@editor/store'
 import { type } from '@engine/render'
+
 import TextInput from '@editor/components/input/text'
 import NumberInput from '@editor/components/input/number'
 import CheckboxInput from '@editor/components/input/checkbox'
 import TextareaInput from '@editor/components/input/textarea'
 import TextlistInput from '@editor/components/input/textlist'
 import TextpairsInput from '@editor/components/input/textpairs'
+
 
 interface Props {
   node: Node
@@ -42,10 +44,12 @@ class NodeView extends React.Component<Props> {
     return type(this.store.translated.getNode(this.props.node))
   }
 
+  @action
   handleCloseMouseOver = () => {
     this.isCloseHovering = true
   }
 
+  @action
   handleCloseMouseOut= () => {
     this.isCloseHovering = false
   }
@@ -55,6 +59,7 @@ class NodeView extends React.Component<Props> {
     e.stopPropagation()
   }
 
+  @action
   handleSelection() {
     const keys = this.props['keys']
     const relevantNodes = keys.Control
@@ -83,6 +88,7 @@ class NodeView extends React.Component<Props> {
   }
 
 
+  @action
   startDrag(position: Vector) {
     this.offset = LA.subtract(position, this.props.node.position)
     this.relativePositions = this.store.selectedNodes
@@ -93,6 +99,7 @@ class NodeView extends React.Component<Props> {
       }), {})
   }
 
+  @action
   moveDrag(position: Vector) {
     this.props.node.position = LA.subtract(position, this.offset)
     Object.entries(this.relativePositions).forEach(([id, position]) => {
@@ -103,6 +110,7 @@ class NodeView extends React.Component<Props> {
     })
   }
 
+  @action
   handleMouseDown = e => {
     e.preventDefault()
     e.stopPropagation()
@@ -118,6 +126,7 @@ class NodeView extends React.Component<Props> {
     }
   }
 
+  @action
   handleMouseMove = e => {
     const mouse = this.props['mouse'].position
     if (mouse) {
@@ -130,12 +139,14 @@ class NodeView extends React.Component<Props> {
     window.removeEventListener('mouseup', this.handleMouseUp)
   }
 
+  @action
   handleDelete = e => {
     e.stopPropagation()
     e.preventDefault()
     this.store.deleteNode(this.props.node)
   }
 
+  @action
   updatePosition = () => {
     if (this.nodeRef.current) {
       this.props.node.boundingBox = {

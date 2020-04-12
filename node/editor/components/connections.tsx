@@ -14,6 +14,10 @@ interface Props {
   connection: Connection
 }
 
+const LINE_STYLE = 'LINE_STYLE'
+const BEZIER_STYLE = 'BEZIER_STYLE'
+const CONNECTION_STYLE = BEZIER_STYLE
+
 @inject('store')
 @observer
 class ConnectionPath extends React.Component<Props> {
@@ -86,17 +90,33 @@ class ConnectionPath extends React.Component<Props> {
     return 'none'
   }
 
+  currentD = ''
+  currentDiff: Vector
   @computed get d(): string {
-    if (this.offset && this.diff) {
+    if (this.currentDiff && this.diff) {
+      // allow 2px error
+      if (LA.distance(this.currentDiff, this.diff) < 2) {
+        return this.currentD
+      }
+    }
+
+    if (this.diff) {
       const distance = LA.distance(this.diff)
       const middle1 = LA.scale(distance / 2, this.props.connection.from.direction)
       const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.direction)
 
-      const o = this.offset
       const v2 = middle1
       const v3 = middle2
       const v4 = this.diff
-      return `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`    
+
+      // try cache the result to not rerender the curve
+      this.currentDiff = this.diff
+      this.currentD = {
+        [BEZIER_STYLE]: `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`,
+        [LINE_STYLE]: `M0 0 L${v4.x} ${v4.y}`
+      }[CONNECTION_STYLE]
+
+      return this.currentD
     }
 
     return ''

@@ -40,7 +40,12 @@ export function product(v: Vector, w?: Vector) {
 }
 
 export function distance(v: Vector, w?: Vector) {
-  return Math.sqrt(product(v, w))
+  if (w) {
+    const diff = subtract(w, v)
+    return Math.sqrt(product(diff, diff))
+  }
+
+  return Math.sqrt(product(v, v))
 }
 
 export function normalize(v: Vector): Vector {

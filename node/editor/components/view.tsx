@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, computed, autorun, IReactionDisposer } from 'mobx'
+import { action, observable, computed, autorun, IReactionDisposer } from 'mobx'
 import { observer, inject, Provider } from 'mobx-react'
 import normalizeWheel from 'normalize-wheel';
 
@@ -121,16 +121,19 @@ class EditorView extends React.Component {
     return this.clientToView({ x: e.clientX, y: e.clientY })
   }
 
+  @action
   updateMousePosition = e => {
     this.mouse.position = this.mouseEventToView(e)
   }
 
+  @action
   handleMouseOut = e => {
     if (e.currentTarget.contains(e.target) || e.target === e.currentTarget) {
       this.mouse.position = undefined
     }
   }
 
+  @action
   handleClick = () => {
     if (!this.isPanningMode) {
       this.store.pendingConnector = null
@@ -143,14 +146,17 @@ class EditorView extends React.Component {
     }
   }
 
+  @action
   handleRightMouseDown = e => {
     this.nodeListPosition = this.clientToWindow({ x: e.clientX, y: e.clientY })
   }
 
+  @action
   handleNodeCreated = () => {
     this.nodeListPosition = null
   }
 
+  @action
   handleMouseDown = e => {
     if (e.button === RIGHT_MOUSE_BUTTON) {
       this.handleRightMouseDown(e)
@@ -164,6 +170,7 @@ class EditorView extends React.Component {
     window.addEventListener('mouseup', this.handleMouseUp)
   }
 
+  @action
   handleMouseMove = e => {
     if (this.isPanningMode) {
       this.selectionRectangle = null
@@ -193,12 +200,14 @@ class EditorView extends React.Component {
     }
   }
 
+  @action
   handleMouseUp = e => {
     this.mouseDownOffset = null
     window.removeEventListener('mousemove', this.handleMouseMove)
     window.removeEventListener('mousemove', this.handleMouseUp)
   }
 
+  @action
   handleWheel = e => {
     const normalized = normalizeWheel(e.nativeEvent)
     const newScale = clamp(this.scale * Math.pow(2, -normalized.pixelY / 1000), MIN_ZOOM, MAX_ZOOM)
@@ -219,6 +228,7 @@ class EditorView extends React.Component {
     this.keys[e.key] = true
   }
 
+  @action
   handleKeyup = e => {
     this.keys[e.key] = false
     if (e.target === document.body && e.key === 'Backspace') {
@@ -251,6 +261,7 @@ class EditorView extends React.Component {
     }
   }
 
+  @action
   updateDimensions = () => {    
     const rect = this.rootRef.current && this.rootRef.current.getBoundingClientRect()
     if (rect) {    
