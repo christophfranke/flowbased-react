@@ -127,11 +127,14 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get nameDisplay(): JSX.Element {
-    if (['input', 'output'].includes(this.props.connector.name)) {
-      return <span style={{ fontStyle: 'italic' }}>{this.typeDisplay}</span>
-    }
+    const displayString = this.props.connector.display
+      || (['input', 'output'].includes(this.props.connector.name)
+        ? ''
+        : this.props.connector.name)
 
-    return <>{this.props.connector.name}: <span style={{ fontStyle: 'italic' }}>{this.typeDisplay}</span></>
+    return displayString
+      ? <>{displayString}: <span style={{ fontStyle: 'italic' }}>{this.typeDisplay}</span></>
+      : <span style={{ fontStyle: 'italic' }}>{this.typeDisplay}</span>
   }
 
   consume = e => {
