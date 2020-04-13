@@ -16,15 +16,20 @@ export function entries(node: Node, filter: (descriptor: ScopeDescriptor) => boo
   return ownScopes.concat(childEntries(node).filter(descriptor => filter(descriptor) && !exit(descriptor)))
 }
 
-let global: Scope = {
-  locals: {
-    global: true
-  },
-  get parent() {
-    return global
-  }
+
+let staticGlobalScope: Scope
+export function setStaticGlobalScope(scope: Scope) {
+  staticGlobalScope = scope
 }
 
-export function getGlobalScope(): Scope {
-  return global
+export function getStaticGlobalScope(): Scope {
+  return staticGlobalScope
+}
+
+export function getGlobalScope(current: Scope): Scope {
+  if (current.parent) {
+    getGlobalScope(current.parent)
+  }
+
+  return current
 }

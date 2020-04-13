@@ -1,8 +1,15 @@
+import { computed } from 'mobx'
 import { Node, Vector } from '@editor/types'
 import { CoreNode } from '@engine/types'
 
 import Store from '@editor/store'
 import Nodes from '@engine/nodes'
+
+interface nodeListItem {
+  name: string
+  type: string
+  create: (position: Vector) => Node
+}
 
 export default class NodeFunctions {
   store: Store
@@ -10,72 +17,117 @@ export default class NodeFunctions {
     this.store = store
   }
 
-  nodeList = [{
-    name: 'Array',
-    type: 'Complex',
-    create: (position: Vector): Node => this.createNode(position, 'Array')
-  }, {
-    name: 'Collect',
-    type: 'Flow',
-    create: this.createCollectNode.bind(this)
-  }, {
-    name: 'If',
-    type: 'Flow',
-    create: this.createIfNode.bind(this)
-  }, {
-    name: 'Iterate',
-    type: 'Flow',
-    create: this.createIterateNode.bind(this)
-  }, {
-    name: 'Object',
-    type: 'Complex',
-    create: (position: Vector): Node => this.createNode(position, 'Object')
-  }, {
-    name: 'Get Key',
-    type: 'Complex',
-    create: this.createGetKeyNode.bind(this)
-  }, {
-    name: 'String',
-    type: 'Primitive',
-    create: this.createStringNode.bind(this)
-  }, {
-    name: 'Text',
-    type: 'Primitive',
-    create: this.createTextNode.bind(this)
-  }, {
-    name: 'Text List',
-    type: 'Complex',
-    create: this.createTextlistNode.bind(this)
-  }, {
-    name: 'Text Pairs',
-    type: 'Complex',
-    create: this.createTextPairsNode.bind(this)
-  }, {
-    name: 'Boolean',
-    type: 'Primitive',
-    create: this.createBooleanNode.bind(this)
-  }, {
-    name: 'Pair',
-    type: 'Primitive',
-    create: this.createPairNode.bind(this)
-  }, {
-    name: 'Number',
-    type: 'Primitive',
-    create: this.createNumberNode.bind(this)
-  }, {
-    name: 'HTML Element',
-    type: 'Render',
-    create: this.createTagNode.bind(this)
-  }, {
-    name: 'Preview',
-    type: 'Output',
-    create: this.createPreviewNode.bind(this)
-  }].sort((a, b) => {
-    if (a.type === b.type) {
-      return a.name < b.name ? -1 : 1
+  @computed get defineList() {
+    return this.store.nodes
+      .filter(node => node.type === 'Define')
+      .map(node => ({
+        name: this.getParamValue(node, 'name'),
+        type: 'Local',
+        create: position => this.createProxy(position, node)
+      }))
+  }
+
+  @computed get nodeList() {
+    return this.defineList.concat([{
+      name: 'Array',
+      type: 'Complex',
+      create: (position: Vector): Node => this.createNode(position, 'Array')
+    }, {
+      name: 'Collect',
+      type: 'Flow',
+      create: this.createCollectNode.bind(this)
+    }, {
+      name: 'If',
+      type: 'Flow',
+      create: this.createIfNode.bind(this)
+    }, {
+      name: 'Iterate',
+      type: 'Flow',
+      create: this.createIterateNode.bind(this)
+    }, {
+      name: 'Object',
+      type: 'Complex',
+      create: (position: Vector): Node => this.createNode(position, 'Object')
+    }, {
+      name: 'Get Key',
+      type: 'Complex',
+      create: this.createGetKeyNode.bind(this)
+    }, {
+      name: 'String',
+      type: 'Primitive',
+      create: this.createStringNode.bind(this)
+    }, {
+      name: 'Text',
+      type: 'Primitive',
+      create: this.createTextNode.bind(this)
+    }, {
+      name: 'Text List',
+      type: 'Complex',
+      create: this.createTextlistNode.bind(this)
+    }, {
+      name: 'Text Pairs',
+      type: 'Complex',
+      create: this.createTextPairsNode.bind(this)
+    }, {
+      name: 'Boolean',
+      type: 'Primitive',
+      create: this.createBooleanNode.bind(this)
+    }, {
+      name: 'Pair',
+      type: 'Primitive',
+      create: this.createPairNode.bind(this)
+    }, {
+      name: 'Number',
+      type: 'Primitive',
+      create: this.createNumberNode.bind(this)
+    }, {
+      name: 'Define',
+      type: 'Core',
+      create: this.createDefineNode.bind(this)
+    }, {
+      name: 'HTML Element',
+      type: 'Render',
+      create: this.createTagNode.bind(this)
+    }, {
+      name: 'Preview',
+      type: 'Preview',
+      create: this.createPreviewNode.bind(this)
+    }]).sort((a, b) => {
+      if (a.type === b.type) {
+        return a.name < b.name ? -1 : 1
+      }
+      return a.type < b.type ? -1 : 1
+    })
+  }
+
+  getParamValue(node: Node, key: string): string {
+    const nameParam = node.params.find(param => param.key === key)
+    return nameParam && nameParam.value
+      ? nameParam.value
+      : 'Unnamed'
+  }
+
+  createProxy(position: Vector, define: Node): Node {
+    const getParamValue = () => this.getParamValue(define, 'name')
+
+    return {
+      id: this.store.uid(),
+      name: getParamValue(),
+      type: 'Proxy',
+      params: [{
+        name: 'Define',
+        key: 'define',
+        value: define.id,
+        type: 'number'
+      }],
+      position,
+      connectors: {
+        input: [],
+        output: [this.store.connector.createOutput()],
+        properties: []
+      }
     }
-    return a.type < b.type ? -1 : 1
-  })
+  }
 
   createNode(position: Vector, type: CoreNode): Node {
     const Node = Nodes[type]
@@ -125,6 +177,20 @@ export default class NodeFunctions {
   createIterateNode(position: Vector): Node {
     const node = this.createNode(position, 'Iterate')
     node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
+  createDefineNode(position: Vector): Node {
+    const node = this.createNode(position, 'Define')
+    node.connectors.input[0].mode = 'single'
+    node.connectors.output = []
+    node.params = [{
+      name: 'Name',
+      key: 'name',
+      value: '',
+      type: 'text'
+    }]
 
     return node
   }

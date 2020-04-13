@@ -1,7 +1,7 @@
 import React from 'react'
 import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
-import { childEntries } from '@engine/scopes'
+import { childEntries, getGlobalScope, getStaticGlobalScope } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { flatten } from '@shared/util'
@@ -51,6 +51,8 @@ export type CoreNode = 'String'
   | 'Textlist'
   | 'TextPairs'
   | 'GetKey'
+  | 'Define'
+  | 'Proxy'
 
 const Nodes: Nodes = {
   String: {
@@ -71,6 +73,39 @@ const Nodes: Nodes = {
     resolve: (node: Node) => node.params.value,
     type: {
       output: () => TypeDefinition.Boolean,
+      properties: {}
+    }
+  },
+  Define: {
+    resolve: (node: Node, scope: Scope) => {
+      const inputConnection = node.connections.input[0]
+      return inputConnection
+        ? value(inputConnection.node, scope)
+        : createEmptyValue(TypeDefinition.Null)
+    },
+    type: {
+      output: () => TypeDefinition.Unresolved,
+      input: () => TypeDefinition.Unresolved,
+      properties: {}
+    }
+  },
+  Proxy: {
+    resolve: (node: Node, scope: Scope) => {
+      const define = getGlobalScope(scope).locals.defines
+        .find(other => other.id === node.params.define)
+
+      return define
+        ? value(define, scope)
+        : createEmptyValue(type(node))
+    },
+    type: {
+      output: (node: Node) => {
+      const define = getStaticGlobalScope().locals.defines
+          .find(other => other.id === node.params.define)
+        return define && define.connections.input[0]
+          ? unmatchedType(define.connections.input[0].node)
+          : TypeDefinition.Unresolved
+      },
       properties: {}
     }
   },

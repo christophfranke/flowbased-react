@@ -1,6 +1,7 @@
 import { observable, computed, autorun, action } from 'mobx'
 import { Connection, Node, Connector, ConnectorState } from '@editor/types'
 import { sync, load } from '@shared/local-storage-sync'
+import { setStaticGlobalScope } from '@engine/scopes'
 import Translator from '@shared/translator'
 
 import ConnectorFunctions from '@editor/store/connector'
@@ -27,6 +28,7 @@ class Store {
     this.node = new NodeFunctions(this)
 
     this.translated = new Translator(this)
+    setStaticGlobalScope(this.translated.scope)
 
     autorun(this.addInputConnectors)
     autorun(this.removeDuplicatePreviews)

@@ -35,7 +35,7 @@ class Preview extends React.Component {
       const root = this.translator.getNode(this.preview) 
            
       return <div style={{ overflowY: 'auto', height: '100%' }}>
-        {render(root)}
+        {render(root, this.translator.scope)}
       </div>
     }
 

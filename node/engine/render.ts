@@ -5,15 +5,20 @@ import { Node, ValueType, Scope } from '@engine/types'
 import Nodes from '@engine/nodes'
 import * as TypeDefinition from '@engine/type-definition'
 import { matchInto, unionAll } from '@engine/type-functions'
-import { getGlobalScope, entries } from '@engine/scopes'
+import { setStaticGlobalScope, entries } from '@engine/scopes'
 
 export const value = computedFn(function(node: Node, scope: Scope): any {
+  if (!Nodes[node.name]) {
+    console.log(node, scope)
+  }
   return Nodes[node.name].resolve(node, scope)
 })
 
-export const render = computedFn(function(node: Node): any {
-  return value(node, getGlobalScope())
-})
+// this function is for api only
+export const render = function(node: Node, globalScope: Scope): any {
+  setStaticGlobalScope(globalScope)
+  return value(node, globalScope)
+}
 
 export const unmatchedType = computedFn(function(node: Node): ValueType {
   return Nodes[node.name].type.output(node)
