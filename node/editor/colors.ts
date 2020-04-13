@@ -8,9 +8,9 @@ interface ColorMap {
 }
 
 export function colorOfType(type: ValueType): ColorMap {
-  if (isMismatch(type)) {
-    return colors.types.error
-  }
+  // if (isMismatch(type)) {
+  //   return colors.types.error
+  // }
 
   const key = {
     Number: 'primitive',
