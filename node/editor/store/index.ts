@@ -45,7 +45,7 @@ class Store {
             get name() {
               const define = store.nodes.find(other => other.id === Number(store.node.getParamValue(node, 'define')))
               return define
-                ? store.node.getParamValue(define, 'name')
+                ? store.node.getParamValue(define, 'name') || 'Unnamed'
                 : 'Undefined'
             }
           }

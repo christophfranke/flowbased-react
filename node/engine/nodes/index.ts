@@ -84,7 +84,10 @@ const Nodes: Nodes = {
         : createEmptyValue(TypeDefinition.Null)
     },
     type: {
-      output: (node: Node) => intersectAll(node.connections.input.map(con => unmatchedType(con.node))),
+      output: (node: Node) => intersectAll(
+        node.connections.input
+          .map(con => unmatchedType(con.node))
+      ),
       input: () => TypeDefinition.Unresolved,
       properties: {}
     }

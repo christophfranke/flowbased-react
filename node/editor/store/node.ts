@@ -25,6 +25,7 @@ export default class NodeFunctions {
         type: 'Local',
         create: position => this.createProxy(position, node)
       }))
+      .filter(node => node.name)
   }
 
   @computed get nodeList() {
@@ -103,12 +104,10 @@ export default class NodeFunctions {
   getParamValue(node: Node, key: string): string {
     const nameParam = node.params.find(param => param.key === key)
     return nameParam && nameParam.value
-      ? nameParam.value
-      : 'Unnamed'
   }
 
   createProxy(position: Vector, define: Node): Node {
-    const getName = () => this.getParamValue(define, 'name')
+    const getName = () => this.getParamValue(define, 'name') || 'Unnamed'
 
     return {
       id: this.store.uid(),
