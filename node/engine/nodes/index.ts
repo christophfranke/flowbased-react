@@ -1,9 +1,9 @@
 import React from 'react'
 import { Node, RenderProps, ValueType, Scope } from '@engine/types'
-import { value, type, unmatchedType } from '@engine/render'
+import { value, type, unmatchedType, expectedType } from '@engine/render'
 import { childEntries, getGlobalScope, getStaticGlobalScope, createScope } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
-import { createEmptyValue, intersectAll } from '@engine/type-functions'
+import { createEmptyValue, intersectAll, matchInto, unionAll } from '@engine/type-functions'
 import { flatten } from '@shared/util'
 import { filteredSubForest } from '@engine/tree'
 
@@ -116,10 +116,11 @@ const Nodes: Nodes = {
     },
     type: {
       output: (node: Node) => {
-      const define = getStaticGlobalScope().locals.defines
+        const define = getStaticGlobalScope().locals.defines
           .find(other => other.id === node.params.define)
-        return define && define.connections.input[0]
-          ? unmatchedType(define.connections.input[0].node)
+
+        return define
+          ? intersectAll(define.connections.input.map(con => type(con.node)))
           : TypeDefinition.Unresolved
       },
       input: (node: Node) => {
@@ -132,7 +133,7 @@ const Nodes: Nodes = {
 
         const forest = filteredSubForest(define, candidate => candidate.name === 'Input')
         return forest.length > 0
-          ? intersectAll(forest.map(tree => type(tree.node)))
+          ? unionAll(forest.map(tree => type(tree.node)))
           : TypeDefinition.Null
       },
       properties: {}

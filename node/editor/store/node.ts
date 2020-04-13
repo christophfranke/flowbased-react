@@ -112,6 +112,8 @@ export default class NodeFunctions {
 
   createProxy(position: Vector, define: Node): Node {
     const getName = () => this.getParamValue(define, 'name') || 'Unnamed'
+    const input = this.store.connector.createInput()
+    input.mode = 'single'
 
     return {
       id: this.store.uid(),
@@ -127,7 +129,7 @@ export default class NodeFunctions {
       }],
       position,
       connectors: {
-        input: [this.store.connector.createInput()],
+        input: [input],
         output: [this.store.connector.createOutput()],
         properties: []
       }
