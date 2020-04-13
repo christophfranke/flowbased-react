@@ -185,6 +185,7 @@ class NodeView extends React.Component<Props> {
     const nameStyle: React.CSSProperties = {
       textAlign: 'center',
       fontSize: '24px',
+      whiteSpace: 'nowrap',
       color: typeColor
     }
 
