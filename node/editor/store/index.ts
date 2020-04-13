@@ -38,7 +38,19 @@ class Store {
   static createFromLocalStorage(): Store {
     if (!Store.syncedInstance) {
       const store = new Store()
-      store.nodes = load(['editor', 'nodes']) || []
+      store.nodes = load(['editor', 'nodes'],
+        nodes => nodes.map(node => node.type === 'Proxy'
+          ? {
+            ...node,
+            get name() {
+              const define = store.nodes.find(other => other.id === Number(store.node.getParamValue(node, 'define')))
+              return define
+                ? store.node.getParamValue(define, 'name')
+                : 'Undefined'
+            }
+          }
+          : node)
+      ) || []
 
       // the connectors map reassures that strict equality comparisions
       // work because two connections with the same id will be the same objects
@@ -59,7 +71,15 @@ class Store {
 
       // autosave immediately
       sync(['editor', 'connections'], store, 'connections')
-      sync(['editor', 'nodes'], store, 'nodes')
+      sync(['editor', 'nodes'], store, 'nodes',
+        nodes => nodes.map(node => node.type === 'Proxy'
+          ? {
+            ...node,
+            name: node.name
+          }
+          : node
+        )
+      )
       sync(['editor', 'uid'], store, 'currentId')
 
       Store.syncedInstance = store

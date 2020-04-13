@@ -108,11 +108,13 @@ export default class NodeFunctions {
   }
 
   createProxy(position: Vector, define: Node): Node {
-    const getParamValue = () => this.getParamValue(define, 'name')
+    const getName = () => this.getParamValue(define, 'name')
 
     return {
       id: this.store.uid(),
-      name: getParamValue(),
+      get name() {
+        return getName()
+      },
       type: 'Proxy',
       params: [{
         name: 'Define',
