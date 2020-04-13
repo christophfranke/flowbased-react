@@ -51,22 +51,22 @@ export const colors = {
   types: {
     render: {
       default: 'rgb(148, 7, 184)',
-      highlight: 'rgb(255, 0, 200)',
+      highlight: 'rgb(209, 35, 252)',
       hover: 'white'
     },
     primitive: {
       default: 'rgb(14, 201, 195)',
-      highlight: 'rgb(28, 255, 255)',
+      highlight: 'rgb(42, 245, 238)',
       hover: 'white'
     },
     complex: {
       default: 'rgb(14, 136, 201)',
-      highlight: 'rgb(64, 184, 247)',
+      highlight: 'rgb(42, 174, 245)',
       hover: 'white'
     },
     error: {
-      default: 'rgb(176, 0, 0)',
-      highlight: 'rgb(232, 44, 44)',
+      default: 'rgb(191, 0, 0)',
+      highlight: 'rgb(217, 30, 30)',
       hover: 'white'
     },
     unresolved: {
