@@ -82,7 +82,7 @@ export function union(src: ValueType, target: ValueType): ValueType {
     const name = src.name
 
     if (name === 'Array') {
-      return TypeDefinition.Array(union(src.params.items, target.params.item))
+      return TypeDefinition.Array(union(src.params.items, target.params.items))
     }
 
     if (name === 'Pair') {
@@ -127,7 +127,7 @@ export function intersect(src: ValueType, target: ValueType): ValueType {
     const name = src.name
 
     if (name === 'Array') {
-      return TypeDefinition.Array(intersect(src.params.items, target.params.item))
+      return TypeDefinition.Array(intersect(src.params.items, target.params.items))
     }
 
     if (name === 'Pair') {
