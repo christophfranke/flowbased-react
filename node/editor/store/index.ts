@@ -127,6 +127,9 @@ class Store {
     const connectors = this.connectorsOfNode(node)
     this.connections = this.connections
       .filter(connection => !connectors.includes(connection.from) && !connectors.includes(connection.to))
+    if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
+      this.pendingConnector = null
+    }
     this.nodes = this.nodes.filter(other => other !== node)
   }
 
