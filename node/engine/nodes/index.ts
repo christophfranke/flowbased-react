@@ -45,7 +45,7 @@ export type CoreNode = 'String'
   | 'Pair'
   | 'Tag'
   | 'Preview'
-  | 'Iterate'
+  | 'Items'
   | 'Collect'
   | 'If'
   | 'Textlist'
@@ -129,7 +129,7 @@ const Nodes: Nodes = {
       properties: {}
     }
   },
-  Iterate: {
+  Items: {
     resolve: (node: Node, scope: Scope) => scope.locals[node.id]
       ? scope.locals[node.id].value
       : createEmptyValue(type(node)), // <- although this should never happen in practice
@@ -329,7 +329,7 @@ const Nodes: Nodes = {
     resolve: (node: Node, scope: Scope) => component(node, Preview, scope),
     type: {
       output: () => TypeDefinition.Element,
-      input: () => TypeDefinition.Element,
+      input: () => TypeDefinition.Unresolved,
       properties: {}
     }
   }

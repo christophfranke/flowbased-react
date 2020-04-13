@@ -217,21 +217,6 @@ class ConnectorView extends React.Component<Props> {
     this.store.pendingConnector = this.props.connector    
   }
 
-  updatePosition = () => {
-    if (this.ref.current) {
-      const newPosition = {
-        x: this.ref.current.offsetLeft + 30,
-        y: this.ref.current.offsetTop + 30
-      }
-
-      if (!this.props.connector.position
-        || newPosition.x !== this.props.connector.position.x
-        || newPosition.y !== this.props.connector.position.y) {
-        this.props.connector.position = newPosition
-      }
-    }
-  }
-
   render () {
     const style: React.CSSProperties = {
       cursor: this.cursor,
@@ -290,10 +275,6 @@ class ConnectorView extends React.Component<Props> {
       } : {
         display: 'none'
       }
-
-    if (!isServer) {
-      requestAnimationFrame(this.updatePosition)
-    }
 
     const arrow = ['input', 'output'].includes(this.props.connector.function)
       ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />

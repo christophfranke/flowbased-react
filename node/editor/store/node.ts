@@ -42,7 +42,7 @@ export default class NodeFunctions {
       type: 'Flow',
       create: this.createIfNode.bind(this)
     }, {
-      name: 'Iterate',
+      name: 'Items',
       type: 'Flow',
       create: this.createIterateNode.bind(this)
     }, {
@@ -176,7 +176,7 @@ export default class NodeFunctions {
   }
 
   createIterateNode(position: Vector): Node {
-    const node = this.createNode(position, 'Iterate')
+    const node = this.createNode(position, 'Items')
     node.connectors.input[0].mode = 'single'
 
     return node

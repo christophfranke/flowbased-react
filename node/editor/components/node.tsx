@@ -2,7 +2,7 @@ import React from 'react'
 import { computed, observable, action } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Node, Vector, ValueType } from '@editor/types'
+import { Node, Vector, ValueType, Connector } from '@editor/types'
 
 import * as LA from '@editor/la'
 import ConnectorView from '@editor/components/connector'
@@ -29,6 +29,19 @@ interface Props {
 class NodeView extends React.Component<Props> {
   store: Store = this.props['store']
   nodeRef = React.createRef<HTMLDivElement>()
+  
+
+  @computed get connectors(): Connector[] {
+    return this.store.connectorsOfNode(this.props.node)
+  }
+
+  @computed get connectorRefs() {
+    return this.connectors.reduce((obj, connector) => ({
+        ...obj,
+        [connector.id]: React.createRef<HTMLDivElement>()
+      }), {})
+  }
+
   offset: Vector
   relativePositions: {
     [id: number]: Vector
@@ -158,9 +171,31 @@ class NodeView extends React.Component<Props> {
     }
   }
 
+  updateConnectorPositions = () => {
+    this.connectors.forEach(connector => {
+      const ref = this.connectorRefs[connector.id]    
+      if (ref && ref.current && ref.current.ref) {
+        const el = ref.current.ref.current
+        const newPosition = {
+          x: el.offsetLeft + 30,
+          y: el.offsetTop + 30
+        }
+
+        if (!connector.position
+          || newPosition.x !== connector.position.x
+          || newPosition.y !== connector.position.y) {
+          connector.position = newPosition
+        }
+      }
+    })
+  }
+
+
+
   render() {
     if (!isServer) {
       requestAnimationFrame(this.updatePosition)
+      requestAnimationFrame(this.updateConnectorPositions)
     }
 
     const { node } = this.props
@@ -211,10 +246,10 @@ class NodeView extends React.Component<Props> {
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
-            {node.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
+            {node.connectors.input.map(input => <ConnectorView ref={this.connectorRefs[input.id]} key={input.id} connector={input} />)}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
-            {node.connectors.properties.map(property => <ConnectorView key={property.id} connector={property} />)}
+            {node.connectors.properties.map(property => <ConnectorView key={property.id} ref={this.connectorRefs[property.id]} connector={property} />)}
           </div>
           <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
@@ -243,7 +278,7 @@ class NodeView extends React.Component<Props> {
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
-            {node.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
+            {node.connectors.output.map(output => <ConnectorView ref={this.connectorRefs[output.id]} key={output.id} connector={output} />)}
           </div>
         </div>
       </div>
