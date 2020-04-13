@@ -79,7 +79,7 @@ const Nodes: Nodes = {
     }
   },
   Input: {
-    resolve: (node: Node, scope: Scope) => scope.locals.input,
+    resolve: (node: Node, scope: Scope) => scope.locals.input[0],
     type: {
       output: () => TypeDefinition.Unresolved,
       properties: {}
