@@ -86,6 +86,10 @@ export default class NodeFunctions {
       type: 'Core',
       create: this.createDefineNode.bind(this)
     }, {
+      name: 'Input',
+      type: 'Core',
+      create: this.createInputNode.bind(this)
+    }, {
       name: 'HTML Element',
       type: 'Render',
       create: this.createTagNode.bind(this)
@@ -123,7 +127,7 @@ export default class NodeFunctions {
       }],
       position,
       connectors: {
-        input: [],
+        input: [this.store.connector.createInput()],
         output: [this.store.connector.createOutput()],
         properties: []
       }
@@ -178,6 +182,13 @@ export default class NodeFunctions {
   createIterateNode(position: Vector): Node {
     const node = this.createNode(position, 'Items')
     node.connectors.input[0].mode = 'single'
+
+    return node
+  }
+
+  createInputNode(position: Vector): Node {
+    const node = this.createNode(position, 'Input')
+    node.connectors.input = []
 
     return node
   }

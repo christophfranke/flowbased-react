@@ -128,7 +128,7 @@ class ConnectionPath extends React.Component<Props> {
       return null
     }
 
-    const width = 3 + 12 * this.numScopeResolvers
+    const width = 3 + 6 * this.numScopeResolvers
     const fromColor = this.fromColor
     const toColor = this.toColor
 

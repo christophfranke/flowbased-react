@@ -1,10 +1,11 @@
 import React from 'react'
 import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 import { value, type, unmatchedType } from '@engine/render'
-import { childEntries, getGlobalScope, getStaticGlobalScope } from '@engine/scopes'
+import { childEntries, getGlobalScope, getStaticGlobalScope, createScope } from '@engine/scopes'
 import * as TypeDefinition from '@engine/type-definition'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { flatten } from '@shared/util'
+import { filteredSubForest } from '@engine/tree'
 
 import Tag from '@engine/nodes/tag'
 import Preview from '@engine/nodes/preview'
@@ -53,6 +54,7 @@ export type CoreNode = 'String'
   | 'GetKey'
   | 'Define'
   | 'Proxy'
+  | 'Input'
 
 const Nodes: Nodes = {
   String: {
@@ -73,6 +75,13 @@ const Nodes: Nodes = {
     resolve: (node: Node) => node.params.value,
     type: {
       output: () => TypeDefinition.Boolean,
+      properties: {}
+    }
+  },
+  Input: {
+    resolve: (node: Node, scope: Scope) => scope.locals.input,
+    type: {
+      output: () => TypeDefinition.Unresolved,
       properties: {}
     }
   },
@@ -97,8 +106,12 @@ const Nodes: Nodes = {
       const define = getGlobalScope(scope).locals.defines
         .find(other => other.id === node.params.define)
 
+      const childScope = createScope(scope, {
+        input: node.connections.input.map(con => value(con.node, scope))
+      })
+
       return define
-        ? value(define, scope)
+        ? value(define, childScope)
         : createEmptyValue(type(node))
     },
     type: {
@@ -109,8 +122,21 @@ const Nodes: Nodes = {
           ? unmatchedType(define.connections.input[0].node)
           : TypeDefinition.Unresolved
       },
+      input: (node: Node) => {
+        const define = getStaticGlobalScope().locals.defines
+          .find(other => other.id === node.params.define)
+
+        if (!define) {
+          return TypeDefinition.Null
+        }
+
+        const forest = filteredSubForest(define, candidate => candidate.name === 'Input')
+        return forest.length > 0
+          ? intersectAll(forest.map(tree => type(tree.node)))
+          : TypeDefinition.Null
+      },
       properties: {}
-    }
+    },
   },
   Array: {
     resolve: (node: Node, current: Scope) => node.connections.input.map(connection => value(connection.node, current)),

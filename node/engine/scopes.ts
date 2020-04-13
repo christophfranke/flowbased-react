@@ -18,6 +18,12 @@ export function entries(node: Node, filter: (descriptor: ScopeDescriptor) => boo
   return ownScopes.concat(childEntries(node).filter(descriptor => filter(descriptor) && !exit(descriptor)))
 }
 
+export function createScope(parent: Scope, locals: { [key: string]: any }): Scope {
+  return {
+    parent,
+    locals
+  }
+}
 
 // TODO: Make it an environment or something like this
 // Do not mix scopes and types
