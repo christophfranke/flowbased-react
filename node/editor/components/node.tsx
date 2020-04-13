@@ -236,7 +236,9 @@ class NodeView extends React.Component<Props> {
               if (param.type === 'pairs') {
                 return <TextpairsInput key={param.key} param={param} typeColor={typeColor} />
               }
-              return <TextInput key={param.key} param={param} typeColor={typeColor} />
+              if (param.type === 'text') {
+                return <TextInput key={param.key} param={param} typeColor={typeColor} />
+              }
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>

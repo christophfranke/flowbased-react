@@ -118,7 +118,7 @@ export default class NodeFunctions {
         name: 'Define',
         key: 'define',
         value: define.id,
-        type: 'number'
+        type: 'hidden'
       }],
       position,
       connectors: {
