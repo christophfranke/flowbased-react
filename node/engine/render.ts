@@ -5,7 +5,7 @@ import { Node, ValueType, Scope } from '@engine/types'
 import Nodes from '@engine/nodes'
 import * as TypeDefinition from '@engine/type-definition'
 import { matchInto, unionAll } from '@engine/type-functions'
-import { setStaticGlobalScope, entries } from '@engine/scopes'
+import { setStaticGlobalScope, childEntries } from '@engine/scopes'
 
 export const value = computedFn(function(node: Node, scope: Scope): any {
   if (!Nodes[node.name]) {
@@ -33,7 +33,7 @@ export const type = computedFn(function(node: Node): ValueType {
 })
 
 export const numScopeResolvers = computedFn(function (node: Node): number {
-  return entries(node).length
+  return childEntries(node).length
 })
 
 export function expectedType(node: Node, key: string = '', other?: Node): ValueType {

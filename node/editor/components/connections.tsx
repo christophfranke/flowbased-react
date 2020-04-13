@@ -50,8 +50,8 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   @computed get numScopeResolvers(): number {
-    return this.fromNode
-      ? numScopeResolvers(this.store.translated.getNode(this.fromNode))
+    return this.toNode
+      ? numScopeResolvers(this.store.translated.getNode(this.toNode))
       : 0
   }
 
