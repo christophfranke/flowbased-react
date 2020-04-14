@@ -1,45 +1,35 @@
 import React from 'react'
 import { computedFn } from 'mobx-utils'
-import { Node, ValueType, Scope } from '@engine/types'
+import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
 
-import Nodes from '@engine/nodes'
-import * as TypeDefinition from '@engine/type-definition'
 import { matchInto, unionAll } from '@engine/type-functions'
-import { setStaticGlobalScope, childEntries } from '@engine/scopes'
 
-export const value = computedFn(function(node: Node, scope: Scope): any {
-  if (!Nodes[node.name]) {
-    console.log(node, scope)
-  }
-  return Nodes[node.name].resolve(node, scope)
+export const value = computedFn(function(node: Node, scope: Scope, key: string = ''): any {
+  return scope.context.definitions.Node[node.name].value(node, scope, key)
 })
 
-// this function is for api only
-export const render = function(node: Node, globalScope: Scope): any {
-  setStaticGlobalScope(globalScope)
-  return value(node, globalScope)
-}
-
-export const unmatchedType = computedFn(function(node: Node): ValueType {
-  return Nodes[node.name].type.output(node)
+export const unmatchedType = computedFn(function(node: Node, context: Context, key: string = ''): ValueType {
+  return context.definitions.Node[node.name].type.output![key || 'output'](node, context)
 })
 
-export const type = computedFn(function(node: Node): ValueType {
+export const type = computedFn(function(node: Node, context: Context): ValueType {
   return matchInto(
-    unmatchedType(node),
+    unmatchedType(node, context),
     unionAll(node.connections.output.map(
-      connection => expectedType(connection.node, connection.key, node)))
+      connection => expectedType(connection, node, context)),
+    context),
+    context
   )
 })
 
 export const numScopeResolvers = computedFn(function (node: Node): number {
-  return childEntries(node).length
+  console.warn('numScopeResolvers not implemented anymore')
+  return 0
 })
 
-export function expectedType(node: Node, key: string = '', other?: Node): ValueType {
-  return key
-    ? Nodes[node.name].type.properties[key](node, other)
-    : (Nodes[node.name].type.input
-      ? Nodes[node.name].type.input!(node, other)
-      : TypeDefinition.Null)
+export function expectedType(connection: Connection, target: Node, context: Context): ValueType {
+  const key = connection.key || 'input'
+  const src = connection.node
+
+  return context.definitions.Node[target.name].type.input![key](target, context)
 }

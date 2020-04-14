@@ -54,7 +54,7 @@ class NodeView extends React.Component<Props> {
   }
 
   @computed get type(): ValueType {
-    return type(this.store.translated.getNode(this.props.node))
+    return type(this.store.translated.getNode(this.props.node), this.store.context)
   }
 
   @action

@@ -33,11 +33,13 @@ export default class ConnectorFunctions {
       const srcNode = this.store.nodeOfConnector(src)
       const targetNode = this.store.nodeOfConnector(dest)
       if (srcNode && targetNode) {
-        const srcType = type(this.store.translated.getNode(srcNode))
+        const srcType = type(this.store.translated.getNode(srcNode), this.store.context)
         const targetKey = dest.name === 'input' ? '' : dest.name
-        const targetType = expectedType(this.store.translated.getNode(targetNode), targetKey)
+        // const targetType = expectedType(this.store.translated.getNode(targetNode), targetKey)
 
-        return canMatch(srcType, targetType)
+        console.warn('valuesAreCompatible not implemented anymore')
+        // return canMatch(srcType, targetType)
+        return true
       }
     }
 

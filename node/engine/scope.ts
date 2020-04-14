@@ -1,5 +1,4 @@
-import { Scope, Node, Locals } from '@engine/types'
-import Nodes, { ScopeDescriptor } from '@engine/nodes'
+import { Scope, Node } from '@engine/types'
 import { flatten, unique } from '@shared/util'
 
 

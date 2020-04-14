@@ -37,7 +37,7 @@ class ConnectionPath extends React.Component<Props> {
     }
 
     const node = this.store.translated.getNode(this.fromNode)
-    return colorOfType(type(node)).default
+    return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get toColor(): string {
@@ -46,7 +46,7 @@ class ConnectionPath extends React.Component<Props> {
     }
 
     const node = this.store.translated.getNode(this.toNode)
-    return colorOfType(type(node)).default
+    return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get numScopeResolvers(): number {
@@ -58,7 +58,7 @@ class ConnectionPath extends React.Component<Props> {
   @transformer
   colorOfNode(editorNode: Node): string {
     const node = this.store.translated.getNode(editorNode)
-    return colorOfType(type(node)).default
+    return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get offset(): Vector | null {

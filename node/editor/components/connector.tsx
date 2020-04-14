@@ -10,7 +10,6 @@ import { colors, colorOfType } from '@editor/colors'
 import { describe } from '@shared/type-display'
 import { type, expectedType } from '@engine/render'
 import Store from '@editor/store'
-import * as TypeDefinition from '@engine/type-definition'
 
 import DownArrow from '@editor/components/down-arrow'
 import RightArrow from '@editor/components/right-arrow'
@@ -80,18 +79,18 @@ class ConnectorView extends React.Component<Props> {
     if (editorNode) {
       const node = this.store.translated.getNode(editorNode)
       if (this.props.connector.function === 'output') {
-        return type(node)
+        return type(node, this.store.context)
       }
 
-      if (this.props.connector.function === 'input') {
-        return expectedType(node)
-      }
-      if (this.props.connector.function === 'property') {
-        return expectedType(node, this.props.connector.name)
-      }
+      // if (this.props.connector.function === 'input') {
+      //   return expectedType(node, this.store.context)
+      // }
+      // if (this.props.connector.function === 'property') {
+      //   return expectedType(node, this.props.connector.name)
+      // }
     }
 
-    return TypeDefinition.Unknown
+    return this.store.context.definitions.Type.Unknown.create()
   }
 
   @computed get type(): ValueType {
@@ -99,27 +98,27 @@ class ConnectorView extends React.Component<Props> {
     if (editorNode) {
       const node = this.store.translated.getNode(editorNode)
       if (this.props.connector.function === 'output') {
-        return type(node)
+        return type(node, this.store.context)
       }
 
       if (['input', 'property'].includes(this.props.connector.function)) {        
         if (this.connections.length === 1) {
           const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
           if (otherEditorNode) {
-            return type(this.store.translated.getNode(otherEditorNode))
+            return type(this.store.translated.getNode(otherEditorNode), this.store.context)
           }
         }
       }
 
-      if (this.props.connector.function === 'input') {
-        return expectedType(node)
-      }
-      if (this.props.connector.function === 'property') {
-        return expectedType(node, this.props.connector.name)
-      }
+      // if (this.props.connector.function === 'input') {
+      //   return expectedType(node)
+      // }
+      // if (this.props.connector.function === 'property') {
+      //   return expectedType(node, this.props.connector.name)
+      // }
     }
 
-    return TypeDefinition.Unknown
+    return this.store.context.definitions.Type.Unknown.create()
   }
 
   @computed get typeDisplay(): string {

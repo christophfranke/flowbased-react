@@ -2,7 +2,7 @@ import { computed, observable } from 'mobx'
 
 import * as Editor from '@editor/types'
 
-import { Node, Connection, Scope } from '@engine/types'
+import { Node, Connection, Scope, Context } from '@engine/types'
 import { flatten, transformer } from '@shared/util'
 
 interface EditorGraph {
@@ -16,17 +16,26 @@ class Translator {
     this.editor = editor
   }
 
+  @computed get context(): Context {
+    return {
+      definitions: {
+        Node: {
+
+        },
+        Type: {
+
+        }
+      }
+    }
+  }
+
   @computed get scope(): Scope {
     const defines = () => this.editor.nodes.filter(node => node.type === 'Define')
       .map(node => this.getNode(node))
 
     return {    
-      locals: {
-        get defines() {
-          return defines()
-        }
-
-      },
+      locals: {},
+      context: this.context,
       parent: null
     }
   }

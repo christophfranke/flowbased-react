@@ -1,9 +1,7 @@
 import { computed } from 'mobx'
 import { Node, Vector } from '@editor/types'
-import { CoreNode } from '@engine/types'
 
 import Store from '@editor/store'
-import Nodes from '@engine/nodes'
 
 interface nodeListItem {
   name: string
@@ -136,8 +134,8 @@ export default class NodeFunctions {
     }
   }
 
-  createNode(position: Vector, type: CoreNode): Node {
-    const Node = Nodes[type]
+  createNode(position: Vector, type: string): Node {
+    const Node = this.store.context.definitions.Node[type]
     const property = this.store.connector.createProperty
 
     return {
@@ -149,8 +147,7 @@ export default class NodeFunctions {
       connectors: {
         input: Node.type.input ? [this.store.connector.createInput()] : [],
         output: [this.store.connector.createOutput()],
-        properties: Object.keys(Node.type.properties)
-          .map(key => property(key))
+        properties: []
       }
     }
   }
