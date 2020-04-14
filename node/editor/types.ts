@@ -43,15 +43,9 @@ export interface Parameter {
 export interface Node {
   id: number
   name: string
-  type: Engine.CoreNode
-  params: Parameter[]
+  type: string
   position: Vector
   boundingBox?: Rectangle
-  connectors: {
-    input: Connector[]
-    output: Connector[]
-    properties: Connector[]
-  }
 }
 
 export interface Mouse {

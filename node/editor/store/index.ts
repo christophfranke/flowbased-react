@@ -18,7 +18,8 @@ class Store {
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
   @computed get connectors(): Connector[] {
-    return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
+    return []
+    // return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
   }
 
   @computed get context(): Context {
@@ -41,18 +42,18 @@ class Store {
   static createFromLocalStorage(): Store {
     if (!Store.syncedInstance) {
       const store = new Store()
-      store.nodes = load(['editor', 'nodes'],
-        nodes => nodes.map(node => node.type === 'Proxy'
-          ? {
-            ...node,
-            get name() {
-              const define = store.nodes.find(other => other.id === Number(store.node.getParamValue(node, 'define')))
-              return define
-                ? store.node.getParamValue(define, 'name') || 'Unnamed'
-                : 'Undefined'
-            }
-          }
-          : node)
+      store.nodes = load(['editor', 'nodes']
+        // nodes => nodes.map(node => node.type === 'Proxy'
+        //   ? {
+        //     ...node,
+        //     get name() {
+        //       const define = store.nodes.find(other => other.id === Number(store.node.getParamValue(node, 'define')))
+        //       return define
+        //         ? store.node.getParamValue(define, 'name') || 'Unnamed'
+        //         : 'Undefined'
+        //     }
+        //   }
+        //   : node)
       ) || []
 
       // the connectors map reassures that strict equality comparisions
@@ -135,7 +136,8 @@ class Store {
 
   @transformer
   connectorsOfNode(node: Node): Connector[] {
-    return flatten(Object.values(node.connectors))
+    // return flatten(Object.values(node.connectors))
+    return []
   }
 
   @action
@@ -157,17 +159,18 @@ class Store {
   }
 
   @computed get nodesWithDuplicateSetting(): Node[] {
-    return this.nodes.filter(node =>
-      node.connectors.input.length > 0
-      && node.connectors.input[0].mode === 'duplicate')
+    return []
+    // return this.nodes.filter(node =>
+    //   node.connectors.input.length > 0
+    //   && node.connectors.input[0].mode === 'duplicate')
   }
 
   addInputConnectors = () => {
-    this.nodesWithDuplicateSetting
-      .filter(node => node.connectors.input.every(connector => this.connector.countConnections(connector) > 0))
-      .forEach(node => {        
-        node.connectors.input.push(this.connector.cloneConnector(node.connectors.input[0]))
-      })
+    // this.nodesWithDuplicateSetting
+    //   .filter(node => node.connectors.input.every(connector => this.connector.countConnections(connector) > 0))
+    //   .forEach(node => {        
+    //     node.connectors.input.push(this.connector.cloneConnector(node.connectors.input[0]))
+    //   })
   }
 
   removeDuplicatePreviews = () => {

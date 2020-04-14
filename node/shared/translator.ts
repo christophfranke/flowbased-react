@@ -55,7 +55,8 @@ class Translator {
 
   @transformer
   static connectorsOfNode(node: Editor.Node): Editor.Connector[] {
-    return flatten(Object.values(node.connectors))
+    return []
+    // return flatten(Object.values(node.connectors))
   }
 
   @transformer
@@ -108,32 +109,42 @@ class Translator {
 
   @transformer
   getNode(editorNode: Editor.Node): Node {
-    const id = editorNode.id
-    const inputs = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.input)
-    const properties = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.properties)
-    const outputs = () => this.getConnectionsOfConnectorsForOutput(editorNode.connectors.output)
-
     return {
-      id: editorNode.id,
-      name: editorNode.type,
-      get params() {
-        return editorNode.params.reduce((obj, { key, value }) => ({
-          ...obj,
-          [key]: value
-        }), {})
-      },
+      id: 1,
+      name: 'Hi',
+      params: {},
       connections: {
-        get input() {
-          return inputs()
-        },
-        get output() {
-          return outputs()
-        },
-        get properties() {
-          return properties()
-        },
+        input: [],
+        output: [],
+        properties: []
       }
     }
+    // const id = editorNode.id
+    // const inputs = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.input)
+    // const properties = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.properties)
+    // const outputs = () => this.getConnectionsOfConnectorsForOutput(editorNode.connectors.output)
+
+    // return {
+    //   id: editorNode.id,
+    //   name: editorNode.type,
+    //   get params() {
+    //     return editorNode.params.reduce((obj, { key, value }) => ({
+    //       ...obj,
+    //       [key]: value
+    //     }), {})
+    //   },
+    //   connections: {
+    //     get input() {
+    //       return inputs()
+    //     },
+    //     get output() {
+    //       return outputs()
+    //     },
+    //     get properties() {
+    //       return properties()
+    //     },
+    //   }
+    // }
   }
 }
 
