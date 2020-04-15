@@ -42,7 +42,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Tag: {
-    type: 'React',
+    type: 'Component',
     create: () => ({
       name: 'JSX Element',
       type: 'Tag',
@@ -55,7 +55,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Preview: {
-    type: 'React',
+    type: 'Preview',
     create: () => ({
       name: 'Preview',
       type: 'Preview',

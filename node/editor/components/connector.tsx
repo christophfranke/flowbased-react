@@ -81,12 +81,9 @@ class ConnectorView extends React.Component<Props> {
       return type(node, this.store.context)
     }
 
-    // if (this.props.connector.function === 'input') {
-    //   return expectedType(node, this.store.context)
-    // }
-    // if (this.props.connector.function === 'property') {
-    //   return expectedType(node, this.props.connector.name)
-    // }
+    if (this.props.connector.group.function === 'input') {
+      return expectedType(node, this.props.connector.group.key, this.store.context)
+    }
 
     return this.store.context.definitions.Type.Unknown.create()
   }
@@ -98,6 +95,7 @@ class ConnectorView extends React.Component<Props> {
       return type(node, this.store.context)
     }
 
+    if (this.props.connector.group.function === 'input') {
     // if (['input', 'property'].includes(this.props.connector.function)) {        
     //   if (this.connections.length === 1) {
     //     const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
@@ -107,12 +105,9 @@ class ConnectorView extends React.Component<Props> {
     //   }
     // }
 
-    // if (this.props.connector.function === 'input') {
-    //   return expectedType(node)
-    // }
-    // if (this.props.connector.function === 'property') {
-    //   return expectedType(node, this.props.connector.name)
-    // }
+      return expectedType(node, this.props.connector.group.key, this.store.context)
+    }
+
 
     return this.store.context.definitions.Type.Unknown.create()
   }

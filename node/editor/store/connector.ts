@@ -91,7 +91,8 @@ export default class ConnectorFunctions {
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
     const srcType = type(this.store.translated.getNode(src.ports.node), this.store.context)
     const targetType = expectedType(
-      this.createTemporaryConnection(src, dest),
+      this.store.translated.getNode(dest.ports.node),
+      dest.key,
       this.store.context
     )
 

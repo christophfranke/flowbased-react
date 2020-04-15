@@ -16,7 +16,7 @@ export const type = computedFn(function(node: Node, context: Context): ValueType
   return matchInto(
     unmatchedType(node, context, 'output'),
     unionAll(node.connections.output.map(
-      connection => expectedType(connection, context)),
+      connection => expectedType(connection.target.node, connection.target.key, context)),
     context),
     context
   )
@@ -27,10 +27,6 @@ export const numScopeResolvers = computedFn(function (node: Node): number {
   return 0
 })
 
-export function expectedType(connection: Connection, context: Context): ValueType {
-  const key = connection.target.key
-  const target = connection.target.node
-  const src = connection.src.node
-
+export function expectedType(target: Node, key: string, context: Context): ValueType {
   return context.definitions.Node[target.type].type.input![key](target, context)
 }
