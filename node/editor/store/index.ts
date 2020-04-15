@@ -17,7 +17,7 @@ class Store {
   node: NodeFunctions
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
-  @observable.ref pendingConnector: Connector | null = null
+  @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
 
@@ -95,7 +95,7 @@ class Store {
       store.currentId = load(['editor', 'uid']) || 0
 
       // autosave immediately
-      sync(['editor', 'connections'], store, 'connections')
+      // sync(['editor', 'connections'], store, 'connections')
       sync(['editor', 'nodes'], store, 'nodes')
       sync(['editor', 'uid'], store, 'currentId')
 

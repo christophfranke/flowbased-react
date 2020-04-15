@@ -1,4 +1,4 @@
-import { computed } from 'mobx'
+import { computed, observable } from 'mobx'
 
 import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
@@ -17,7 +17,7 @@ export default class ConnectorFunctions {
 
   @transformer
   ports(node: Node): Ports {
-    const ports: Ports = {
+    const ports: Ports = observable({
       node,
       input: {
         main: [],
@@ -27,7 +27,7 @@ export default class ConnectorFunctions {
         main: [],
         side: []
       }
-    }
+    })
 
     ports.input.main = Object.keys(this.store.definitions.Node[node.type].type.input || {})
       .map(key => this.createInput(key, ports))
@@ -39,7 +39,7 @@ export default class ConnectorFunctions {
   }
 
   createInput = (key: string, ports: Ports): ConnectorGroup<'input', 'single'> => {
-    const group: ConnectorGroup<'input', 'single'> = {
+    const group: ConnectorGroup<'input', 'single'> = observable({
       key,
       ports,
       connectors: [],
@@ -47,7 +47,7 @@ export default class ConnectorFunctions {
       name: 'input',
       function: 'input',
       direction: { x: 0, y: -1 },
-    }
+    })
 
     group.connectors = [{
       group
@@ -57,7 +57,7 @@ export default class ConnectorFunctions {
   }
 
   createOutput = (key: string, ports: Ports): ConnectorGroup<'output', 'multiple'> => {
-    const group: ConnectorGroup<'output', 'multiple'> = {
+    const group: ConnectorGroup<'output', 'multiple'> = observable({
       key,
       ports,
       connectors: [],
@@ -65,27 +65,13 @@ export default class ConnectorFunctions {
       name: 'output',
       function: 'output',
       direction: { x: 0, y: 1 },
-    }
+    })
 
     group.connectors = [{
       group
     }]
 
     return group
-  }
-
-  createTemporaryConnection(src: ConnectorGroup<'output'>, target: ConnectorGroup<'input'>): Engine.Connection {
-    return {
-      id: -1,
-      src: {
-        node: this.store.translated.getNode(src.ports.node),
-        key: src.key
-      },
-      target: {
-        node: this.store.translated.getNode(target.ports.node),
-        key: target.key
-      }
-    }
   }
 
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {

@@ -132,36 +132,38 @@ class ConnectorView extends React.Component<Props> {
   }
 
   connect() {
-    // if (this.store.pendingConnector) {
-    //   const from = this.store.connector.isSrc(this.store.pendingConnector)
-    //     ? this.store.pendingConnector
-    //     : this.props.connector
-    //   const to = this.store.connector.isSrc(this.store.pendingConnector)
-    //     ? this.props.connector
-    //     : this.store.pendingConnector
+    if (this.store.pendingConnector) {
+      const from = this.store.connector.isSrc(this.store.pendingConnector.group)
+        ? this.store.pendingConnector
+        : this.props.connector
+      const to = this.store.connector.isSrc(this.store.pendingConnector.group)
+        ? this.props.connector
+        : this.store.pendingConnector
 
-    //   const connection: Connection = {
-    //     id: this.store.uid(),
-    //     from,
-    //     to
-    //   }
+      const connection: Connection = {
+        id: this.store.uid(),
+        from,
+        to
+      }
 
-    //   this.store.connections.push(connection)
-    // }
+      this.store.connections.push(connection)
+    }
   }
 
-  unconnect(): Connector | undefined {
-    // const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
-    // if (connection) {
-    //   const other = connection.from === this.props.connector
-    //     ? connection.to
-    //     : connection.from
+  unconnect(): Connector | null {
+    console.log('unconnect')
+    const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+    if (connection) {
+      const other = connection.from === this.props.connector
+        ? connection.to
+        : connection.from
 
-    //   this.store.connections = this.store.connections.filter(con => con !== connection)
+      this.store.connections = this.store.connections.filter(con => con !== connection)
 
-    //   return other
-    // }
-    return undefined
+      return other
+    }
+
+    return null
   }
 
   handleMouseOver = e => {
@@ -181,7 +183,7 @@ class ConnectorView extends React.Component<Props> {
       if (this.store.connector.state(this.props.connector) === 'hot') {
         if (this.store.connector.countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.group.mode)) {
           this.connect()
-          this.store.pendingConnector = this.unconnect() || null
+          this.store.pendingConnector = this.unconnect()
           return
         }
 
