@@ -115,10 +115,11 @@ class Store {
 
   @transformer
   getChildren(node: Node): Node[] {
-    return this.connections
-      .filter(connection => this.nodeOfConnector(connection.to) === node)
-      .filter(connection => this.nodeOfConnector(connection.from))
-      .map(connection => this.nodeOfConnector(connection.from) || node)
+    // return this.connections
+    //   .filter(connection => this.nodeOfConnector(connection.to) === node)
+    //   .filter(connection => this.nodeOfConnector(connection.from))
+    //   .map(connection => this.nodeOfConnector(connection.from) || node)
+    return []
   }
 
   @transformer
@@ -140,12 +141,6 @@ class Store {
   }
 
   @transformer
-  nodeOfConnector(connector: Connector): Node | undefined {
-    return this.nodes.find(node => this.connectorsOfNode(node)
-      .some(con => con === connector))      
-  }
-
-  @transformer
   connectorsOfNode(node: Node): Connector[] {
     // return flatten(Object.values(node.connectors))
     return []
@@ -163,9 +158,9 @@ class Store {
     const connectors = this.connectorsOfNode(node)
     this.connections = this.connections
       .filter(connection => !connectors.includes(connection.from) && !connectors.includes(connection.to))
-    if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
-      this.pendingConnector = null
-    }
+    // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
+    //   this.pendingConnector = null
+    // }
     this.nodes = this.nodes.filter(other => other !== node)
   }
 

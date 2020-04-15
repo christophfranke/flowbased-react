@@ -88,7 +88,7 @@ export default class ConnectorFunctions {
     const dest = this.isSrc(pending.group) ? possiblyHot : pending
 
     return src !== dest
-      && !this.willProduceLoop(this.store.nodeOfConnector(src), this.store.nodeOfConnector(dest))
+      // && !this.willProduceLoop(this.store.nodeOfConnector(src), this.store.nodeOfConnector(dest))
       && !(src.group.mode === 'multiple' && dest.group.mode === 'multiple')
       && this.valuesAreCompatible(src.group, dest.group)
   }
@@ -123,33 +123,4 @@ export default class ConnectorFunctions {
       id: this.store.uid()
     }
   }
-
-  // createInput = (group: ConnectorGroup, overrides = {}): Connector => {
-  //   return {
-  //     id: this.store.uid(),
-  //     direction: { x: 0, y: -1 },
-  //     group,
-  //     ...overrides
-  //   }
-  // }
-
-  // createOutput = (): Connector => {
-  //   return {
-  //     id: this.store.uid(),
-  //     mode: 'multiple',
-  //     name: 'output',
-  //     function: 'output',
-  //     direction: { x: 0, y: 1 }
-  //   }
-  // }
-
-  // createProperty = (name: string): Connector => {
-  //   return {
-  //     id: this.store.uid(),
-  //     mode: 'single',
-  //     function: 'property',
-  //     name,
-  //     direction: { x: -1, y: 0 }
-  //   }
-  // }
 }

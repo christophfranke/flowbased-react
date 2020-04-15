@@ -13,7 +13,7 @@ class Nodes extends React.Component {
     return <div>
       <Provider store={syncedStore}>
         <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-          <EditorView  />
+          <EditorView />
         </Viewport>
       </Provider>
     </div>
