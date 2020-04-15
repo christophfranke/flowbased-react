@@ -4,6 +4,11 @@ type ValueResolver = (node: Node, current: Scope, key: string) => any
 type TypeResolver = (node: Node, context: Context) => ValueType
 type ContextResolver = (node: Node, context: Context) => Context
 
+export interface Module {
+  Type: ModuleTypes<string>
+  Node: ModuleNodes<string> 
+}
+
 export interface NodeDefinition {
   type: {
     input?: {

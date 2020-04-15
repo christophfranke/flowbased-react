@@ -1,11 +1,13 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
-import { RenderProps, NodeProps, Node, Scope } from '@engine/types'
+import { Node, Scope, Connection } from '@engine/types'
+import { RenderProps, NodeProps } from './types'
+
 import { value, type } from '@engine/render'
 import { contains } from '@engine/type-functions'
 import { transformer } from '@shared/util'
-import Nodes from '@engine/nodes'
+
 
 let currentRenderId = 0
 function getRenderKey(): number {
@@ -18,11 +20,11 @@ const HOC = (Component, scope: Scope) => {
   @observer
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
-    getChild(childNode: Node) {
-      const result = value(childNode, scope)
-      const nodeType = type(childNode)
+    getChild(input: Connection) {
+      const result = value(input.src.node, scope, input.src.key)
+      const nodeType = type(input.src.node, scope.context)
       if (contains(nodeType, 'Object') || contains(nodeType, 'Pair') || nodeType.name === 'Boolean') {
-        if (contains(type(childNode), 'Element')) {
+        if (contains(type(input.src.node, scope.context), 'Element')) {
           return '{ Complex Object }'
         }
         return JSON.stringify(result)
@@ -32,22 +34,22 @@ const HOC = (Component, scope: Scope) => {
     }
 
     @computed get children() {
-      return this.props.node.connections.input.map(child => this.getChild(child.node))
+      return this.props.node.connections.input.map(child => this.getChild(child))
     }
 
-    @computed get properties() {
-      return this.props.node.connections.properties.reduce((obj, property) => ({
-        ...obj,
-        [property.key]: value(property.node, scope)
-      }), {})
-    }
+    // @computed get properties() {
+    //   return this.props.node.connections.properties.reduce((obj, property) => ({
+    //     ...obj,
+    //     [property.key]: value(property.node, scope)
+    //   }), {})
+    // }
 
     @computed get params() {
       return this.props.node.params
     }
 
     render() {
-      return <Component params={this.params} properties={this.properties}>
+      return <Component params={this.params} properties={{}}>
         {this.children}
       </Component>
     }

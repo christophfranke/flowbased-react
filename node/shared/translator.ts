@@ -2,10 +2,11 @@ import { computed, observable } from 'mobx'
 
 import * as Editor from '@editor/types'
 
-import { Node, Connection, Scope, Context } from '@engine/types'
+import { Node, Connection, Scope, Context, Module } from '@engine/types'
 import { flatten, transformer } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
+import * as React from '@engine/modules/react'
 
 interface EditorGraph {
   nodes: Editor.Node[]
@@ -18,16 +19,32 @@ class Translator {
     this.editor = editor
   }
 
+  modules = {
+    Core,
+    React
+  }
+
+  @computed
+  get definitions(): Module {
+    return {
+      Node: {
+        ...Object.values(this.modules).reduce((all, module) => ({
+          ...all,
+          ...module.Node
+        }), {})
+      },
+      Type: {
+        ...Object.values(this.modules).reduce((all, module) => ({
+          ...all,
+          ...module.Type
+        }), {})
+      }
+    }
+  }
+
   @computed get context(): Context {
     return {
-      definitions: {
-        Node: {
-          ...Core.Node
-        },
-        Type: {
-          ...Core.Type
-        }
-      }
+      definitions: this.definitions
     }
   }
 

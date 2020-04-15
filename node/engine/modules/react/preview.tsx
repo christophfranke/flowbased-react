@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { RenderProps } from '@engine/types'
+import { RenderProps } from './types'
 
 @observer
 class Preview extends React.Component<RenderProps> {

@@ -251,7 +251,7 @@ class NodeView extends React.Component<Props> {
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
-            Inputs
+            {this.ports.input.main.map(group => <ConnectorGroup key={group.key} group={group} />)}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
             Props

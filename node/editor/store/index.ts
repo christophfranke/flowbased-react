@@ -10,6 +10,7 @@ import NodeFunctions from '@editor/store/node'
 import { flatten, transformer } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
+import * as React from '@engine/modules/react'
 
 class Store {
   connector: ConnectorFunctions
@@ -21,7 +22,8 @@ class Store {
   @observable currentId: number = 0
 
   modules = {
-    Core
+    Core,
+    React
   }
 
   @computed

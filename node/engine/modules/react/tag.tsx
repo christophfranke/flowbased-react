@@ -1,7 +1,8 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 
-import { Node, RenderProps } from '@engine/types'
+import { Node } from '@engine/types'
+import { RenderProps } from './types'
 
 const voidElements = ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']
 

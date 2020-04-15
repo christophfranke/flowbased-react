@@ -29,10 +29,31 @@ export default class ConnectorFunctions {
       }
     }
 
+    ports.input.main = Object.keys(this.store.definitions.Node[node.type].type.input || {})
+      .map(key => this.createInput(key, ports))
+
     ports.output.main = Object.keys(this.store.definitions.Node[node.type].type.output || {})
       .map(key => this.createOutput(key, ports))
 
     return ports
+  }
+
+  createInput = (key: string, ports: Ports): ConnectorGroup<'input', 'single'> => {
+    const group: ConnectorGroup<'input', 'single'> = {
+      key,
+      ports,
+      connectors: [],
+      mode: 'single',
+      name: 'input',
+      function: 'input',
+      direction: { x: 0, y: -1 },
+    }
+
+    group.connectors = [{
+      group
+    }]
+
+    return group
   }
 
   createOutput = (key: string, ports: Ports): ConnectorGroup<'output', 'multiple'> => {
