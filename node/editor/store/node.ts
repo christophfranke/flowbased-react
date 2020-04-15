@@ -41,6 +41,8 @@ export default class NodeFunctions {
     })
   }
 
+
+
   // getParamValue(node: Node, key: string): string {
   //   const nameParam = node.params.find(param => param.key === key)
   //   return nameParam && nameParam.value

@@ -5,6 +5,8 @@ import * as Editor from '@editor/types'
 import { Node, Connection, Scope, Context } from '@engine/types'
 import { flatten, transformer } from '@shared/util'
 
+import * as Core from '@engine/modules/core'
+
 interface EditorGraph {
   nodes: Editor.Node[]
   connections: Editor.Connection[]
@@ -20,10 +22,10 @@ class Translator {
     return {
       definitions: {
         Node: {
-
+          ...Core.Node
         },
         Type: {
-
+          ...Core.Type
         }
       }
     }

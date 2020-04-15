@@ -9,6 +9,8 @@ import NodeFunctions from '@editor/store/node'
 
 import { flatten, transformer } from '@shared/util'
 
+import * as Core from '@engine/modules/core'
+
 class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
@@ -17,6 +19,19 @@ class Store {
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
+
+  definitions = {
+    Node: {
+      ...Core.Node
+    },
+    Type: {
+      ...Core.Type
+    },
+    EditorNode: {
+      ...Core.EditorNode
+    }
+  }
+
   @computed get connectors(): Connector[] {
     return []
     // return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
@@ -42,19 +57,7 @@ class Store {
   static createFromLocalStorage(): Store {
     if (!Store.syncedInstance) {
       const store = new Store()
-      store.nodes = load(['editor', 'nodes']
-        // nodes => nodes.map(node => node.type === 'Proxy'
-        //   ? {
-        //     ...node,
-        //     get name() {
-        //       const define = store.nodes.find(other => other.id === Number(store.node.getParamValue(node, 'define')))
-        //       return define
-        //         ? store.node.getParamValue(define, 'name') || 'Unnamed'
-        //         : 'Undefined'
-        //     }
-        //   }
-        //   : node)
-      ) || []
+      store.nodes = load(['editor', 'nodes']) || []
 
       // the connectors map reassures that strict equality comparisions
       // work because two connections with the same id will be the same objects
@@ -75,15 +78,7 @@ class Store {
 
       // autosave immediately
       sync(['editor', 'connections'], store, 'connections')
-      sync(['editor', 'nodes'], store, 'nodes',
-        nodes => nodes.map(node => node.type === 'Proxy'
-          ? {
-            ...node,
-            name: node.name
-          }
-          : node
-        )
-      )
+      sync(['editor', 'nodes'], store, 'nodes')
       sync(['editor', 'uid'], store, 'currentId')
 
       Store.syncedInstance = store

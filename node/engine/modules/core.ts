@@ -1,4 +1,5 @@
 import * as Engine from '@engine/types'
+import * as Editor from '@editor/types'
 
 export type Nodes = 'String' | 'Number' | 'Boolean'
 export const Node: Engine.ModuleNodes<Nodes> = {
@@ -25,6 +26,45 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         output: () => Type.Boolean.create(),
       }
     }
+  },
+}
+
+export const EditorNode: Editor.ModuleNodes<Nodes> = {
+  String: {
+    create: () => ({
+      name: 'String',
+      type: 'String',
+      params: [{
+        name: '',
+        key: 'value',
+        value: '',
+        type: 'text'
+      }],
+    })
+  },
+  Number: {
+    create: () => ({
+      name: 'Number',
+      type: 'Number',
+      params: [{
+        name: '',
+        key: 'value',
+        value: 0,
+        type: 'number'
+      }],
+    })
+  },
+  Boolean: {
+    create: () => ({
+      name: 'Boolean',
+      type: 'Boolean',
+      params: [{
+        name: '',
+        key: 'value',
+        value: false,
+        type: 'checkbox'
+      }],
+    })
   },
 }
 

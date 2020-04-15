@@ -1,5 +1,15 @@
 import * as Engine from '@engine/types'
 
+import * as Core from '@engine/modules/core'
+
+export type ModuleNodes<NodeName extends keyof any> = {
+  [key in NodeName]: NodeDefinition<key>
+}
+
+export interface NodeDefinition<T> {
+  create: () => RawNode<T>
+}
+
 export type ValueType = Engine.ValueType
 export interface Rectangle {
   x: number
@@ -19,16 +29,33 @@ export interface Connection {
   to: Connector
 }
 
-export type ConnectorFunction = 'input' | 'output' | 'property' | 'action'
+export interface Ports {
+  node: Node
+  input: {
+    main: ConnectorGroup<'input', 'single' | 'duplicate'>[]
+    side: ConnectorGroup<'input', 'single'>[]
+  }
+  output: {
+    main: ConnectorGroup<'output', 'multiple'>[]
+    side: ConnectorGroup<'output', 'multiple'>[]
+  }
+}
+
+export interface ConnectorGroup<Function extends ConnectorFunction = ConnectorFunction, Mode extends ConnectorMode = ConnectorMode> {
+  ports: Ports
+  connectors: Connector[]
+  mode: Mode
+  function: ConnectorFunction
+  direction: Vector
+  key: string
+  name: string
+}
+
+export type ConnectorFunction = 'input' | 'output'
 export type ConnectorState = 'default' | 'hot' | 'pending'
 export type ConnectorMode = 'single' | 'multiple' | 'duplicate'
 export interface Connector {
-  id: number
-  name: string
-  display? : string
-  mode: ConnectorMode
-  function: ConnectorFunction
-  direction: Vector
+  group: ConnectorGroup
   position?: Vector
 }
 
@@ -40,10 +67,14 @@ export interface Parameter {
   type: InputType
 }
 
-export interface Node {
-  id: number
+export interface RawNode<T> {
   name: string
-  type: string
+  type: T
+  params: Parameter[]  
+}
+
+export interface Node extends RawNode<Core.Nodes> {
+  id: number
   position: Vector
   boundingBox?: Rectangle
 }

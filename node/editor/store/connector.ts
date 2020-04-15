@@ -1,10 +1,13 @@
 import { computed } from 'mobx'
 
-import { Connector, Connection, ConnectorState, ValueType, Node } from '@editor/types'
+import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
 import { transformer } from '@shared/util'
+
+import * as Engine from '@engine/types'
+
 
 export default class ConnectorFunctions {
   store: Store
@@ -12,58 +15,82 @@ export default class ConnectorFunctions {
     this.store = store
   }
 
-  functionsAreCompatible(src: Connector, dest: Connector): boolean {
-    if (dest.function === 'input') {
-      if (src.function === 'output') {
-        return true
-      }
-    }
-
-    if (dest.function === 'property') {
-      if (src.function === 'output') {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  valuesAreCompatible(src: Connector, dest: Connector): boolean {
-    if (src.function === 'output') {
-      const srcNode = this.store.nodeOfConnector(src)
-      const targetNode = this.store.nodeOfConnector(dest)
-      if (srcNode && targetNode) {
-        const srcType = type(this.store.translated.getNode(srcNode), this.store.context)
-        const targetKey = dest.name === 'input' ? '' : dest.name
-        // const targetType = expectedType(this.store.translated.getNode(targetNode), targetKey)
-
-        console.warn('valuesAreCompatible not implemented anymore')
-        // return canMatch(srcType, targetType)
-        return true
-      }
-    }
-
-    return false
-  }
-
   @transformer
-  isSrc(connector: Connector): boolean {
-    return ['action', 'output'].includes(connector.function)
+  connectors(node: Node): Ports {
+    const ports: Ports = {
+      node,
+      input: {
+        main: [],
+        side: []
+      },
+      output: {
+        main: [],
+        side: []
+      }
+    }
+
+    ports.output.main = Object.keys(this.store.definitions.Node[node.type].type.output || {})
+      .map(key => this.createOutput(key, ports))
+
+    return ports
+  }
+
+  createOutput = (key: string, ports: Ports): ConnectorGroup<'output', 'multiple'> => {
+    const group: ConnectorGroup<'output', 'multiple'> = {
+      key,
+      ports,
+      connectors: [],
+      mode: 'multiple',
+      name: 'output',
+      function: 'output',
+      direction: { x: 0, y: 1 },
+    }
+
+    return group
+  }
+
+  createTemporaryConnection(src: ConnectorGroup<'output'>, target: ConnectorGroup<'input'>): Engine.Connection {
+    return {
+      id: -1,
+      src: {
+        node: this.store.translated.getNode(src.ports.node),
+        key: src.key
+      },
+      target: {
+        node: this.store.translated.getNode(target.ports.node),
+        key: target.key
+      }
+    }
+  }
+
+  valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
+    const srcType = type(this.store.translated.getNode(src.ports.node), this.store.context)
+    const targetType = expectedType(
+      this.createTemporaryConnection(src, dest),
+      this.store.context
+    )
+
+    console.warn('valuesAreCompatible not implemented anymore')
+    // return canMatch(srcType, targetType)
+    return true
   }
 
   willProduceLoop(src?: Node, dest?: Node): boolean {
     return !!src && !!dest && this.store.getSubtree(src).includes(dest)
   }
 
+  isSrc(group: ConnectorGroup): group is ConnectorGroup<'output'> {
+    return group.function === 'output'
+  }
+
   canConnect(pending: Connector, possiblyHot: Connector): boolean {
-    const src = this.isSrc(pending) ? pending : possiblyHot
-    const dest = this.isSrc(possiblyHot) ? pending : possiblyHot
+    const src = this.isSrc(pending.group) ? pending : possiblyHot
+    const dest = this.isSrc(pending.group) ? possiblyHot : pending
 
     return src !== dest
       && !this.willProduceLoop(this.store.nodeOfConnector(src), this.store.nodeOfConnector(dest))
-      && !(src.mode === 'multiple' && dest.mode === 'multiple')
-      && this.functionsAreCompatible(src, dest)
-      && this.valuesAreCompatible(src, dest)
+      && !(src.group.mode === 'multiple' && dest.group.mode === 'multiple')
+      && this.valuesAreCompatible(src.group, dest.group)
   }
 
   @transformer
@@ -85,7 +112,6 @@ export default class ConnectorFunctions {
     return this.store.connections
       .filter(connection => connection.from === connector || connection.to === connector)
   }
-
   @transformer
   countConnections(connector: Connector): number {
     return this.getConnections(connector).length
@@ -98,13 +124,11 @@ export default class ConnectorFunctions {
     }
   }
 
-  createInput = (overrides = {}): Connector => {
+  createInput = (group: ConnectorGroup, overrides = {}): Connector => {
     return {
       id: this.store.uid(),
-      mode: 'duplicate',
-      function: 'input',
-      name: 'input',
       direction: { x: 0, y: -1 },
+      group,
       ...overrides
     }
   }

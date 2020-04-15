@@ -17,11 +17,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       }), {}),
     type: {
       output: {
-        output: (node: Engine.Node) => Type.Object.create(node.connections.input
+        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(node.connections.input
           .map(connection => ({
             key: connection.node.params.key.trim(),
-            type: unmatchedType(connection.node).params.value
-              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(connection.node).name}`)
+            type: unmatchedType(connection.node, context).params.value
+              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(connection.node, context).name}`)
           }))
           .filter(pair => pair.key)
           .reduce((obj, pair) => ({

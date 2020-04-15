@@ -39,10 +39,16 @@ export interface ValueTypeTemplate<T> {
     [key: string]: ValueType
   }
 }
+
 export interface Connection {
   readonly id: number
-  readonly node: Node
-  readonly key: string
+  readonly src: Port
+  readonly target: Port
+}
+
+export interface Port {
+  node: Node
+  key: string
 }
 
 export interface Params {  
@@ -56,7 +62,6 @@ export interface Node {
   connections: {
     readonly input: Connection[]
     readonly output: Connection[]
-    readonly properties: Connection[]
   }
 }
 
