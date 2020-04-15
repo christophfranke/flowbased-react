@@ -75,48 +75,44 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get expectedType(): ValueType {
-    const editorNode = this.store.nodeOfConnector(this.props.connector)
-    if (editorNode) {
-      const node = this.store.translated.getNode(editorNode)
-      if (this.props.connector.function === 'output') {
-        return type(node, this.store.context)
-      }
-
-      // if (this.props.connector.function === 'input') {
-      //   return expectedType(node, this.store.context)
-      // }
-      // if (this.props.connector.function === 'property') {
-      //   return expectedType(node, this.props.connector.name)
-      // }
+    const editorNode = this.props.connector.group.ports.node
+    const node = this.store.translated.getNode(editorNode)
+    if (this.props.connector.group.function === 'output') {
+      return type(node, this.store.context)
     }
+
+    // if (this.props.connector.function === 'input') {
+    //   return expectedType(node, this.store.context)
+    // }
+    // if (this.props.connector.function === 'property') {
+    //   return expectedType(node, this.props.connector.name)
+    // }
 
     return this.store.context.definitions.Type.Unknown.create()
   }
 
   @computed get type(): ValueType {
-    const editorNode = this.store.nodeOfConnector(this.props.connector)
-    if (editorNode) {
-      const node = this.store.translated.getNode(editorNode)
-      if (this.props.connector.function === 'output') {
-        return type(node, this.store.context)
-      }
-
-      if (['input', 'property'].includes(this.props.connector.function)) {        
-        if (this.connections.length === 1) {
-          const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
-          if (otherEditorNode) {
-            return type(this.store.translated.getNode(otherEditorNode), this.store.context)
-          }
-        }
-      }
-
-      // if (this.props.connector.function === 'input') {
-      //   return expectedType(node)
-      // }
-      // if (this.props.connector.function === 'property') {
-      //   return expectedType(node, this.props.connector.name)
-      // }
+    const editorNode = this.props.connector.group.ports.node
+    const node = this.store.translated.getNode(editorNode)
+    if (this.props.connector.group.function === 'output') {
+      return type(node, this.store.context)
     }
+
+    // if (['input', 'property'].includes(this.props.connector.function)) {        
+    //   if (this.connections.length === 1) {
+    //     const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
+    //     if (otherEditorNode) {
+    //       return type(this.store.translated.getNode(otherEditorNode), this.store.context)
+    //     }
+    //   }
+    // }
+
+    // if (this.props.connector.function === 'input') {
+    //   return expectedType(node)
+    // }
+    // if (this.props.connector.function === 'property') {
+    //   return expectedType(node, this.props.connector.name)
+    // }
 
     return this.store.context.definitions.Type.Unknown.create()
   }
@@ -126,10 +122,10 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get nameDisplay(): JSX.Element {
-    const displayString = this.props.connector.display
-      || (['input', 'output'].includes(this.props.connector.name)
+    const displayString = this.props.connector.group.name
+      || (['input', 'output'].includes(this.props.connector.group.name)
         ? ''
-        : this.props.connector.name)
+        : this.props.connector.group.name)
 
     return displayString
       ? <>{displayString}: <span style={{ fontStyle: 'italic' }}>{this.typeDisplay}</span></>
@@ -141,35 +137,36 @@ class ConnectorView extends React.Component<Props> {
   }
 
   connect() {
-    if (this.store.pendingConnector) {
-      const from = this.store.connector.isSrc(this.store.pendingConnector)
-        ? this.store.pendingConnector
-        : this.props.connector
-      const to = this.store.connector.isSrc(this.store.pendingConnector)
-        ? this.props.connector
-        : this.store.pendingConnector
+    // if (this.store.pendingConnector) {
+    //   const from = this.store.connector.isSrc(this.store.pendingConnector)
+    //     ? this.store.pendingConnector
+    //     : this.props.connector
+    //   const to = this.store.connector.isSrc(this.store.pendingConnector)
+    //     ? this.props.connector
+    //     : this.store.pendingConnector
 
-      const connection: Connection = {
-        id: this.store.uid(),
-        from,
-        to
-      }
+    //   const connection: Connection = {
+    //     id: this.store.uid(),
+    //     from,
+    //     to
+    //   }
 
-      this.store.connections.push(connection)
-    }
+    //   this.store.connections.push(connection)
+    // }
   }
 
   unconnect(): Connector | undefined {
-    const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
-    if (connection) {
-      const other = connection.from === this.props.connector
-        ? connection.to
-        : connection.from
+    // const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+    // if (connection) {
+    //   const other = connection.from === this.props.connector
+    //     ? connection.to
+    //     : connection.from
 
-      this.store.connections = this.store.connections.filter(con => con !== connection)
+    //   this.store.connections = this.store.connections.filter(con => con !== connection)
 
-      return other
-    }
+    //   return other
+    // }
+    return undefined
   }
 
   handleMouseOver = e => {
@@ -187,7 +184,7 @@ class ConnectorView extends React.Component<Props> {
 
     if (this.store.pendingConnector) {
       if (this.store.connector.state(this.props.connector) === 'hot') {
-        if (this.store.connector.countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.mode)) {
+        if (this.store.connector.countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.group.mode)) {
           this.connect()
           this.store.pendingConnector = this.unconnect() || null
           return
@@ -201,12 +198,12 @@ class ConnectorView extends React.Component<Props> {
     }
 
     if (this.store.connector.countConnections(this.props.connector) > 0) {
-      if (['duplicate', 'single'].includes(this.props.connector.mode)) {
+      if (['duplicate', 'single'].includes(this.props.connector.group.mode)) {
         this.store.pendingConnector = this.unconnect() || null
         return
       }
 
-      if (this.props.connector.mode === 'multiple') {
+      if (this.props.connector.group.mode === 'multiple') {
         this.store.pendingConnector = this.props.connector
       }
 
@@ -232,10 +229,10 @@ class ConnectorView extends React.Component<Props> {
 
     let positioning = {}
     const margin = 5
-    if (this.props.connector.direction.x > 0) {
+    if (this.props.connector.group.direction.x > 0) {
       positioning['left'] = `${CONNECTOR_SIZE + margin}px`
     }
-    if (this.props.connector.direction.x < 0) {
+    if (this.props.connector.group.direction.x < 0) {
       positioning['right'] = `${CONNECTOR_SIZE + margin}px`
       if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {
         positioning['padding'] = '0'
@@ -243,10 +240,10 @@ class ConnectorView extends React.Component<Props> {
         positioning['color'] = colors.text.mediumDim
       }
     }
-    if (this.props.connector.direction.y > 0) {
+    if (this.props.connector.group.direction.y > 0) {
       positioning['top'] = `${CONNECTOR_SIZE + margin}px`
     }
-    if (this.props.connector.direction.y < 0) {
+    if (this.props.connector.group.direction.y < 0) {
       positioning['bottom'] = `${CONNECTOR_SIZE + margin}px`
       if (this.store.connector.state(this.props.connector) === 'hot' && !this.isHovering) {
         positioning['transformOrigin'] = 'bottom left'
@@ -275,7 +272,7 @@ class ConnectorView extends React.Component<Props> {
         display: 'none'
       }
 
-    const arrow = ['input', 'output'].includes(this.props.connector.function)
+    const arrow = ['input', 'output'].includes(this.props.connector.group.function)
       ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
       : <RightArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
 

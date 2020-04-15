@@ -2,13 +2,15 @@ import React from 'react'
 import { computed, observable, action } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Node, Vector, ValueType, Connector, Parameter } from '@editor/types'
+import { Node, Vector, ValueType, Connector, Parameter, Ports } from '@editor/types'
 
 import * as LA from '@editor/la'
 import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
 import Store from '@editor/store'
 import { type } from '@engine/render'
+
+import ConnectorGroup from '@editor/components/connector-group'
 
 import TextInput from '@editor/components/input/text'
 import NumberInput from '@editor/components/input/number'
@@ -30,12 +32,8 @@ class NodeView extends React.Component<Props> {
   nodeRef = React.createRef<HTMLDivElement>()
   
 
-  @computed get connectors(): { [key: string]: Connector[] } {
-    return {
-      input: [],
-      output: [],
-      properties: []
-    }
+  @computed get ports(): Ports {
+    return this.store.connector.ports(this.props.node)
   }
 
   @computed get params(): Parameter[] {
@@ -253,10 +251,10 @@ class NodeView extends React.Component<Props> {
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
-            
+            Inputs
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
-            
+            Props
           </div>
           <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
@@ -285,7 +283,7 @@ class NodeView extends React.Component<Props> {
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
-            
+            {this.ports.output.main.map(group => <ConnectorGroup group={group} />)}
           </div>
         </div>
       </div>

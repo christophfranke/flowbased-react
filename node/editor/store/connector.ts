@@ -16,7 +16,7 @@ export default class ConnectorFunctions {
   }
 
   @transformer
-  connectors(node: Node): Ports {
+  ports(node: Node): Ports {
     const ports: Ports = {
       node,
       input: {
@@ -45,6 +45,10 @@ export default class ConnectorFunctions {
       function: 'output',
       direction: { x: 0, y: 1 },
     }
+
+    group.connectors = [{
+      group
+    }]
 
     return group
   }
