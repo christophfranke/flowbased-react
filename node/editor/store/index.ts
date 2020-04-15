@@ -61,18 +61,18 @@ class Store {
 
       // the connectors map reassures that strict equality comparisions
       // work because two connections with the same id will be the same objects
-      const connectorsMap = store.connectors.reduce((obj, connector) => ({
-        ...obj,
-        [connector.id]: connector
-      }), {})
+      // const connectorsMap = store.connectors.reduce((obj, connector) => ({
+      //   ...obj,
+      //   [connector.id]: connector
+      // }), {})
 
       // take the connectors from the map
       const connections = load(['editor', 'connections']) || []
-      store.connections = connections.map(connection => ({
-        ...connection,
-        from: connectorsMap[connection.from.id],
-        to: connectorsMap[connection.to.id]
-      }))
+      // store.connections = connections.map(connection => ({
+      //   ...connection,
+      //   from: connectorsMap[connection.from.id],
+      //   to: connectorsMap[connection.to.id]
+      // }))
 
       store.currentId = load(['editor', 'uid']) || 0
 
@@ -169,14 +169,14 @@ class Store {
   }
 
   removeDuplicatePreviews = () => {
-    const previews = this.nodes.filter(node => node.type === 'Preview')
-    if (previews.length > 1) {
-      previews.reverse().forEach((preview, index) => {
-        if (index > 0) {
-          this.deleteNode(preview)
-        }
-      })
-    }
+    // const previews = this.nodes.filter(node => node.type === 'Preview')
+    // if (previews.length > 1) {
+    //   previews.reverse().forEach((preview, index) => {
+    //     if (index > 0) {
+    //       this.deleteNode(preview)
+    //     }
+    //   })
+    // }
   }
 }
 

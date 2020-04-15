@@ -124,32 +124,32 @@ export default class ConnectorFunctions {
     }
   }
 
-  createInput = (group: ConnectorGroup, overrides = {}): Connector => {
-    return {
-      id: this.store.uid(),
-      direction: { x: 0, y: -1 },
-      group,
-      ...overrides
-    }
-  }
+  // createInput = (group: ConnectorGroup, overrides = {}): Connector => {
+  //   return {
+  //     id: this.store.uid(),
+  //     direction: { x: 0, y: -1 },
+  //     group,
+  //     ...overrides
+  //   }
+  // }
 
-  createOutput = (): Connector => {
-    return {
-      id: this.store.uid(),
-      mode: 'multiple',
-      name: 'output',
-      function: 'output',
-      direction: { x: 0, y: 1 }
-    }
-  }
+  // createOutput = (): Connector => {
+  //   return {
+  //     id: this.store.uid(),
+  //     mode: 'multiple',
+  //     name: 'output',
+  //     function: 'output',
+  //     direction: { x: 0, y: 1 }
+  //   }
+  // }
 
-  createProperty = (name: string): Connector => {
-    return {
-      id: this.store.uid(),
-      mode: 'single',
-      function: 'property',
-      name,
-      direction: { x: -1, y: 0 }
-    }
-  }
+  // createProperty = (name: string): Connector => {
+  //   return {
+  //     id: this.store.uid(),
+  //     mode: 'single',
+  //     function: 'property',
+  //     name,
+  //     direction: { x: -1, y: 0 }
+  //   }
+  // }
 }

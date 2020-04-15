@@ -32,8 +32,8 @@ class Translator {
   }
 
   @computed get scope(): Scope {
-    const defines = () => this.editor.nodes.filter(node => node.type === 'Define')
-      .map(node => this.getNode(node))
+    // const defines = () => this.editor.nodes.filter(node => node.type === 'Define')
+    //   .map(node => this.getNode(node))
 
     return {    
       locals: {},
@@ -43,28 +43,24 @@ class Translator {
   }
 
   @computed get defines(): Node[] {
-    console.log('nodes', this.editor.nodes)
-    console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
-    return this.editor.nodes.filter(node => node.type === 'Define')
-      .map(node => this.getNode(node))
+    // console.log('nodes', this.editor.nodes)
+    // console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
+    // return this.editor.nodes.filter(node => node.type === 'Define')
+    //   .map(node => this.getNode(node))
+    return []
   }
 
   @transformer
   getConnections(connector: Editor.Connector): Editor.Connection[] {
-    return this.editor.connections
-      .filter(connection => connection.from.id === connector.id || connection.to.id === connector.id)
+    // return this.editor.connections
+    //   .filter(connection => connection.from.id === connector.id || connection.to.id === connector.id)
+    return []
   }
 
   @transformer
   static connectorsOfNode(node: Editor.Node): Editor.Connector[] {
     return []
     // return flatten(Object.values(node.connectors))
-  }
-
-  @transformer
-  nodeOfConnector(connector: Editor.Connector): Editor.Node | undefined {
-    return this.editor.nodes.find(node => Translator.connectorsOfNode(node)
-      .some(con => con.id === connector.id))      
   }
 
   @transformer
@@ -79,17 +75,17 @@ class Translator {
   private getConnection(editorConnection: Editor.Connection, otherKey: 'from' | 'to'): Connection {
     const id = editorConnection.id
     const connector = editorConnection[otherKey]
-    const node = this.nodeOfConnector(connector)
-    if (!node) {
-      throw new Error('Cannot find node of connector')
-    }
 
     return {
       id: editorConnection.id,
-      node: this.getNode(node),
-      key: editorConnection.to.name === 'input'
-        ? ''
-        : editorConnection.to.name
+      src: {
+        node: this.getNode(editorConnection.from.group.ports.node),
+        key: editorConnection.from.group.key
+      },
+      target: {
+        node: this.getNode(editorConnection.to.group.ports.node),
+        key: editorConnection.to.group.key
+      }
     }
   }
 
@@ -117,8 +113,7 @@ class Translator {
       params: {},
       connections: {
         input: [],
-        output: [],
-        properties: []
+        output: []
       }
     }
     // const id = editorNode.id

@@ -5,7 +5,6 @@ import { observer, inject } from 'mobx-react'
 import { Node, Vector, ValueType, Connector, Parameter } from '@editor/types'
 
 import * as LA from '@editor/la'
-import ConnectorView from '@editor/components/connector'
 import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
 import Store from '@editor/store'
@@ -254,10 +253,10 @@ class NodeView extends React.Component<Props> {
     return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
-            {this.connectors.input.map(input => <ConnectorView key={input.id} connector={input} />)}
+            
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'props' }}>
-            {this.connectors.properties.map(property => <ConnectorView key={property.id} connector={property} />)}
+            
           </div>
           <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
@@ -286,7 +285,7 @@ class NodeView extends React.Component<Props> {
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
-            {this.connectors.output.map(output => <ConnectorView key={output.id} connector={output} />)}
+            
           </div>
         </div>
       </div>
