@@ -341,6 +341,7 @@ class EditorView extends React.Component {
       <Provider mouse={this.mouse} keys={this.keys}>
         <div style={innerStyle}>
           {this.store.nodes.map(node => <NodeView key={node.id} node={node} />)}
+          <PendingConnections />
         </div>
         {nodeList}
         {selectionRectangle}

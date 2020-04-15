@@ -16,7 +16,7 @@ class Store {
   node: NodeFunctions
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
-  @observable pendingConnector: Connector | null = null
+  @observable.ref pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
 

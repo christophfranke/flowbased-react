@@ -213,6 +213,16 @@ class ConnectorView extends React.Component<Props> {
     this.store.pendingConnector = this.props.connector    
   }
 
+  componentDidMount() {
+    const el = this.ref.current
+    if (el) {
+      this.props.connector.position = {
+        x: el.offsetLeft + 30,
+        y: el.offsetTop + 30
+      }
+    }
+  }
+
   render () {
     const style: React.CSSProperties = {
       cursor: this.cursor,

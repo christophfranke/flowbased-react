@@ -17,15 +17,19 @@ class PendingConnections extends React.Component {
   store = this.props['store']
 
   path(connector: Connector): string {
-    const node = this.store.nodeOfConnector(connector)
-    const start = LA.add(node!.position, connector.position!)
-    const end = this.mouse.position!
+    const node = connector.group.ports.node
+    if (connector.position) {    
+      const start = LA.add(node!.position, connector.position)
+      const end = this.mouse.position!
 
-    const diff = LA.subtract(end, start)
-    const factor = Math.max(Math.min(LA.distance(diff), BEZIER_DISTANCE), LA.product(diff, connector.direction))
-    const middle = LA.madd(start, factor, connector.direction)
+      const diff = LA.subtract(end, start)
+      const factor = Math.max(Math.min(LA.distance(diff), BEZIER_DISTANCE), LA.product(diff, connector.group.direction))
+      const middle = LA.madd(start, factor, connector.group.direction)
 
-    return `M${start.x} ${start.y} Q${middle.x} ${middle.y} ${end.x} ${end.y}`
+      return `M${start.x} ${start.y} Q${middle.x} ${middle.y} ${end.x} ${end.y}`
+    }
+
+    return ''
   }
 
   render () {
@@ -42,7 +46,7 @@ class PendingConnections extends React.Component {
 
     return <svg style={style}>
       <g stroke={colors.connections} strokeWidth="2" fill="none">
-        <path key={this.store.pendingConnector.id} d={this.path(this.store.pendingConnector)} />
+        <path d={this.path(this.store.pendingConnector)} />
       </g>
     </svg>
   }

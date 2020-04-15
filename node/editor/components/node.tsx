@@ -283,7 +283,7 @@ class NodeView extends React.Component<Props> {
             })}
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'output' }}>
-            {this.ports.output.main.map(group => <ConnectorGroup group={group} />)}
+            {this.ports.output.main.map(group => <ConnectorGroup key={group.key} group={group} />)}
           </div>
         </div>
       </div>

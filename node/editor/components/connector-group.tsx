@@ -19,7 +19,6 @@ class ConnectorGroupView extends React.Component<Props> {
   store: Store = this.props['store']
 
   render () {
-    console.log(this.props.group)
     return <div>
       {this.props.group.connectors.map((connector, index) => <ConnectorView key={index} connector={connector} />)}
     </div>
