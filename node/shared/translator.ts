@@ -108,8 +108,8 @@ class Translator {
   @transformer
   getNode(editorNode: Editor.Node): Node {
     return {
-      id: 1,
-      name: 'String',
+      id: editorNode.id,
+      type: editorNode.type,
       params: {},
       connections: {
         input: [],

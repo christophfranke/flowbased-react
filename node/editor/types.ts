@@ -2,11 +2,17 @@ import * as Engine from '@engine/types'
 
 import * as Core from '@engine/modules/core'
 
+export interface Module {
+  Type: Engine.ModuleTypes<string>
+  Node: Engine.ModuleNodes<string>
+  EditorNode: ModuleNodes<string>
+}
 export type ModuleNodes<NodeName extends keyof any> = {
   [key in NodeName]: NodeDefinition<key>
 }
 
-export interface NodeDefinition<T> {
+export interface NodeDefinition<T = string> {
+  type: string
   create: () => RawNode<T>
 }
 

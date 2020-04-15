@@ -31,6 +31,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   String: {
+    type: 'Value',
     create: () => ({
       name: 'String',
       type: 'String',
@@ -43,6 +44,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Number: {
+    type: 'Value',
     create: () => ({
       name: 'Number',
       type: 'Number',
@@ -55,6 +57,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Boolean: {
+    type: 'Value',
     create: () => ({
       name: 'Boolean',
       type: 'Boolean',

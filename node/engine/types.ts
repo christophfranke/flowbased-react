@@ -57,7 +57,7 @@ export interface Params {
 
 export interface Node {
   readonly id: number
-  readonly name: string
+  readonly type: string
   readonly params: Params
   connections: {
     readonly input: Connection[]

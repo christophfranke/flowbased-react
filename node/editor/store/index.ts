@@ -1,5 +1,5 @@
 import { observable, computed, autorun, action } from 'mobx'
-import { Connection, Node, Connector, ConnectorState } from '@editor/types'
+import { Connection, Node, Connector, ConnectorState, Module } from '@editor/types'
 import { sync, load } from '@shared/local-storage-sync'
 import Translator from '@shared/translator'
 import { Context } from '@engine/types'
@@ -20,15 +20,31 @@ class Store {
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
 
-  definitions = {
-    Node: {
-      ...Core.Node
-    },
-    Type: {
-      ...Core.Type
-    },
-    EditorNode: {
-      ...Core.EditorNode
+  modules = {
+    Core
+  }
+
+  @computed
+  get definitions(): Module {
+    return {
+      Node: {
+        ...Object.values(this.modules).reduce((all, module) => ({
+          ...all,
+          ...module.Node
+        }), {})
+      },
+      Type: {
+        ...Object.values(this.modules).reduce((all, module) => ({
+          ...all,
+          ...module.Type
+        }), {})
+      },
+      EditorNode: {
+        ...Object.values(this.modules).reduce((all, module) => ({
+          ...all,
+          ...module.EditorNode
+        }), {})
+      }
     }
   }
 

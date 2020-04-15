@@ -1,5 +1,5 @@
 import { computed } from 'mobx'
-import { Node, Vector } from '@editor/types'
+import { Node, Vector, NodeDefinition } from '@editor/types'
 
 import Store from '@editor/store'
 
@@ -28,12 +28,15 @@ export default class NodeFunctions {
   // }
 
   @computed get nodeList() {
-    return [{
-      name: 'String',
-      type: 'Value',
-      module: 'Core',
-      create: this.createStringNode.bind(this)
-    }].sort((a, b) => {
+   const list = Object.entries(this.store.definitions.EditorNode)
+      .map(([name, nodeDefinition]) => ({
+        name,
+        type: nodeDefinition.type,
+        module: 'Unknown',
+        create: position => this.createNode(position, nodeDefinition)
+      }));
+
+    return list.sort((a, b) => {
       if (a.type === b.type) {
         return a.name < b.name ? -1 : 1
       }
@@ -48,7 +51,15 @@ export default class NodeFunctions {
   //   return nameParam && nameParam.value
   // }
 
+  createNode(position: Vector, nodeDefinition: NodeDefinition): Node {
+    return {
+      ...nodeDefinition.create(),
+      position
+    } as Node    
+  }
+
   createStringNode(position: Vector): Node {
+    console.log(this.store.definitions.EditorNode.String.create())
     return {
       id: this.store.uid(),
       name: 'String',

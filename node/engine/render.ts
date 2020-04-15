@@ -5,11 +5,11 @@ import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
 import { matchInto, unionAll } from '@engine/type-functions'
 
 export const value = computedFn(function(node: Node, scope: Scope, key: string): any {
-  return scope.context.definitions.Node[node.name].value(node, scope, key)
+  return scope.context.definitions.Node[node.type].value(node, scope, key)
 })
 
 export const unmatchedType = computedFn(function(node: Node, context: Context, key: string): ValueType {
-  return context.definitions.Node[node.name].type.output![key](node, context)
+  return context.definitions.Node[node.type].type.output![key](node, context)
 })
 
 export const type = computedFn(function(node: Node, context: Context): ValueType {
@@ -32,5 +32,5 @@ export function expectedType(connection: Connection, context: Context): ValueTyp
   const target = connection.target.node
   const src = connection.src.node
 
-  return context.definitions.Node[target.name].type.input![key](target, context)
+  return context.definitions.Node[target.type].type.input![key](target, context)
 }
