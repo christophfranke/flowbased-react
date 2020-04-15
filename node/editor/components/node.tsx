@@ -37,7 +37,7 @@ class NodeView extends React.Component<Props> {
   }
 
   @computed get params(): Parameter[] {
-    return []
+    return this.props.node.params
   }
 
   // @computed get connectorRefs() {

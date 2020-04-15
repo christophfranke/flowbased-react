@@ -14,6 +14,11 @@ class NumberInput extends React.Component<Props> {
     e.stopPropagation()
   }
 
+  handleChange = e => {
+    // const value = parseFloat(e.target.value)
+    this.props.param.value = e.target.value
+  }
+
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
@@ -33,7 +38,7 @@ class NumberInput extends React.Component<Props> {
     const param = this.props.param
     return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <label style={labelStyle}>{param.name}</label>
-      <input type="number" style={inputStyle} value={param.value || ''} onChange={(e) => param.value = parseFloat(e.target.value)} onMouseDown={this.stop} />
+      <input type="number" style={inputStyle} value={param.value} onChange={this.handleChange} onMouseDown={this.stop} />
     </div>    
   }
 }

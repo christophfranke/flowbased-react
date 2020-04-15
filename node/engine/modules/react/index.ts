@@ -49,7 +49,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       params: [{
         name: 'Tag',
         key: 'tag',
-        value: '',
+        value: 'div',
         type: 'text'
       }],      
     })

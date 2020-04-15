@@ -23,28 +23,20 @@ const CONNECTION_STYLE = BEZIER_STYLE
 class ConnectionPath extends React.Component<Props> {
   store: Store = this.props['store']
 
-  @computed get fromNode(): Node | undefined {
-    return this.store.nodeOfConnector(this.props.connection.from)
+  @computed get fromNode(): Node {
+    return this.props.connection.from.group.ports.node
   }
 
-  @computed get toNode(): Node | undefined {
-    return this.store.nodeOfConnector(this.props.connection.to)
+  @computed get toNode(): Node {
+    return this.props.connection.to.group.ports.node
   }
 
   @computed get fromColor(): string {
-    if (!this.fromNode) {
-      return ''
-    }
-
     const node = this.store.translated.getNode(this.fromNode)
     return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get toColor(): string {
-    if (!this.toNode) {
-      return ''
-    }
-
     const node = this.store.translated.getNode(this.toNode)
     return colorOfType(type(node, this.store.context)).default
   }
@@ -70,9 +62,8 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   @computed get diff(): Vector | null {
-    const toNode = this.store.nodeOfConnector(this.props.connection.to)
-    if (toNode && this.props.connection.to.position) {
-      const toCoords = LA.add(toNode.position, this.props.connection.to.position)
+    if (this.props.connection.to.position) {
+      const toCoords = LA.add(this.toNode.position, this.props.connection.to.position)
       if (this.offset) {
         return LA.subtract(toCoords, this.offset)
       }
@@ -102,8 +93,8 @@ class ConnectionPath extends React.Component<Props> {
 
     if (this.diff) {
       const distance = LA.distance(this.diff)
-      const middle1 = LA.scale(distance / 2, this.props.connection.from.direction)
-      const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.direction)
+      const middle1 = LA.scale(distance / 2, this.props.connection.from.group.direction)
+      const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.group.direction)
 
       const v2 = middle1
       const v3 = middle2
