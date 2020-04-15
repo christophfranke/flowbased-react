@@ -109,7 +109,7 @@ class Translator {
   getNode(editorNode: Editor.Node): Node {
     return {
       id: 1,
-      name: 'Hi',
+      name: 'String',
       params: {},
       connections: {
         input: [],

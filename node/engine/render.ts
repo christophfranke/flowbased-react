@@ -4,17 +4,17 @@ import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
 
 import { matchInto, unionAll } from '@engine/type-functions'
 
-export const value = computedFn(function(node: Node, scope: Scope, key: string = ''): any {
+export const value = computedFn(function(node: Node, scope: Scope, key: string): any {
   return scope.context.definitions.Node[node.name].value(node, scope, key)
 })
 
-export const unmatchedType = computedFn(function(node: Node, context: Context, key: string = ''): ValueType {
-  return context.definitions.Node[node.name].type.output![key || 'output'](node, context)
+export const unmatchedType = computedFn(function(node: Node, context: Context, key: string): ValueType {
+  return context.definitions.Node[node.name].type.output![key](node, context)
 })
 
 export const type = computedFn(function(node: Node, context: Context): ValueType {
   return matchInto(
-    unmatchedType(node, context),
+    unmatchedType(node, context, 'output'),
     unionAll(node.connections.output.map(
       connection => expectedType(connection, context)),
     context),
