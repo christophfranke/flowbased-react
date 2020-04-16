@@ -27,10 +27,17 @@ export interface Vector {
   y: number
 }
 
+export interface ConnectorDescription<Function extends ConnectorFunction = ConnectorFunction> {
+  node: Node
+  key: string
+  slot: number
+  function: Function
+}
+
 export interface Connection {
   id: number
-  from: Connector
-  to: Connector
+  src: ConnectorDescription<'output'>
+  target: ConnectorDescription<'input'>
 }
 
 export interface Ports {

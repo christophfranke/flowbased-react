@@ -11,6 +11,8 @@ import { flatten, transformer } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
+import * as ObjectModule from '@engine/modules/object'
+import * as ArrayModule from '@engine/modules/array'
 
 class Store {
   connector: ConnectorFunctions
@@ -23,7 +25,9 @@ class Store {
 
   modules = {
     Core,
-    React
+    React,
+    ArrayModule,
+    ObjectModule
   }
 
   @computed
@@ -95,7 +99,7 @@ class Store {
       store.currentId = load(['editor', 'uid']) || 0
 
       // autosave immediately
-      // sync(['editor', 'connections'], store, 'connections')
+      sync(['editor', 'connections'], store, 'connections')
       sync(['editor', 'nodes'], store, 'nodes')
       sync(['editor', 'uid'], store, 'currentId')
 
@@ -118,8 +122,9 @@ class Store {
   @transformer
   getChildren(node: Node): Node[] {
     return this.connections
-      .filter(connection => connection.to.group.ports.node === node)
-      .map(connection => connection.from.group.ports.node)
+      .filter(connection => this.connector.connector(connection.src))
+      .filter(connection => this.connector.connector(connection.src)!.group.ports.node === node)
+      .map(connection => this.connector.connector(connection.target)!.group.ports.node)
   }
 
   @transformer
@@ -157,8 +162,10 @@ class Store {
   deleteNode(node: Node) {
     this.connections = this.connections
       .filter(connection =>
-        connection.from.group.ports.node !== node &&
-        connection.to.group.ports.node !== node)
+        this.connector.connector(connection.src) &&
+        this.connector.connector(connection.src)!.group.ports.node !== node &&
+        this.connector.connector(connection.target) &&
+        this.connector.connector(connection.target)!.group.ports.node !== node)
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
     //   this.pendingConnector = null
     // }

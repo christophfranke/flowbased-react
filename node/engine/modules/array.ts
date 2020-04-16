@@ -1,4 +1,5 @@
 import * as Engine from '@engine/types'
+import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
 import { intersectAll } from '@engine/type-functions'
@@ -31,6 +32,17 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         }
       }
     }
+  }
+}
+
+export const EditorNode: Editor.ModuleNodes<Nodes> = {
+  Array: {
+    type: 'Value',
+    create: () => ({
+      name: 'Array',
+      type: 'Array',
+      params: [],
+    })    
   }
 }
 

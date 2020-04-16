@@ -23,27 +23,52 @@ const CONNECTION_STYLE = BEZIER_STYLE
 class ConnectionPath extends React.Component<Props> {
   store: Store = this.props['store']
 
-  @computed get fromNode(): Node {
-    return this.props.connection.from.group.ports.node
+  @computed get srcConnector(): Connector | null {
+    return this.store.connector.connector(this.props.connection.src)
   }
 
-  @computed get toNode(): Node {
-    return this.props.connection.to.group.ports.node
+  @computed get srcNode(): Node {
+    return this.srcConnector!.group.ports.node
   }
+
+  @computed get srcPosition(): Vector | undefined {
+    return this.srcConnector!.position
+  }
+
+  @computed get srcDirection(): Vector {
+    return this.srcConnector!.group.direction
+  }
+
+  @computed get targetConnector(): Connector | null {
+    return this.store.connector.connector(this.props.connection.target)
+  }
+
+  @computed get targetNode(): Node {
+   return this.targetConnector!.group.ports.node 
+  }
+
+  @computed get targetPosition(): Vector | undefined {
+    return this.targetConnector!.position
+  }
+
+  @computed get targetDirection(): Vector {
+    return this.targetConnector!.group.direction
+  }
+
 
   @computed get fromColor(): string {
-    const node = this.store.translated.getNode(this.fromNode)
+    const node = this.store.translated.getNode(this.srcNode)
     return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get toColor(): string {
-    const node = this.store.translated.getNode(this.toNode)
+    const node = this.store.translated.getNode(this.targetNode)
     return colorOfType(type(node, this.store.context)).default
   }
 
   @computed get numScopeResolvers(): number {
-    return this.toNode
-      ? numScopeResolvers(this.store.translated.getNode(this.toNode))
+    return this.targetNode
+      ? numScopeResolvers(this.store.translated.getNode(this.targetNode))
       : 0
   }
 
@@ -54,16 +79,16 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   @computed get offset(): Vector | null {
-    if (this.fromNode && this.props.connection.from.position) {
-       return LA.add(this.fromNode.position, this.props.connection.from.position)
+    if (this.srcNode && this.srcPosition) {
+       return LA.add(this.srcNode.position, this.srcPosition)
     }
 
     return null
   }
 
   @computed get diff(): Vector | null {
-    if (this.props.connection.to.position) {
-      const toCoords = LA.add(this.toNode.position, this.props.connection.to.position)
+    if (this.targetPosition) {
+      const toCoords = LA.add(this.targetNode.position, this.targetPosition)
       if (this.offset) {
         return LA.subtract(toCoords, this.offset)
       }
@@ -93,8 +118,8 @@ class ConnectionPath extends React.Component<Props> {
 
     if (this.diff) {
       const distance = LA.distance(this.diff)
-      const middle1 = LA.scale(distance / 2, this.props.connection.from.group.direction)
-      const middle2 = LA.madd(this.diff, distance / 2, this.props.connection.to.group.direction)
+      const middle1 = LA.scale(distance / 2, this.srcDirection)
+      const middle2 = LA.madd(this.diff, distance / 2, this.targetDirection)
 
       const v2 = middle1
       const v3 = middle2
@@ -115,7 +140,7 @@ class ConnectionPath extends React.Component<Props> {
 
   render() {
     const diff = this.diff
-    if (!diff || !this.fromNode || !this.toNode) {
+    if (!diff || !this.srcNode || !this.targetNode) {
       return null
     }
 

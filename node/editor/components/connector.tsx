@@ -89,17 +89,22 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get type(): ValueType {
+    console.log('type', this.props.connector.group.ports.node.name)
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
+      console.log('output', type(node, this.store.context))
       return type(node, this.store.context)
     }
 
     if (this.props.connector.group.function === 'input') {
-      if (['input', 'property'].includes(this.props.connector.group.function)) {        
-        if (this.connections.length === 1) {
+      console.log('input', this.connections.length)
+      if (this.connections.length === 1) {
+        const connector = this.store.connector.connector(this.connections[0].src)
+        if (connector) {
+          const node = connector.group.ports.node        
           return type(
-            this.store.translated.getNode(this.connections[0].from.group.ports.node),
+            this.store.translated.getNode(node),
             this.store.context
            )
         }
@@ -132,36 +137,36 @@ class ConnectorView extends React.Component<Props> {
   }
 
   connect() {
-    if (this.store.pendingConnector) {
-      const from = this.store.connector.isSrc(this.store.pendingConnector.group)
-        ? this.store.pendingConnector
-        : this.props.connector
-      const to = this.store.connector.isSrc(this.store.pendingConnector.group)
-        ? this.props.connector
-        : this.store.pendingConnector
+    // if (this.store.pendingConnector) {
+    //   const from = this.store.connector.isSrc(this.store.pendingConnector.group)
+    //     ? this.store.pendingConnector
+    //     : this.props.connector
+    //   const to = this.store.connector.isSrc(this.store.pendingConnector.group)
+    //     ? this.props.connector
+    //     : this.store.pendingConnector
 
-      const connection: Connection = {
-        id: this.store.uid(),
-        from,
-        to
-      }
+    //   const connection: Connection = {
+    //     id: this.store.uid(),
+    //     from,
+    //     to
+    //   }
 
-      this.store.connections.push(connection)
-    }
+    //   this.store.connections.push(connection)
+    // }
   }
 
   unconnect(): Connector | null {
-    console.log('unconnect')
-    const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
-    if (connection) {
-      const other = connection.from === this.props.connector
-        ? connection.to
-        : connection.from
+    // console.log('unconnect')
+    // const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
+    // if (connection) {
+    //   const other = connection.from === this.props.connector
+    //     ? connection.to
+    //     : connection.from
 
-      this.store.connections = this.store.connections.filter(con => con !== connection)
+    //   this.store.connections = this.store.connections.filter(con => con !== connection)
 
-      return other
-    }
+    //   return other
+    // }
 
     return null
   }

@@ -57,14 +57,4 @@ export default class NodeFunctions {
       position
     } as Node    
   }
-
-  createStringNode(position: Vector): Node {
-    console.log(this.store.definitions.EditorNode.String.create())
-    return {
-      id: this.store.uid(),
-      name: 'String',
-      type: 'String',
-      position
-    } as Node
-  }
 }

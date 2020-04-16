@@ -7,6 +7,8 @@ import { flatten, transformer } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
+import * as ObjectModule from '@engine/modules/object'
+import * as ArrayModule from '@engine/modules/array'
 
 interface EditorGraph {
   nodes: Editor.Node[]
@@ -21,7 +23,9 @@ class Translator {
 
   modules = {
     Core,
-    React
+    React,
+    ArrayModule,
+    ObjectModule
   }
 
   @computed
@@ -80,47 +84,47 @@ class Translator {
     // return flatten(Object.values(node.connectors))
   }
 
-  @transformer
-  getConnectionFrom(editorConnection: Editor.Connection) {
-    return this.getConnection(editorConnection, 'from')
-  }
-  @transformer
-  getConnectionTo(editorConnection: Editor.Connection) {
-    return this.getConnection(editorConnection, 'to')
-  }
+  // @transformer
+  // getConnectionFrom(editorConnection: Editor.Connection) {
+  //   return this.getConnection(editorConnection, 'from')
+  // }
+  // @transformer
+  // getConnectionTo(editorConnection: Editor.Connection) {
+  //   return this.getConnection(editorConnection, 'to')
+  // }
 
-  private getConnection(editorConnection: Editor.Connection, otherKey: 'from' | 'to'): Connection {
-    const id = editorConnection.id
-    const connector = editorConnection[otherKey]
+  // private getConnection(editorConnection: Editor.Connection, otherKey: 'from' | 'to'): Connection {
+  //   const id = editorConnection.id
+  //   const connector = editorConnection[otherKey]
 
-    return {
-      id: editorConnection.id,
-      src: {
-        node: this.getNode(editorConnection.from.group.ports.node),
-        key: editorConnection.from.group.key
-      },
-      target: {
-        node: this.getNode(editorConnection.to.group.ports.node),
-        key: editorConnection.to.group.key
-      }
-    }
-  }
+  //   return {
+  //     id: editorConnection.id,
+  //     src: {
+  //       node: this.getNode(editorConnection.from.group.ports.node),
+  //       key: editorConnection.from.group.key
+  //     },
+  //     target: {
+  //       node: this.getNode(editorConnection.to.group.ports.node),
+  //       key: editorConnection.to.group.key
+  //     }
+  //   }
+  // }
 
-  @transformer
-  getConnectionsOfConnectorsForInputs(connectorGroup: Editor.Connector[]): Connection[] {
-    return this.getConnectionsOfConnectors(connectorGroup, 'from')
-  }
-  @transformer
-  getConnectionsOfConnectorsForOutput(connectorGroup: Editor.Connector[]): Connection[] {
-    return this.getConnectionsOfConnectors(connectorGroup, 'to')
-  }
+  // @transformer
+  // getConnectionsOfConnectorsForInputs(connectorGroup: Editor.Connector[]): Connection[] {
+  //   return this.getConnectionsOfConnectors(connectorGroup, 'from')
+  // }
+  // @transformer
+  // getConnectionsOfConnectorsForOutput(connectorGroup: Editor.Connector[]): Connection[] {
+  //   return this.getConnectionsOfConnectors(connectorGroup, 'to')
+  // }
 
-  private getConnectionsOfConnectors(connectorGroup: Editor.Connector[], otherKey: 'from' | 'to'): Connection[] {
-    return flatten(connectorGroup.map(connector => this.getConnections(connector)))
-      .map(editorConnection => otherKey === 'from'
-        ? this.getConnectionFrom(editorConnection)
-        : this.getConnectionTo(editorConnection))
-  }
+  // private getConnectionsOfConnectors(connectorGroup: Editor.Connector[], otherKey: 'from' | 'to'): Connection[] {
+  //   return flatten(connectorGroup.map(connector => this.getConnections(connector)))
+  //     .map(editorConnection => otherKey === 'from'
+  //       ? this.getConnectionFrom(editorConnection)
+  //       : this.getConnectionTo(editorConnection))
+  // }
 
   @transformer
   getNode(editorNode: Editor.Node): Node {

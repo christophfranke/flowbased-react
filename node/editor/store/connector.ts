@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx'
 
-import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ValueType, Node } from '@editor/types'
+import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
@@ -13,6 +13,19 @@ export default class ConnectorFunctions {
   store: Store
   constructor(store: Store) {
     this.store = store
+  }
+
+  @transformer
+  connector(description: ConnectorDescription): Connector | null {
+    const ports = this.ports(description.node)
+    const group = [...ports[description.function].main, ...ports[description.function].side]
+      .find(group => group.key === description.key)
+
+    if (group) {
+      return group.connectors[description.slot]
+    }
+
+    return null
   }
 
   @transformer
@@ -122,7 +135,9 @@ export default class ConnectorFunctions {
   @transformer
   getConnections(connector: Connector): Connection[] {
     return this.store.connections
-      .filter(connection => connection.from === connector || connection.to === connector)
+      .filter(connection =>
+        this.store.connector.connector(connection.src) === connector ||
+        this.store.connector.connector(connection.target) === connector)
   }
 
   @transformer
