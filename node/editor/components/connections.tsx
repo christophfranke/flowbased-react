@@ -140,7 +140,7 @@ class ConnectionPath extends React.Component<Props> {
 
   render() {
     const diff = this.diff
-    if (!diff || !this.srcNode || !this.targetNode) {
+    if (!diff || !this.srcConnector || !this.targetConnector) {
       return null
     }
 

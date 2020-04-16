@@ -17,7 +17,13 @@ export default class ConnectorFunctions {
 
   @transformer
   connector<F extends ConnectorFunction>(description: ConnectorDescription<F>): Connector<F> | null {
-    const ports = this.ports(description.node)
+    const node = this.store.getNodeById(description.nodeId)
+    if (!node) {
+      console.warn('node not found', description)
+      return null
+    }
+
+    const ports = this.ports(node)
     const group = [...ports[description.function].main, ...ports[description.function].side]
       .find(group => group.key === description.key)
 
@@ -30,7 +36,7 @@ export default class ConnectorFunctions {
 
   description<F extends ConnectorFunction>(connector: Connector<F>): ConnectorDescription<F> {
     return {
-      node: connector.group.ports.node,
+      nodeId: connector.group.ports.node.id,
       key: connector.group.key,
       slot: connector.group.connectors.indexOf(connector),
       function: connector.group.function as F
@@ -38,7 +44,7 @@ export default class ConnectorFunctions {
   }
 
   areSame(one: ConnectorDescription, other: ConnectorDescription): boolean {
-    return one.node === other.node
+    return one.nodeId === other.nodeId
       && one.key === other.key
       && one.slot === other.slot
       && one.function === other.function

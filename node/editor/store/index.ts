@@ -89,7 +89,7 @@ class Store {
       // }), {})
 
       // take the connectors from the map
-      const connections = load(['editor', 'connections']) || []
+      store.connections = load(['editor', 'connections']) || []
       // store.connections = connections.map(connection => ({
       //   ...connection,
       //   from: connectorsMap[connection.from.id],

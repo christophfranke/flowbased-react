@@ -28,7 +28,7 @@ export interface Vector {
 }
 
 export interface ConnectorDescription<Function extends ConnectorFunction = ConnectorFunction> {
-  node: Node
+  nodeId: number
   key: string
   slot: number
   function: Function

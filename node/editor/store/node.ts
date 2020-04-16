@@ -54,6 +54,7 @@ export default class NodeFunctions {
   createNode(position: Vector, nodeDefinition: NodeDefinition): Node {
     return {
       ...nodeDefinition.create(),
+      id: this.store.uid(),
       position
     } as Node    
   }
