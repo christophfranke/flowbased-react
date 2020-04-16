@@ -43,6 +43,14 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Tag: {
     type: 'Component',
+    ports: {
+      input: {
+        input: ['duplicate'],
+        classList: ['side'],
+        style: ['side'],
+        props: ['side']
+      }
+    },
     create: () => ({
       name: 'JSX Element',
       type: 'Tag',
@@ -61,7 +69,8 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'Preview',
       params: [],
     })
-  }}
+  }
+}
 
 export type Types = 'Element'
 export const Type: Engine.ModuleTypes<Types> = {

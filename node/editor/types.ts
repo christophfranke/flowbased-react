@@ -11,8 +11,15 @@ export type ModuleNodes<NodeName extends keyof any> = {
 
 export interface NodeDefinition<T = string> {
   type: string
+  ports?: {
+    [key in ConnectorFunction]?: {
+      [key: string]: ConnectorOption[]
+    }
+  }
   create: () => RawNode<T>
 }
+
+export type ConnectorOption = 'side' | 'duplicate' | 'hidden'
 
 export type ValueType = Engine.ValueType
 export interface Rectangle {

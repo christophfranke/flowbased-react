@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx'
 
-import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ConnectorFunction, ValueType, Node } from '@editor/types'
+import { Connector, ConnectorOption, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ConnectorFunction, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
@@ -34,6 +34,7 @@ export default class ConnectorFunctions {
     return null
   }
 
+  @transformer
   description<F extends ConnectorFunction>(connector: Connector<F>): ConnectorDescription<F> {
     return {
       nodeId: connector.group.ports.node.id,
@@ -48,6 +49,18 @@ export default class ConnectorFunctions {
       && one.key === other.key
       && one.slot === other.slot
       && one.function === other.function
+  }
+
+  connectorOptions(node: Node, fn: ConnectorFunction, key: string): ConnectorOption[] {
+    const portConfig = this.store.definitions.EditorNode[node.type].ports
+    if (portConfig) {
+      const fnConfig = portConfig[fn]
+      if (fnConfig) {
+        return fnConfig[key] || []
+      }
+    }
+
+    return []
   }
 
   @transformer
@@ -65,7 +78,12 @@ export default class ConnectorFunctions {
     })
 
     ports.input.main = Object.keys(this.store.definitions.Node[node.type].type.input || {})
+      .filter(key => !this.connectorOptions(node, 'input', key).includes('side'))
       .map(key => this.createInput(key, ports))
+
+    ports.input.side = Object.keys(this.store.definitions.Node[node.type].type.input || {})
+      .filter(key => this.connectorOptions(node, 'input', key).includes('side'))
+      .map(key => this.createProperty(key, ports))
 
     ports.output.main = Object.keys(this.store.definitions.Node[node.type].type.output || {})
       .map(key => this.createOutput(key, ports))
@@ -79,9 +97,27 @@ export default class ConnectorFunctions {
       ports,
       connectors: [],
       mode: 'single',
-      name: 'input',
+      name: key,
       function: 'input',
       direction: { x: 0, y: -1 },
+    })
+
+    group.connectors = [{
+      group
+    }]
+
+    return group
+  }
+
+  createProperty = (key: string, ports: Ports): ConnectorGroup<'input', 'single'> => {
+    const group: ConnectorGroup<'input', 'single'> = observable({
+      key,
+      ports,
+      connectors: [],
+      mode: 'single',
+      name: key,
+      function: 'input',
+      direction: { x: -1, y: 0 },
     })
 
     group.connectors = [{
@@ -126,6 +162,7 @@ export default class ConnectorFunctions {
     return !!src && !!dest && this.store.getSubtree(src).includes(dest)
   }
 
+  @transformer
   isSrc(group: ConnectorGroup): group is ConnectorGroup<'output'> {
     return group.function === 'output'
   }

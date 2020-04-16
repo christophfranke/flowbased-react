@@ -2,7 +2,7 @@ import React from 'react'
 import { observable, computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Connector, ConnectorState, Connection, Vector, Node, ValueType } from '@editor/types'
+import { Connector, ConnectorState, ConnectorGroup, Connection, Vector, Node, ValueType } from '@editor/types'
 
 import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
@@ -284,7 +284,7 @@ class ConnectorView extends React.Component<Props> {
         display: 'none'
       }
 
-    const arrow = ['input', 'output'].includes(this.props.connector.group.function)
+    const arrow = [...this.props.connector.group.ports.input.main, ...this.props.connector.group.ports.output.main].includes(this.props.connector.group)
       ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
       : <RightArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
 
