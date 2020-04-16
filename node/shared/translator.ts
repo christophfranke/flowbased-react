@@ -78,53 +78,7 @@ class Translator {
     return []
   }
 
-  @transformer
-  static connectorsOfNode(node: Editor.Node): Editor.Connector[] {
-    return []
-    // return flatten(Object.values(node.connectors))
-  }
 
-  // @transformer
-  // getConnectionFrom(editorConnection: Editor.Connection) {
-  //   return this.getConnection(editorConnection, 'from')
-  // }
-  // @transformer
-  // getConnectionTo(editorConnection: Editor.Connection) {
-  //   return this.getConnection(editorConnection, 'to')
-  // }
-
-  // private getConnection(editorConnection: Editor.Connection, otherKey: 'from' | 'to'): Connection {
-  //   const id = editorConnection.id
-  //   const connector = editorConnection[otherKey]
-
-  //   return {
-  //     id: editorConnection.id,
-  //     src: {
-  //       node: this.getNode(editorConnection.from.group.ports.node),
-  //       key: editorConnection.from.group.key
-  //     },
-  //     target: {
-  //       node: this.getNode(editorConnection.to.group.ports.node),
-  //       key: editorConnection.to.group.key
-  //     }
-  //   }
-  // }
-
-  // @transformer
-  // getConnectionsOfConnectorsForInputs(connectorGroup: Editor.Connector[]): Connection[] {
-  //   return this.getConnectionsOfConnectors(connectorGroup, 'from')
-  // }
-  // @transformer
-  // getConnectionsOfConnectorsForOutput(connectorGroup: Editor.Connector[]): Connection[] {
-  //   return this.getConnectionsOfConnectors(connectorGroup, 'to')
-  // }
-
-  // private getConnectionsOfConnectors(connectorGroup: Editor.Connector[], otherKey: 'from' | 'to'): Connection[] {
-  //   return flatten(connectorGroup.map(connector => this.getConnections(connector)))
-  //     .map(editorConnection => otherKey === 'from'
-  //       ? this.getConnectionFrom(editorConnection)
-  //       : this.getConnectionTo(editorConnection))
-  // }
   getEditorNode(id: number): Editor.Node {
     const node = this.editor.nodes.find(node => node.id === id)
     if (node) {
@@ -177,14 +131,25 @@ class Translator {
   }
 
   @transformer
+  getParams(editorNode: Editor.Node): { [key: string]: any } {
+    return editorNode.params.reduce((obj, param) => ({
+      ...obj,
+      [param.key]: param.value
+    }), {})
+  }
+
+  @transformer
   getNode(editorNode: Editor.Node): Node {
     const getInputs = () => this.getInputs(editorNode)
     const getOutputs = () => this.getOutputs(editorNode)
+    const getParams = () => this.getParams(editorNode)
 
     return {
       id: editorNode.id,
       type: editorNode.type,
-      params: {},
+      get params() {
+        return getParams()
+      },
       connections: {
         get input() {
           return getInputs()
