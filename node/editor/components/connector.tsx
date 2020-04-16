@@ -137,36 +137,36 @@ class ConnectorView extends React.Component<Props> {
   }
 
   connect() {
-    // if (this.store.pendingConnector) {
-    //   const from = this.store.connector.isSrc(this.store.pendingConnector.group)
-    //     ? this.store.pendingConnector
-    //     : this.props.connector
-    //   const to = this.store.connector.isSrc(this.store.pendingConnector.group)
-    //     ? this.props.connector
-    //     : this.store.pendingConnector
+    if (this.store.pendingConnector) {
+      const from = this.store.connector.isSrc(this.store.pendingConnector.group)
+        ? this.store.pendingConnector
+        : this.props.connector
+      const to = this.store.connector.isSrc(this.store.pendingConnector.group)
+        ? this.props.connector
+        : this.store.pendingConnector
 
-    //   const connection: Connection = {
-    //     id: this.store.uid(),
-    //     from,
-    //     to
-    //   }
+      const connection: Connection = {
+        id: this.store.uid(),
+        src: this.store.connector.description<'output'>(from),
+        target: this.store.connector.description<'input'>(to)
+      }
 
-    //   this.store.connections.push(connection)
-    // }
+      this.store.connections.push(connection)
+    }
   }
 
   unconnect(): Connector | null {
-    // console.log('unconnect')
-    // const connection = this.connections.find(con => con.from === this.props.connector || con.to === this.props.connector)
-    // if (connection) {
-    //   const other = connection.from === this.props.connector
-    //     ? connection.to
-    //     : connection.from
+    const connections = this.store.connector.getConnections(this.props.connector)
+    if (connections.length > 0) {
+      const connection = connections[0]
+      const other = this.props.connector.group.function === 'input'
+        ? this.store.connector.connector(connection.src)
+        : this.store.connector.connector(connection.target)
 
-    //   this.store.connections = this.store.connections.filter(con => con !== connection)
+      this.store.connections = this.store.connections.filter(con => con !== connection)
 
-    //   return other
-    // }
+      return other
+    }
 
     return null
   }

@@ -65,8 +65,8 @@ export interface ConnectorGroup<Function extends ConnectorFunction = ConnectorFu
 export type ConnectorFunction = 'input' | 'output'
 export type ConnectorState = 'default' | 'hot' | 'pending'
 export type ConnectorMode = 'single' | 'multiple' | 'duplicate'
-export interface Connector {
-  group: ConnectorGroup
+export interface Connector<Function extends ConnectorFunction = ConnectorFunction> {
+  group: ConnectorGroup<Function>
   position?: Vector
 }
 

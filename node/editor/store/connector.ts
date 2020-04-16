@@ -1,6 +1,6 @@
 import { computed, observable } from 'mobx'
 
-import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ValueType, Node } from '@editor/types'
+import { Connector, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ConnectorFunction, ValueType, Node } from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
@@ -16,7 +16,7 @@ export default class ConnectorFunctions {
   }
 
   @transformer
-  connector(description: ConnectorDescription): Connector | null {
+  connector<F extends ConnectorFunction>(description: ConnectorDescription<F>): Connector<F> | null {
     const ports = this.ports(description.node)
     const group = [...ports[description.function].main, ...ports[description.function].side]
       .find(group => group.key === description.key)
@@ -26,6 +26,22 @@ export default class ConnectorFunctions {
     }
 
     return null
+  }
+
+  description<F extends ConnectorFunction>(connector: Connector<F>): ConnectorDescription<F> {
+    return {
+      node: connector.group.ports.node,
+      key: connector.group.key,
+      slot: connector.group.connectors.indexOf(connector),
+      function: connector.group.function as F
+    }
+  }
+
+  areSame(one: ConnectorDescription, other: ConnectorDescription): boolean {
+    return one.node === other.node
+      && one.key === other.key
+      && one.slot === other.slot
+      && one.function === other.function
   }
 
   @transformer
@@ -136,8 +152,8 @@ export default class ConnectorFunctions {
   getConnections(connector: Connector): Connection[] {
     return this.store.connections
       .filter(connection =>
-        this.store.connector.connector(connection.src) === connector ||
-        this.store.connector.connector(connection.target) === connector)
+        this.areSame(connection.src, this.description(connector)) ||
+        this.areSame(connection.target, this.description(connector)))
   }
 
   @transformer
