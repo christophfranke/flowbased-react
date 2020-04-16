@@ -122,9 +122,9 @@ class Store {
   @transformer
   getChildren(node: Node): Node[] {
     return this.connections
-      .filter(connection => this.connector.connector(connection.src))
-      .filter(connection => this.connector.connector(connection.src)!.group.ports.node === node)
-      .map(connection => this.connector.connector(connection.target)!.group.ports.node)
+      .filter(connection => this.connector.connector(connection.target))
+      .filter(connection => this.connector.connector(connection.target)!.group.ports.node === node)
+      .map(connection => this.connector.connector(connection.src)!.group.ports.node)
   }
 
   @transformer

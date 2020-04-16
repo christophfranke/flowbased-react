@@ -135,7 +135,7 @@ export default class ConnectorFunctions {
     const dest = this.isSrc(pending.group) ? possiblyHot : pending
 
     return src !== dest
-      // && !this.willProduceLoop(this.store.nodeOfConnector(src), this.store.nodeOfConnector(dest))
+      && !this.willProduceLoop(src.group.ports.node, dest.group.ports.node)
       && !(src.group.mode === 'multiple' && dest.group.mode === 'multiple')
       && this.valuesAreCompatible(src.group, dest.group)
   }
