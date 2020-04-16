@@ -171,9 +171,7 @@ export default class ConnectorFunctions {
       this.store.context
     )
 
-    console.warn('valuesAreCompatible not implemented anymore')
-    // return canMatch(srcType, targetType)
-    return true
+    return canMatch(srcType, targetType, this.store.context)
   }
 
   willProduceLoop(src?: Node, dest?: Node): boolean {
