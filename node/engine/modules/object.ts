@@ -3,11 +3,11 @@ import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
-import { intersectAll } from '@engine/type-functions'
+import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 import * as Core from '@engine/modules/core'
 
-export type Nodes = 'Object'
+export type Nodes = 'Object' | 'Pair'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {
     value: (node: Engine.Node, scope: Engine.Scope) => inputs(node)
@@ -38,7 +38,25 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         // : Type.Pair(Type.Unresolved)
       }
     }
-  }
+  },
+  Pair: {
+    value: (node: Engine.Node, scope: Engine.Scope) => ({
+      key: node.params.key.trim(),
+      value: inputs(node).length > 0
+        ? value(inputs(node)[0].node, scope, inputs(node)[0].key)
+        : createEmptyValue(type(node, scope.context).params.value)
+    }),
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => Type.Pair.create(inputs(node).length > 0
+          ? unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
+          : Core.Type.Unresolved.create())
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => type(node, context).params.value
+      }
+    }
+  },
 }
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
@@ -55,19 +73,19 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       params: [],
     })    
   },
-  // Pair: {
-  //   type: 'Value',
-  //   create: () => ({
-  //     name: 'Pair',
-  //     type: 'Pair',
-  //     params: [{
-  //       name: 'Key',
-  //       key: 'key',
-  //       value: '',
-  //       type: 'text'
-  //     }],
-  //   })    
-  // }
+  Pair: {
+    type: 'Value',
+    create: () => ({
+      name: 'Pair',
+      type: 'Pair',
+      params: [{
+        name: 'Key',
+        key: 'key',
+        value: '',
+        type: 'text'
+      }],
+    })    
+  }
 }
 
 export type Types = 'Object' | 'Pair'
