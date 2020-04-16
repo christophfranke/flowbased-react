@@ -96,14 +96,14 @@ class ConnectorView extends React.Component<Props> {
     }
 
     if (this.props.connector.group.function === 'input') {
-    // if (['input', 'property'].includes(this.props.connector.function)) {        
-    //   if (this.connections.length === 1) {
-    //     const otherEditorNode = this.store.nodeOfConnector(this.connections[0].from)
-    //     if (otherEditorNode) {
-    //       return type(this.store.translated.getNode(otherEditorNode), this.store.context)
-    //     }
-    //   }
-    // }
+      if (['input', 'property'].includes(this.props.connector.group.function)) {        
+        if (this.connections.length === 1) {
+          return type(
+            this.store.translated.getNode(this.connections[0].from.group.ports.node),
+            this.store.context
+           )
+        }
+      }
 
       return expectedType(node, this.props.connector.group.key, this.store.context)
     }

@@ -124,6 +124,7 @@ export default class ConnectorFunctions {
     return this.store.connections
       .filter(connection => connection.from === connector || connection.to === connector)
   }
+
   @transformer
   countConnections(connector: Connector): number {
     return this.getConnections(connector).length
