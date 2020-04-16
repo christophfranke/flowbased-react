@@ -89,16 +89,13 @@ class ConnectorView extends React.Component<Props> {
   }
 
   @computed get type(): ValueType {
-    console.log('type', this.props.connector.group.ports.node.name)
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
-      console.log('output', type(node, this.store.context))
       return type(node, this.store.context)
     }
 
     if (this.props.connector.group.function === 'input') {
-      console.log('input', this.connections.length)
       if (this.connections.length === 1) {
         const connector = this.store.connector.connector(this.connections[0].src)
         if (connector) {
@@ -215,7 +212,7 @@ class ConnectorView extends React.Component<Props> {
     this.store.pendingConnector = this.props.connector    
   }
 
-  componentDidMount() {
+  updatePosition() {
     const el = this.ref.current
     if (el) {
       this.props.connector.position = {
@@ -223,6 +220,14 @@ class ConnectorView extends React.Component<Props> {
         y: el.offsetTop + 30
       }
     }
+  }
+
+  componentDidMount() {
+    this.updatePosition()
+  }
+
+  componentDidUpdate() {
+    this.updatePosition()
   }
 
   render () {
@@ -287,7 +292,6 @@ class ConnectorView extends React.Component<Props> {
     const arrow = [...this.props.connector.group.ports.input.main, ...this.props.connector.group.ports.output.main].includes(this.props.connector.group)
       ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
       : <RightArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
-
 
     return <div ref={this.ref} style={style} onClick={this.handleClick} onMouseDown={this.consume} onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
       <div style={titleStyle}>{this.nameDisplay}</div>

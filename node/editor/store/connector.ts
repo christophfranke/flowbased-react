@@ -79,7 +79,13 @@ export default class ConnectorFunctions {
 
     ports.input.main = Object.keys(this.store.definitions.Node[node.type].type.input || {})
       .filter(key => !this.connectorOptions(node, 'input', key).includes('side'))
-      .map(key => this.createInput(key, ports))
+      .map(key => this.createInput(
+        key,
+        ports,
+        this.connectorOptions(node, 'input', key).includes('duplicate')
+          ? 'duplicate'
+          : 'single'
+        ))
 
     ports.input.side = Object.keys(this.store.definitions.Node[node.type].type.input || {})
       .filter(key => this.connectorOptions(node, 'input', key).includes('side'))
@@ -91,20 +97,32 @@ export default class ConnectorFunctions {
     return ports
   }
 
-  createInput = (key: string, ports: Ports): ConnectorGroup<'input', 'single'> => {
-    const group: ConnectorGroup<'input', 'single'> = observable({
+  createInput = (key: string, ports: Ports, mode: 'duplicate' | 'single'): ConnectorGroup<'input', 'single' | 'duplicate'> => {
+    const group: ConnectorGroup<'input', 'single' | 'duplicate'> = observable({
       key,
       ports,
       connectors: [],
-      mode: 'single',
+      mode,
       name: key,
       function: 'input',
       direction: { x: 0, y: -1 },
     })
 
-    group.connectors = [{
-      group
-    }]
+    if (mode === 'single') {    
+      group.connectors = [{
+        group
+      }]
+    }
+
+    if (mode === 'duplicate') {
+      const numConnectors = this.store.connections
+        .filter(connection => connection.target.nodeId === ports.node.id).length
+        + 1
+
+      group.connectors = Array(numConnectors).fill(0).map(() => ({
+        group
+      }))
+    }
 
     return group
   }

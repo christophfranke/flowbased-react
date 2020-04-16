@@ -11,6 +11,7 @@ import Store from '@editor/store'
 
 interface Props {
   group: ConnectorGroup
+  vertical?: boolean
 }
 
 @inject('store')
@@ -19,7 +20,11 @@ class ConnectorGroupView extends React.Component<Props> {
   store: Store = this.props['store']
 
   render () {
-    return <div>
+    const style = {
+      display: this.props.vertical ? 'block' : 'flex'
+    }
+
+    return <div style={style}>
       {this.props.group.connectors.map((connector, index) => <ConnectorView key={index} connector={connector} />)}
     </div>
   }
