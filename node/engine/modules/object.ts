@@ -44,6 +44,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Object: {
     type: 'Value',
+    ports: {
+      input: {
+        input: ['duplicate']
+      }
+    },
     create: () => ({
       name: 'Object',
       type: 'Object',

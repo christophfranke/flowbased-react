@@ -39,6 +39,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Array: {
     type: 'Value',
+    ports: {
+      input: {
+        input: ['duplicate']
+      }
+    },
     create: () => ({
       name: 'Array',
       type: 'Array',
