@@ -9,20 +9,24 @@ export type Nodes = 'Array'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Array: {
     value: (node: Engine.Node, current: Engine.Scope) =>
-      node.connections.input.map(connection => value(connection.node, current)),
+      node.connections.input.map(connection => value(connection.src.node, current, connection.src.key)),
     type: {
       output: {
-        output: (node: Engine.Node) => Type.Array.create(
-          intersectAll(node.connections.input.map(con => unmatchedType(con.node))))
+        output: (node: Engine.Node, context: Engine.Context) => Type.Array.create(
+          intersectAll(
+            node.connections.input.map(con => unmatchedType(con.src.node, context, con.src.key)),
+            context
+          )
+        )
       },
       input: {
-        input: (node: Engine.Node) => {
-          const nodeType = type(node)
+        input: (node: Engine.Node, context: Engine.Context) => {
+          const nodeType = type(node, context)
           if (nodeType.name === 'Unresolved') {
             return Core.Type.Unresolved.create()
           }
 
-          return type(node).params.items
+          return type(node, context).params.items
             || Core.Type.Mismatch.create(`Expected Array, got ${nodeType.name}`)
         }
       }

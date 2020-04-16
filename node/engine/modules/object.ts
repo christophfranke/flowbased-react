@@ -9,7 +9,7 @@ export type Nodes = 'Object'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {
     value: (node: Engine.Node, scope: Engine.Scope) => node.connections.input
-      .map(connection => value(connection.node, scope))
+      .map(connection => value(connection.src.node, scope, connection.src.key))
       .filter(pair => pair.key)
       .reduce((obj, pair) => ({
         ...obj,
@@ -19,9 +19,9 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(node.connections.input
           .map(connection => ({
-            key: connection.node.params.key.trim(),
-            type: unmatchedType(connection.node, context).params.value
-              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(connection.node, context).name}`)
+            key: connection.src.node.params.key.trim(),
+            type: unmatchedType(connection.src.node, context, connection.src.key).params.value
+              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(connection.src.node, context, connection.src.key).name}`)
           }))
           .filter(pair => pair.key)
           .reduce((obj, pair) => ({
