@@ -84,7 +84,7 @@ export interface RawNode<T> {
   params: Parameter[]  
 }
 
-export interface Node extends RawNode<Core.Nodes> {
+export interface Node extends RawNode<string> {
   id: number
   position: Vector
   boundingBox?: Rectangle

@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Node, Connection } from '@editor/types'
 import Translator from '@shared/translator'
 
-import { render } from '@engine/render'
+import { value } from '@engine/render'
 
 @inject('store')
 @observer
@@ -20,6 +20,7 @@ class Preview extends React.Component {
   @computed get preview(): Node | undefined {
     return this.store.nodes.find(node => node.type === 'Preview')
   }
+
   translator = new Translator(this.store)
 
   componentDidMount() {
@@ -35,7 +36,7 @@ class Preview extends React.Component {
       const root = this.translator.getNode(this.preview) 
            
       return <div style={{ overflowY: 'auto', height: '100%' }}>
-        {render(root, this.translator.scope)}
+        {value(root, this.translator.scope, 'output')}
       </div>
     }
 
