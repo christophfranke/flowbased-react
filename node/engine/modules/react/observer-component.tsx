@@ -1,10 +1,11 @@
 import React from 'react'
 import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
-import { Node, Scope, Connection } from '@engine/types'
+import { Node, Scope, Port, Connection } from '@engine/types'
 import { RenderProps, NodeProps } from './types'
 
 import { value, type } from '@engine/render'
+import { inputs } from '@engine/tree'
 import { contains } from '@engine/type-functions'
 import { transformer } from '@shared/util'
 
@@ -20,11 +21,11 @@ const HOC = (Component, scope: Scope) => {
   @observer
   class RenderComponent extends React.Component<NodeProps> {
     @transformer
-    getChild(input: Connection) {
-      const result = value(input.src.node, scope, input.src.key)
-      const nodeType = type(input.src.node, scope.context)
+    getChild(input: Port) {
+      const result = value(input.node, scope, input.key)
+      const nodeType = type(input.node, scope.context)
       if (contains(nodeType, 'Object') || contains(nodeType, 'Pair') || nodeType.name === 'Boolean') {
-        if (contains(type(input.src.node, scope.context), 'Element')) {
+        if (contains(type(input.node, scope.context), 'Element')) {
           return '{ Complex Object }'
         }
         return JSON.stringify(result)
@@ -34,7 +35,7 @@ const HOC = (Component, scope: Scope) => {
     }
 
     @computed get children() {
-      return this.props.node.connections.input.map(child => this.getChild(child))
+      return inputs(this.props.node).map(child => this.getChild(child))
     }
 
     // @computed get properties() {

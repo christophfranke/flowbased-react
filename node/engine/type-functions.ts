@@ -1,5 +1,5 @@
 import React from 'react'
-import { Node, ValueType, Context } from '@engine/types'
+import { ValueType, Context } from '@engine/types'
 
 import { expectedType } from '@engine/render'
 import { unique } from '@shared/util'

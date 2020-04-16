@@ -1,4 +1,4 @@
-import { Node } from '@engine/types'
+import { Node, Port } from '@engine/types'
 import { unique, flatten } from '@shared/util'
 
 interface NodeTree {
@@ -9,8 +9,7 @@ type NodeForest = NodeTree[]
 
 function children(node: Node): Node[] {
   return unique(
-    node.connections.input.map(con => con.node)
-      .concat(node.connections.properties.map(con => con.node))
+    flatten(Object.values(node.connections.input).map(group => group.map(con => con.src.node)))
   )  
 }
 
@@ -24,4 +23,14 @@ export function filteredSubForest(root: Node, condition: Condition): NodeForest 
   }
 
   return flatten(children(root).map(child => filteredSubForest(child, condition)))
+}
+
+export function outputs(node: Node): Port[] {
+  return flatten(Object.values(node.connections.output)
+    .map(group => group.map(connection => connection.target)))
+}
+
+export function inputs(node: Node): Port[] {
+  return flatten(Object.values(node.connections.input)
+    .map(group => group.map(connection => connection.src)))
 }

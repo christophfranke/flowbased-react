@@ -65,8 +65,12 @@ export interface Node {
   readonly type: string
   readonly params: Params
   connections: {
-    readonly input: Connection[]
-    readonly output: Connection[]
+    readonly input: {
+      [key: string]: Connection[]
+    }
+    readonly output: {
+      [key: string]: Connection[]
+    }
   }
 }
 

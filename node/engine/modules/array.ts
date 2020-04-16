@@ -2,6 +2,7 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
+import { inputs, outputs } from '@engine/tree'
 import { intersectAll } from '@engine/type-functions'
 
 import * as Core from '@engine/modules/core'
@@ -10,12 +11,12 @@ export type Nodes = 'Array'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Array: {
     value: (node: Engine.Node, current: Engine.Scope) =>
-      node.connections.input.map(connection => value(connection.src.node, current, connection.src.key)),
+      inputs(node).map(src => value(src.node, current, src.key)),
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => Type.Array.create(
           intersectAll(
-            node.connections.input.map(con => unmatchedType(con.src.node, context, con.src.key)),
+            inputs(node).map(src => unmatchedType(src.node, context, src.key)),
             context
           )
         )

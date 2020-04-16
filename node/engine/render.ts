@@ -1,6 +1,7 @@
 import React from 'react'
 import { computedFn } from 'mobx-utils'
 import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
+import { outputs } from '@engine/tree'
 
 import { matchInto, unionAll } from '@engine/type-functions'
 
@@ -12,11 +13,11 @@ export const unmatchedType = computedFn(function(node: Node, context: Context, k
   return context.definitions.Node[node.type].type.output![key](node, context)
 })
 
-export const type = computedFn(function(node: Node, context: Context): ValueType {
+export const type = computedFn(function(node: Node, context: Context, key: string = 'output'): ValueType {
   return matchInto(
-    unmatchedType(node, context, 'output'),
-    unionAll(node.connections.output.map(
-      connection => expectedType(connection.target.node, connection.target.key, context)),
+    unmatchedType(node, context, key),
+    unionAll(outputs(node).map(
+      target => expectedType(target.node, target.key, context)),
     context),
     context
   )

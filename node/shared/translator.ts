@@ -3,7 +3,7 @@ import { computed, observable } from 'mobx'
 import * as Editor from '@editor/types'
 
 import { Node, Connection, Scope, Context, Module } from '@engine/types'
-import { flatten, transformer } from '@shared/util'
+import { flatten, transformer, unique } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
@@ -125,16 +125,73 @@ class Translator {
   //       ? this.getConnectionFrom(editorConnection)
   //       : this.getConnectionTo(editorConnection))
   // }
+  getEditorNode(id: number): Editor.Node {
+    const node = this.editor.nodes.find(node => node.id === id)
+    if (node) {
+      return node
+    }
+
+    throw new Error(`Cannot find editor node with id ${id}`)
+  }
+
+  @transformer
+  getInputs(editorNode: Editor.Node): { [key: string]: Connection[] } {
+    const connections = this.editor.connections.filter(connection => connection.target.nodeId === editorNode.id)
+    return unique(connections.map(con => con.target.key))
+      .reduce((obj, key) => ({
+        [key]: connections.filter(con => con.target.key)
+          .sort((a, b) => a.target.slot - b.target.slot)
+          .map(connection => ({
+            id: connection.id,
+            src: {
+              key: connection.src.key,
+              node: this.getNode(this.getEditorNode(connection.src.nodeId))
+            },
+            target: {
+              key: connection.target.key,
+              node: this.getNode(this.getEditorNode(connection.target.nodeId))
+            }
+          }))
+      }), {})
+  }
+
+  @transformer
+  getOutputs(editorNode: Editor.Node): { [key: string]: Connection[] } {
+    const connections = this.editor.connections.filter(connection => connection.src.nodeId === editorNode.id)
+    return unique(connections.map(con => con.src.key))
+      .reduce((obj, key) => ({
+        [key]: connections.filter(con => con.src.key)
+          .sort((a, b) => a.src.slot - b.src.slot)
+          .map(connection => ({
+            id: connection.id,
+            src: {
+              key: connection.src.key,
+              node: this.getNode(this.getEditorNode(connection.src.nodeId))
+            },
+            target: {
+              key: connection.target.key,
+              node: this.getNode(this.getEditorNode(connection.target.nodeId))
+            }
+          }))
+      }), {})
+  }
 
   @transformer
   getNode(editorNode: Editor.Node): Node {
+    const getInputs = () => this.getInputs(editorNode)
+    const getOutputs = () => this.getOutputs(editorNode)
+
     return {
       id: editorNode.id,
       type: editorNode.type,
       params: {},
       connections: {
-        input: [],
-        output: []
+        get input() {
+          return getInputs()
+        },
+        get output() {
+          return getOutputs()
+        }
       }
     }
     // const id = editorNode.id

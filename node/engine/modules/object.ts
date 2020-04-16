@@ -2,6 +2,7 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
+import { inputs, outputs } from '@engine/tree'
 import { intersectAll } from '@engine/type-functions'
 
 import * as Core from '@engine/modules/core'
@@ -9,8 +10,8 @@ import * as Core from '@engine/modules/core'
 export type Nodes = 'Object'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {
-    value: (node: Engine.Node, scope: Engine.Scope) => node.connections.input
-      .map(connection => value(connection.src.node, scope, connection.src.key))
+    value: (node: Engine.Node, scope: Engine.Scope) => inputs(node)
+      .map(port => value(port.node, scope, port.key))
       .filter(pair => pair.key)
       .reduce((obj, pair) => ({
         ...obj,
@@ -18,11 +19,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       }), {}),
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(node.connections.input
-          .map(connection => ({
-            key: connection.src.node.params.key.trim(),
-            type: unmatchedType(connection.src.node, context, connection.src.key).params.value
-              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(connection.src.node, context, connection.src.key).name}`)
+        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(inputs(node)
+          .map(src => ({
+            key: src.node.params.key.trim(),
+            type: unmatchedType(src.node, context, src.key).params.value
+              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(src.node, context, src.key).name}`)
           }))
           .filter(pair => pair.key)
           .reduce((obj, pair) => ({
