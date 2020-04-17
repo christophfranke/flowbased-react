@@ -6,10 +6,7 @@ import { outputs } from '@engine/tree'
 import { matchInto, unionAll } from '@engine/type-functions'
 
 export const value = computedFn(function(node: Node, scope: Scope, key: string): any {
-  const result = scope.context.definitions.Node[node.type].value(node, scope, key)
-  console.log(node.type, node.id, key, result)
-
-  return result
+  return scope.context.definitions.Node[node.type].value(node, scope, key)
 })
 
 export const unmatchedType = computedFn(function(node: Node, context: Context, key: string): ValueType {
