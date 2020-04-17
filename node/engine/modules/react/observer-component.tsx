@@ -35,22 +35,32 @@ const HOC = (Component, scope: Scope) => {
     }
 
     @computed get children() {
-      return inputs(this.props.node).map(child => this.getChild(child))
+      return this.props.node.connections.input.input
+        ? this.props.node.connections.input.input
+          .map(input => this.getChild(input.src))
+        : []
     }
 
-    // @computed get properties() {
-    //   return this.props.node.connections.properties.reduce((obj, property) => ({
-    //     ...obj,
-    //     [property.key]: value(property.node, scope)
-    //   }), {})
-    // }
+    @computed get properties() {
+      return Object.keys(this.props.node.connections.input)
+        .filter(key => key !== 'input')
+        .reduce((obj, key) => ({
+          ...obj,
+          [key]: this.props.node.connections.input[key].length > 0
+            ? value(
+              this.props.node.connections.input[key][0].src.node,
+              scope,
+              this.props.node.connections.input[key][0].src.key)
+            : null
+        }), {})
+    }
 
     @computed get params() {
       return this.props.node.params
     }
 
     render() {
-      return <Component params={this.params} properties={{}}>
+      return <Component params={this.params} properties={this.properties}>
         {this.children}
       </Component>
     }

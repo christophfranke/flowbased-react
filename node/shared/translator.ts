@@ -93,7 +93,8 @@ class Translator {
     const connections = this.editor.connections.filter(connection => connection.target.nodeId === editorNode.id)
     return unique(connections.map(con => con.target.key))
       .reduce((obj, key) => ({
-        [key]: connections.filter(con => con.target.key)
+        ...obj,
+        [key]: connections.filter(con => con.target.key === key)
           .sort((a, b) => a.target.slot - b.target.slot)
           .map(connection => ({
             id: connection.id,
@@ -114,7 +115,8 @@ class Translator {
     const connections = this.editor.connections.filter(connection => connection.src.nodeId === editorNode.id)
     return unique(connections.map(con => con.src.key))
       .reduce((obj, key) => ({
-        [key]: connections.filter(con => con.src.key)
+        ...obj,
+        [key]: connections.filter(con => con.src.key === key)
           .sort((a, b) => a.src.slot - b.src.slot)
           .map(connection => ({
             id: connection.id,
@@ -152,6 +154,7 @@ class Translator {
       },
       connections: {
         get input() {
+          console.log('inputs', editorNode.type, editorNode.id, getInputs())
           return getInputs()
         },
         get output() {

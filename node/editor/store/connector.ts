@@ -116,7 +116,9 @@ export default class ConnectorFunctions {
 
     if (mode === 'duplicate') {
       const numConnectors = this.store.connections
-        .filter(connection => connection.target.nodeId === ports.node.id).length
+        .filter(connection =>
+          connection.target.key === key &&
+          connection.target.nodeId === ports.node.id).length
         + 1
 
       group.connectors = Array(numConnectors).fill(0).map(() => ({
