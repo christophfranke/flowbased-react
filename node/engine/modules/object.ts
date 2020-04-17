@@ -7,7 +7,7 @@ import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 import * as Core from '@engine/modules/core'
 
-export type Nodes = 'Object' | 'Pair'
+export type Nodes = 'Object' | 'Pair' | 'Key'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {
     value: (node: Engine.Node, scope: Engine.Scope) => inputs(node)
@@ -36,6 +36,33 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         // input: (node, other) => other && other.params.key
         // ? Type.Pair(type(node).params[other!.params.key.trim()])
         // : Type.Pair(Type.Unresolved)
+      }
+    }
+  },
+  Key: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      return inputs(node).length > 0
+        ? value(inputs(node)[0].node, scope, inputs(node)[0].key)[node.params.key.trim()]
+        : createEmptyValue(type(node, scope.context))
+    },
+    type: {
+      output: {
+        output: (node:Engine. Node, context: Engine.Context) => {
+          if (inputs(node).length > 0 && node.params.key) {
+            const inputType = unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
+            if (inputType.name !== 'Unresolved') {
+              return inputType.params[node.params.key.trim()]
+                || Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
+            }
+          }
+
+          return Core.Type.Unresolved.create()
+        }
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => node.params.key
+          ? Type.Object.create({ [node.params.key.trim()]: type(node, context) })
+          : Type.Object.create({})
       }
     }
   },
@@ -85,6 +112,19 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         type: 'text'
       }],
     })    
+  },
+  Key: {
+    type: 'Value',
+    create:() => ({
+      name: 'Key',
+      type: 'Key',
+      params: [{
+        name: 'Key',
+        key: 'key',
+        value: '',
+        type: 'text'
+      }]
+    })
   }
 }
 

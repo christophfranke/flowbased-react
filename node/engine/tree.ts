@@ -1,4 +1,5 @@
 import { Node, Port } from '@engine/types'
+import { computedFunction } from '@engine/util'
 import { unique, flatten } from '@shared/util'
 
 interface NodeTree {
@@ -25,12 +26,12 @@ export function filteredSubForest(root: Node, condition: Condition): NodeForest 
   return flatten(children(root).map(child => filteredSubForest(child, condition)))
 }
 
-export function outputs(node: Node): Port[] {
+export const outputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.output)
     .map(group => group.map(connection => connection.target)))
-}
+})
 
-export function inputs(node: Node): Port[] {
+export const inputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.input)
     .map(group => group.map(connection => connection.src)))
-}
+})

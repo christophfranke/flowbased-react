@@ -1,19 +1,19 @@
 import React from 'react'
-import { computedFn } from 'mobx-utils'
 import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
 import { outputs } from '@engine/tree'
+import { computedFunction } from '@engine/util'
 
 import { matchInto, unionAll } from '@engine/type-functions'
 
-export const value = computedFn(function(node: Node, scope: Scope, key: string): any {
+export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
   return scope.context.definitions.Node[node.type].value(node, scope, key)
 })
 
-export const unmatchedType = computedFn(function(node: Node, context: Context, key: string): ValueType {
+export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
   return context.definitions.Node[node.type].type.output![key](node, context)
 })
 
-export const type = computedFn(function(node: Node, context: Context, key: string = 'output'): ValueType {
+export const type = computedFunction(function(node: Node, context: Context, key: string = 'output'): ValueType {
   return matchInto(
     unmatchedType(node, context, key),
     unionAll(outputs(node).map(
@@ -23,7 +23,7 @@ export const type = computedFn(function(node: Node, context: Context, key: strin
   )
 })
 
-export const numScopeResolvers = computedFn(function (node: Node): number {
+export const numScopeResolvers = computedFunction(function (node: Node): number {
   console.warn('numScopeResolvers not implemented anymore')
   return 0
 })
