@@ -41,13 +41,6 @@ class NodeView extends React.Component<Props> {
     return this.props.node.params
   }
 
-  // @computed get connectorRefs() {
-  //   return this.connectors.reduce((obj, connector) => ({
-  //       ...obj,
-  //       [connector.id]: React.createRef<HTMLDivElement>()
-  //     }), {})
-  // }
-
   offset: Vector
   relativePositions: {
     [id: number]: Vector
@@ -217,10 +210,10 @@ class NodeView extends React.Component<Props> {
     }
 
     const nameStyle: React.CSSProperties = {
-      textAlign: 'center',
       fontSize: '18px',
       whiteSpace: 'nowrap',
       cursor: 'help',
+      display: 'inline',
       color: typeColor
     }
 
@@ -261,7 +254,7 @@ class NodeView extends React.Component<Props> {
           <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
-          <div style={{ gridArea: 'params' }}>
+          <div style={{ gridArea: 'params', textAlign: 'center' }}>
             <div style={nameStyle} onClick={this.showHelp}>{node.name}</div>
             {this.isDocumentationVisible && <Documentation nodeType={this.props.node.type} nodeModule={this.props.node.module} style={documentationStyle} />}
             {this.params.map(param => {
