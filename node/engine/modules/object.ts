@@ -89,6 +89,15 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Object: {
     type: 'Value',
+    documentation: {
+      explanation: 'This node creates an *Object* value. An *Object* is a collection of key - value *Pairs*. The values can have any type (including *Object*) and may be all different. You can later use a *Key* node, to get access a value inside an object. *Objects* are useful, to bundle many values in a structured way.',
+      input: {
+        input: 'A key - vaule *Pair*, that will be put into the *Object*. If multiple *Pairs* with the same key are present, the rightmost input value will be chosen.'
+      },
+      output: {
+        output: 'The *Object*'
+      }
+    },
     ports: {
       input: {
         input: ['duplicate']
@@ -98,10 +107,22 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       name: 'Object',
       type: 'Object',
       params: [],
-    })    
+    })
   },
   Pair: {
     type: 'Value',
+    documentation: {
+      explanation: 'A key - value *Pair*. Its primary use is to feed an *Object*.',
+      params: {
+        key: 'This is the key if the key - value *Pair*. The key cannot be changed at runtime.'
+      },
+      input: {
+        input: 'This is the value of the *Pair*. It can have any type.'
+      },
+      output: {
+        output: 'The key - value *Pair*.'
+      }
+    },
     create: () => ({
       name: 'Pair',
       type: 'Pair',
@@ -115,6 +136,18 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   Key: {
     type: 'Value',
+    documentation: {
+      explanation: 'This node gets the value of a key from an *Object*.',
+      input: {
+        input: 'The *Object* that has the key'
+      },
+      params: {
+        key: 'The key you want to access.'
+      },
+      output: {
+        output: 'The value of the key in the *Object*.'
+      }
+    },
     create:() => ({
       name: 'Key',
       type: 'Key',

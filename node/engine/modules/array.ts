@@ -39,6 +39,15 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Array: {
     type: 'Value',
+    documentation: {
+      explanation: 'Creates an *Array* value. An *Array* is a collection of items, that all share the same type.',
+      input: {
+        input: 'The items, that you want to collect'
+      },
+      output: {
+        output: 'The *Array*'
+      }
+    },
     ports: {
       input: {
         input: ['duplicate']

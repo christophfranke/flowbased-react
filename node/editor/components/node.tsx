@@ -11,6 +11,7 @@ import Store from '@editor/store'
 import { type } from '@engine/render'
 
 import ConnectorGroup from '@editor/components/connector-group'
+import Documentation from '@editor/components/documentation'
 
 import TextInput from '@editor/components/input/text'
 import NumberInput from '@editor/components/input/number'
@@ -30,7 +31,7 @@ interface Props {
 class NodeView extends React.Component<Props> {
   store: Store = this.props['store']
   nodeRef = React.createRef<HTMLDivElement>()
-  
+  @observable isDocumentationVisible = false  
 
   @computed get ports(): Ports {
     return this.store.connector.ports(this.props.node)
@@ -75,6 +76,16 @@ class NodeView extends React.Component<Props> {
   handleClick = e => {
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  @action
+  showHelp = () => {
+    this.isDocumentationVisible = true
+  }
+
+  @action
+  hideHelp = (e) => {
+    this.isDocumentationVisible = false
   }
 
   @action
@@ -176,31 +187,10 @@ class NodeView extends React.Component<Props> {
     }
   }
 
-  updateConnectorPositions = () => {
-    // this.connectors.forEach(connector => {
-    //   const ref = this.connectorRefs[connector.id]    
-    //   if (ref && ref.current && ref.current.ref) {
-    //     const el = ref.current.ref.current
-    //     const newPosition = {
-    //       x: el.offsetLeft + 30,
-    //       y: el.offsetTop + 30
-    //     }
-
-    //     if (!connector.position
-    //       || newPosition.x !== connector.position.x
-    //       || newPosition.y !== connector.position.y) {
-    //       connector.position = newPosition
-    //     }
-    //   }
-    // })
-  }
-
-
 
   render() {
     if (!isServer) {
       requestAnimationFrame(this.updatePosition)
-      requestAnimationFrame(this.updateConnectorPositions)
     }
 
     const { node } = this.props
@@ -226,6 +216,7 @@ class NodeView extends React.Component<Props> {
       textAlign: 'center',
       fontSize: '24px',
       whiteSpace: 'nowrap',
+      cursor: 'help',
       color: typeColor
     }
 
@@ -248,7 +239,11 @@ class NodeView extends React.Component<Props> {
         1fr min-content 1fr`
     }
 
-    return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef}>
+    const documentationStyle: React.CSSProperties = {
+      position: 'absolute'
+    }
+
+    return <div style={nodeStyle} onMouseDown={this.handleMouseDown} onClick={this.handleClick} ref={this.nodeRef} onMouseLeave={this.hideHelp}>
         <div style={innerStyle}>
           <div style={{ display: 'flex', justifyContent: 'center', gridArea: 'input' }}>
             {this.ports.input.main.map(group => <ConnectorGroup key={group.key} group={group} />)}
@@ -260,7 +255,8 @@ class NodeView extends React.Component<Props> {
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params' }}>
-            <div style={nameStyle}>{node.name}</div>
+            <div style={nameStyle} onClick={this.showHelp}>{node.name}</div>
+            {this.isDocumentationVisible && <Documentation nodeType={this.props.node.type} style={documentationStyle} />}
             {this.params.map(param => {
               if (param.type === 'number') {
                 return <NumberInput key={param.key} param={param} typeColor={typeColor} />

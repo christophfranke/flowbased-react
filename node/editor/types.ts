@@ -11,6 +11,18 @@ export type ModuleNodes<NodeName extends keyof any> = {
 
 export interface NodeDefinition<T = string> {
   type: string
+  documentation: {
+    explanation: string
+    input?: {
+      [key: string]: string
+    }
+    output?: {
+      [key: string]: string
+    }
+    params?: {
+      [key: string]: string
+    }
+  }
   ports?: {
     [key in ConnectorFunction]?: {
       [key: string]: ConnectorOption[]

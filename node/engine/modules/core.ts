@@ -32,6 +32,15 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   String: {
     type: 'Value',
+    documentation: {
+      explanation: 'Creates a *String* value. A *String* is a string of characters (i.e. letters) that form a text.',
+      params: {
+        value: 'Here you can type in the *String* value'
+      },
+      output: {
+        output: 'The *String*'
+      }
+    },
     create: () => ({
       name: 'String',
       type: 'String',
@@ -45,6 +54,15 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   Number: {
     type: 'Value',
+    documentation: {
+      explanation: 'Creates a *Number* value. This can be any real number, but not infinity.',
+      params: {
+        value: 'Here you can type in the number. If the number cannot be created or is invalid, the *Number* becomes NaN (Not a Number).'
+      },
+      output: {
+        output: 'The *Number*'
+      }
+    },
     create: () => ({
       name: 'Number',
       type: 'Number',
@@ -58,6 +76,15 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   Boolean: {
     type: 'Value',
+    documentation: {
+      explanation: 'Creates a *Boolean* value. A *Boolean* can either be *True* or *False*.',
+      params: {
+        value: 'Here you can pick a value.'
+      },
+      output: {
+        output: 'The *Boolean*'
+      }
+    },
     create: () => ({
       name: 'Boolean',
       type: 'Boolean',
