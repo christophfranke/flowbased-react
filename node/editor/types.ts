@@ -66,7 +66,7 @@ export interface Ports {
     side: ConnectorGroup<'input', 'single'>[]
   }
   output: {
-    main: ConnectorGroup<'output', 'multiple'>[]
+    main: ConnectorGroup<'output', 'multiple' | 'hidden'>[]
     side: ConnectorGroup<'output', 'multiple'>[]
   }
 }
@@ -83,7 +83,7 @@ export interface ConnectorGroup<Function extends ConnectorFunction = ConnectorFu
 
 export type ConnectorFunction = 'input' | 'output'
 export type ConnectorState = 'default' | 'hot' | 'pending'
-export type ConnectorMode = 'single' | 'multiple' | 'duplicate'
+export type ConnectorMode = 'single' | 'multiple' | 'duplicate' | 'hidden'
 export interface Connector<Function extends ConnectorFunction = ConnectorFunction> {
   group: ConnectorGroup<Function>
   position?: Vector

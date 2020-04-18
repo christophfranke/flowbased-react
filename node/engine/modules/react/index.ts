@@ -85,6 +85,11 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         input: 'This will be rendered into the preview screen.'
       }
     },
+    ports: {
+      output: {
+        output: ['hidden']
+      }
+    },
     create: () => ({
       name: 'Preview',
       type: 'Preview',

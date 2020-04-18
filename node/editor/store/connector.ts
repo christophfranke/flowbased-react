@@ -63,6 +63,10 @@ export default class ConnectorFunctions {
     return []
   }
 
+  hasConnectorOption(node: Node, fn: ConnectorFunction, key: string, option: ConnectorOption): boolean {
+    return this.connectorOptions(node, fn, key).includes(option)
+  }
+
   @transformer
   ports(node: Node): Ports {
     const ports: Ports = observable({
@@ -92,7 +96,12 @@ export default class ConnectorFunctions {
       .map(key => this.createProperty(key, ports))
 
     ports.output.main = Object.keys(this.store.modules[node.module].Node[node.type].type.output || {})
-      .map(key => this.createOutput(key, ports))
+      .map(key => this.createOutput(
+        key,
+        this.hasConnectorOption(node, 'output', key, 'hidden')
+          ? 'hidden'
+          : 'multiple',
+        ports))
 
     return ports
   }
@@ -147,20 +156,22 @@ export default class ConnectorFunctions {
     return group
   }
 
-  createOutput = (key: string, ports: Ports): ConnectorGroup<'output', 'multiple'> => {
-    const group: ConnectorGroup<'output', 'multiple'> = observable({
+  createOutput = (key: string, mode: 'multiple' | 'hidden', ports: Ports): ConnectorGroup<'output', 'multiple' | 'hidden'> => {
+    const group: ConnectorGroup<'output', 'multiple' | 'hidden'> = observable({
       key,
       ports,
       connectors: [],
-      mode: 'multiple',
+      mode,
       name: 'output',
       function: 'output',
       direction: { x: 0, y: 1 },
     })
 
-    group.connectors = [{
-      group
-    }]
+    if (mode === 'multiple') {    
+      group.connectors = [{
+        group
+      }]
+    }
 
     return group
   }
@@ -187,7 +198,7 @@ export default class ConnectorFunctions {
 
   canConnect(pending: Connector, possiblyHot: Connector): boolean {
     const src = this.isSrc(pending.group) ? pending : possiblyHot
-    const dest = this.isSrc(pending.group) ? possiblyHot : pending
+    const dest = this.isSrc(possiblyHot.group) ? pending : possiblyHot
 
     return src !== dest
       && !this.willProduceLoop(src.group.ports.node, dest.group.ports.node)
