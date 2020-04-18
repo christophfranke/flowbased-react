@@ -22,25 +22,53 @@ class Translator {
     this.editor = editor
   }
 
-  modules = {
-    Core,
-    React,
-    Array: ArrayModule,
-    Object: ObjectModule,
-    Define
+  @computed get modules() {
+    // old school bind this to self
+    const self = this
+
+    return {
+      Core,
+      React,
+      Array: ArrayModule,
+      Object: ObjectModule,
+      Define,
+      get Local() {
+        return {
+          Node: self.localNodes,
+          Type: self.localTypes,
+        } as Module
+      }
+    }
   }
 
-  @computed
-  get definitions(): Module {
-    return {
-      Node: {},
-      Type: {}
-    }
+  @computed get localNodes() {
+    const result = this.context.defines.reduce((obj, define) => ({
+      ...obj,
+      [define.params.name]: {
+        value: (node: Node, scope: Scope) => {
+          return scope.context.modules.Define.Node.Proxy.value(node, scope, 'output')
+        },
+        type: {
+          output: {
+            output: (node: Node, context: Context) => {
+              return context.modules.Define.Node.Proxy.type.output!.output!(node, context)
+            }
+          }
+        }
+      }
+    }), {})
+
+    console.log(result)
+
+    return result
+  }
+
+  @computed get localTypes() {
+    return {}
   }
 
   @computed get context(): Context {
     return {
-      // definitions: this.definitions,
       modules: this.modules,
       types: {},
       defines: this.defines
@@ -61,7 +89,7 @@ class Translator {
   @computed get defines(): Node[] {
     // console.log('nodes', this.editor.nodes)
     // console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
-    return this.editor.nodes.filter(node => node.type === 'Define')
+    return this.editor.nodes.filter(node => node.type === 'Define' && node.params.find(param => param.key === 'name' && param.value))
       .map(node => this.getNode(node))
   }
 

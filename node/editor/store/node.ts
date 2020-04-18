@@ -17,27 +17,17 @@ export default class NodeFunctions {
     this.store = store
   }
 
-  // @computed get defineList() {
-  //   return this.store.nodes
-  //     .filter(node => node.type === 'Define')
-  //     .map(node => ({
-  //       name: this.getParamValue(node, 'name'),
-  //       type: 'Local',
-  //       create: position => this.createProxy(position, node)
-  //     }))
-  //     .filter(node => node.name)
-  // }
 
   @computed get nodeList(): NodeListItem[] {
     const list = flatten(Object.entries(this.store.modules)
-     .map(([module, definitions]) =>
+      .map(([module, definitions]) =>
         Object.entries(definitions.EditorNode)
           .map(([name, nodeDefinition]) => ({
             name,
             type: nodeDefinition.type,
             module,
             create: position => this.createNode(position, module, name)
-          }))));
+          }))))
 
     return list.sort((a, b) => {
       if (a.module === b.module) {
@@ -45,6 +35,27 @@ export default class NodeFunctions {
       }
       return a.module < b.module ? -1 : 1
     })
+  }
+
+  createProxy(position, define) {
+    const node: Node = {
+      id: this.store.uid(),
+      type: 'Proxy',
+      params: [{
+        name: 'Define',
+        key: 'define',
+        value: define.id,
+        type: 'hidden'
+      }],
+      module: 'Define',
+      position,
+      zIndex: 1,
+      get name() {
+        return define.params.find(param => param.key === 'name').value
+      },
+    }
+
+    this.store.nodes.push(node)
   }
 
 

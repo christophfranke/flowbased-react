@@ -1,5 +1,5 @@
 import { observable, computed, autorun, action } from 'mobx'
-import { Connection, Node, Connector, ConnectorState, Module } from '@editor/types'
+import { Connection, Node, Connector, ConnectorState, Module, NodeDefinition } from '@editor/types'
 import { sync, load } from '@shared/local-storage-sync'
 import Translator from '@shared/translator'
 import { Context } from '@engine/types'
@@ -18,49 +18,58 @@ import * as Define from '@engine/modules/define'
 class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
+
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
-  @observable currentId: number = 0
+  @observable currentId = 0
   @observable currentHighZ = 1
 
-  modules = {
-    Core,
-    React,
-    Array: ArrayModule,
-    Object: ObjectModule,
-    Define
+  @computed get modules() {
+    // old school bind this to self
+    const self = this
+
+    return {
+      Core,
+      React,
+      Array: ArrayModule,
+      Object: ObjectModule,
+      Define,
+      get Local() {
+        return {
+          Node: self.translated.context.modules.Local.Node,
+          Type: self.translated.context.modules.Local.Type,
+          EditorNode: self.localEditorNodes
+        } as Module
+      }
+    }
   }
 
-  // @computed
-  // get definitions(): Module {
-  //   return {
-  //     Node: {
-  //       ...Object.values(this.modules).reduce((all, module) => ({
-  //         ...all,
-  //         ...module.Node
-  //       }), {})
-  //     },
-  //     Type: {
-  //       ...Object.values(this.modules).reduce((all, module) => ({
-  //         ...all,
-  //         ...module.Type
-  //       }), {})
-  //     },
-  //     EditorNode: {
-  //       ...Object.values(this.modules).reduce((all, module) => ({
-  //         ...all,
-  //         ...module.EditorNode
-  //       }), {})
-  //     }
-  //   }
-  // }
-
-  @computed get connectors(): Connector[] {
-    return []
-    // return flatten(flatten(this.nodes.map(node => Object.values(node.connectors))))
+  @computed get localEditorNodes(): { [key: string]: NodeDefinition } {
+    return this.context.defines.reduce((obj, define) => {
+      return {
+        ...obj,
+        [define.params.name]: {        
+          type: 'Local',
+          documentation: {
+            explanation: 'Locally defined node'
+          },
+          create: () => ({
+            name: define.params.name,
+            type: define.params.name,
+            params: [{
+              name: 'Define',
+              key: 'define',
+              value: define.id,
+              type: 'hidden'
+            }]
+          })
+        }
+      }
+    }, {})
   }
+
 
   @computed get context(): Context {
     return this.translated.context
