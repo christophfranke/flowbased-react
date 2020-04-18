@@ -18,7 +18,7 @@ interface Props {
   connector: Connector
 }
 
-const CONNECTOR_SIZE = 40
+const CONNECTOR_SIZE = 30
 
 @inject('store')
 @observer

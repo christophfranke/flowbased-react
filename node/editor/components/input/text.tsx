@@ -3,6 +3,8 @@ import { observer } from 'mobx-react'
 import { Parameter } from '@editor/types'
 import { colors } from '@editor/colors'
 
+import fontSize from '@editor/components/input/font-size'
+
 interface Props {
   param: Parameter
   typeColor: string
@@ -17,16 +19,16 @@ class TextInput extends React.Component<Props> {
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: '16px'
+      fontSize: fontSize.label
     }
 
     const inputStyle: React.CSSProperties = {
       outline: 'none',
       backgroundColor: colors.background.default,
-      minWidth: '200px',
+      minWidth: '120px',
       width: '100%',
       margin: '8px',
-      fontSize: '20px',
+      fontSize: fontSize.input,
       borderBottom: `1px solid ${this.props.typeColor}`,
     }
 

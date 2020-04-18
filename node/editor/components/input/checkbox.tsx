@@ -3,6 +3,8 @@ import { observer } from 'mobx-react'
 import { Parameter } from '@editor/types'
 import { colors } from '@editor/colors'
 
+import fontSize from '@editor/components/input/font-size'
+
 interface Props {
   param: Parameter
   typeColor: string
@@ -21,7 +23,7 @@ class CheckboxInput extends React.Component<Props> {
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: '16px',
+      fontSize: fontSize.label,
       marginRight: '8px'
     }
 
@@ -31,7 +33,7 @@ class CheckboxInput extends React.Component<Props> {
       marginBottom: '8px',
       minWidth: '85px',
       display: 'inline',
-      fontSize: '20px',
+      fontSize: fontSize.input,
       borderBottom: `1px solid ${this.props.typeColor}`,
     }
 

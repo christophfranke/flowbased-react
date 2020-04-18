@@ -119,7 +119,6 @@ export function union(src: ValueType, target: ValueType, context: Context): Valu
 }
 
 export function intersectAll(types: ValueType[], context: Context): ValueType {
-  console.log('intersect', types)
   return types.reduce((result, type) => intersect(type, result, context), context.modules.Core.Type.Unresolved.create())
 }
 export function intersect(src: ValueType, target: ValueType, context: Context): ValueType {

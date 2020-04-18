@@ -3,6 +3,8 @@ import { observer } from 'mobx-react'
 import { Parameter } from '@editor/types'
 import { colors } from '@editor/colors'
 
+import fontSize from '@editor/components/input/font-size'
+
 interface Props {
   param: Parameter
   typeColor: string
@@ -23,7 +25,7 @@ class TextareaInput extends React.Component<Props> {
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: '16px'
+      fontSize: fontSize.label
     }
 
     const inputStyle: React.CSSProperties = {
@@ -36,7 +38,7 @@ class TextareaInput extends React.Component<Props> {
       padding: '8px',
       width: '100%',
       margin: '8px',
-      fontSize: '20px',
+      fontSize: fontSize.input,
       border: `1px solid ${this.props.typeColor}`,
     }
 

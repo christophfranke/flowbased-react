@@ -215,7 +215,7 @@ class NodeView extends React.Component<Props> {
 
     const nameStyle: React.CSSProperties = {
       textAlign: 'center',
-      fontSize: '24px',
+      fontSize: '18px',
       whiteSpace: 'nowrap',
       cursor: 'help',
       color: typeColor
@@ -223,9 +223,9 @@ class NodeView extends React.Component<Props> {
 
     const closeStyle: React.CSSProperties = {
       gridArea: 'close',
-      transform: 'scale(1.7)',
+      transform: 'scale(1.4)',
       marginLeft: '10px',
-      marginTop: '4px',
+      marginTop: '1px',
       color: this.isCloseHovering ? colors.deleteNode : typeColor,
       cursor: 'pointer'
     }
