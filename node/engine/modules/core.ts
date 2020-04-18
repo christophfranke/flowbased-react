@@ -1,7 +1,11 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-export type Nodes = 'String' | 'Number' | 'Boolean'
+import { value, type, unmatchedType } from '@engine/render'
+import { createEmptyValue, intersectAll } from '@engine/type-functions'
+import { inputs } from '@engine/tree'
+
+export type Nodes = 'String' | 'Number' | 'Boolean' | 'Type'
 export const Node: Engine.ModuleNodes<Nodes> = {
   String: {
     value: (node: Engine.Node) => node.params.value,
@@ -27,6 +31,28 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       }
     }
   },
+  Type: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const input = node.connections.input.input
+        .find(connection => connection.target.key === 'input')
+
+      return input
+        ? value(input.src.node, scope, input.src.key)
+        : createEmptyValue(type(node, scope.context))
+    },
+    type: {
+      input: {
+        type: () => Type.Unresolved.create(),
+        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
+      },
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => intersectAll(
+          inputs(node).map(input => unmatchedType(input.node, context, input.key)),
+          context
+        )
+      }
+    }
+  }
 }
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
@@ -96,6 +122,29 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }],
     })
   },
+  Type: {
+    type: 'Type',
+    ports: {
+      input: {
+        type: ['side']
+      }
+    },
+    documentation: {
+      explanation: 'This node fixes a type while passing the value from the input to the output.',
+      input: {
+        input: 'This is the value input. The value will be passed through the node unchanged.',
+        type: 'You can input any value here. The value will be ignored, but the type fixes the type of the input and output of this node.'
+      },
+      output: {
+        output: 'Outputs exactly the input'
+      }
+    },
+    create: () => ({
+      name: 'Type',
+      type: 'Type',
+      params: []
+    })
+  }
 }
 
 export type Types = 'String'
