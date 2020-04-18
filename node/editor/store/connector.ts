@@ -128,7 +128,7 @@ export default class ConnectorFunctions {
         .filter(connection =>
           connection.target.key === key &&
           connection.target.nodeId === ports.node.id)
-        .reduce((max, connection) => Math.max(max, connection.target.slot), 0)
+        .reduce((max, connection) => Math.max(max, connection.target.slot + 1), 0)
         + 1
 
       group.connectors = Array(numConnectors).fill(0).map(() => ({
