@@ -127,7 +127,8 @@ export default class ConnectorFunctions {
       const numConnectors = this.store.connections
         .filter(connection =>
           connection.target.key === key &&
-          connection.target.nodeId === ports.node.id).length
+          connection.target.nodeId === ports.node.id)
+        .reduce((max, connection) => Math.max(max, connection.target.slot), 0)
         + 1
 
       group.connectors = Array(numConnectors).fill(0).map(() => ({
