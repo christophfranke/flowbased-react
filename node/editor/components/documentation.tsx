@@ -67,7 +67,7 @@ class Documentation extends React.Component<Props> {
     const documentation = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType].documentation
 
     const style: React.CSSProperties = {
-      minWidth: '20vw',
+      minWidth: '30vw',
       maxWidth: '60vw',
       maxHeight: '75vh',
       overflowY: 'auto',

@@ -30,7 +30,7 @@ class NumberInput extends React.Component<Props> {
     const inputStyle: React.CSSProperties = {
       outline: 'none',
       backgroundColor: colors.background.default,
-      minWidth: '200px',
+      minWidth: '100px',
       width: '100%',
       margin: '8px',
       fontSize: fontSize.input,

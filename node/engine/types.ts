@@ -80,6 +80,9 @@ export interface Context {
   modules: {
     [key: string]: Module
   }
+  types: {
+    [key: number]: ValueType
+  }
   // definitions: {
   //   Node: ModuleNodes<string>
   //   Type: ModuleTypes<string>

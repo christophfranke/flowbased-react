@@ -25,7 +25,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         input: (node: Engine.Node, context: Engine.Context) => {
           const nodeType = type(node, context)
           if (nodeType.name === 'Unresolved') {
-            return Core.Type.Unresolved.create()
+            return nodeType
           }
 
           return type(node, context).params.items

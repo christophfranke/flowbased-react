@@ -39,7 +39,8 @@ class Translator {
   @computed get context(): Context {
     return {
       // definitions: this.definitions,
-      modules: this.modules
+      modules: this.modules,
+      types: {}
     }
   }
 

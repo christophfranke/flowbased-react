@@ -10,7 +10,25 @@ export const value = computedFunction(function(node: Node, scope: Scope, key: st
 })
 
 export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
-  return context.modules[node.module].Node[node.type].type.output![key](node, context)
+  if (context.types[node.id]) {
+    return context.types[node.id]
+  }
+
+  const newContext = {
+    ...context,
+    types: {
+      ...context.types,
+      [node.id]: context.modules.Core.Type.Unresolved.create()
+    }
+  }
+
+  return matchInto(
+    context.modules[node.module].Node[node.type].type.output![key](node, newContext),
+    unionAll(outputs(node).map(
+      target => expectedType(target.node, target.key, newContext)),
+    newContext),
+    newContext
+  )
 })
 
 export const type = computedFunction(function(node: Node, context: Context, key: string = 'output'): ValueType {
