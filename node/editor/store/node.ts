@@ -8,7 +8,7 @@ interface NodeListItem {
   name: string
   type: string
   module: string
-  create: (position: Vector) => Node
+  create: (position: Vector) => void
 }
 
 export default class NodeFunctions {
@@ -36,7 +36,7 @@ export default class NodeFunctions {
             name,
             type: nodeDefinition.type,
             module,
-            create: position => this.createNode(position, module, nodeDefinition)
+            create: position => this.createNode(position, module, name)
           }))));
 
     return list.sort((a, b) => {
@@ -48,13 +48,22 @@ export default class NodeFunctions {
   }
 
 
-  createNode(position: Vector, module: string, nodeDefinition: NodeDefinition): Node {
-    return {
+  createNode(position: Vector, module: string, name: string) {
+    const nodeDefinition = this.store.modules[module].EditorNode[name]
+
+    const node: Node = {
       ...nodeDefinition.create(),
       module,
       zIndex: 1,
       id: this.store.uid(),
       position
-    } as Node    
+    }
+
+    if (nodeDefinition.options && nodeDefinition.options.includes('singleton')) {
+      const singletonNodes = this.store.nodes.filter(node => node.type === name)
+      this.store.deleteNodes(singletonNodes)
+    }
+
+    this.store.nodes.push(node)
   }
 }

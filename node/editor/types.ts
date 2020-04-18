@@ -9,8 +9,10 @@ export type ModuleNodes<NodeName extends keyof any> = {
   [key in NodeName]: NodeDefinition<key>
 }
 
+export type NodeOption = 'singleton'
 export interface NodeDefinition<T = string> {
   type: string
+  options?: NodeOption[]
   documentation: {
     explanation: string
     input?: {

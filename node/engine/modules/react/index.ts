@@ -79,6 +79,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   Preview: {
     type: 'Preview',
+    options: ['singleton'],
     documentation: {
       explanation: 'This node is used to identify what to render into the preview. There can only be one preview node in a graph, so whenever a new *Preview* is created, the preexisting *Preview* is destroyed.',
       input: {

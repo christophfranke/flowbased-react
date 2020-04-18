@@ -43,7 +43,7 @@ class NodeList extends React.Component<Props> {
   }
 
   create = factory => {
-    this.store.nodes.push(factory(this.props.position))
+    factory(this.props.position)
     this.props.onComplete()
   }
 
