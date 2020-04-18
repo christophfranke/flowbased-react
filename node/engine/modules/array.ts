@@ -5,7 +5,7 @@ import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
 import { intersectAll } from '@engine/type-functions'
 
-import * as Core from '@engine/modules/core'
+export const Dependencies = ['Core']
 
 export type Nodes = 'Array'
 export const Node: Engine.ModuleNodes<Nodes> = {
@@ -29,7 +29,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           }
 
           return type(node, context).params.items
-            || Core.Type.Mismatch.create(`Expected Array, got ${nodeType.name}`)
+            || context.modules.Core.Type.Mismatch.create(`Expected Array, got ${nodeType.name}`)
         }
       }
     }

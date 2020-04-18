@@ -58,7 +58,7 @@ export interface Port {
 }
 
 export interface Params {  
-  [key: string]: string
+  [key: string]: any
 }
 
 export interface Node {
@@ -82,11 +82,9 @@ export interface Context {
   }
   types: {
     [key: number]: ValueType
+    [key: string]: ValueType
   }
-  // definitions: {
-  //   Node: ModuleNodes<string>
-  //   Type: ModuleTypes<string>
-  // }
+  defines: Node[]
 }
 
 export interface Scope {

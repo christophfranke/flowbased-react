@@ -5,7 +5,8 @@ import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
-import * as Core from '@engine/modules/core'
+
+export const Dependencies = ['Core']
 
 export type Nodes = 'Object' | 'Pair' | 'Key'
 export const Node: Engine.ModuleNodes<Nodes> = {
@@ -23,7 +24,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           .map(src => ({
             key: src.node.params.key.trim(),
             type: unmatchedType(src.node, context, src.key).params.value
-              || Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(src.node, context, src.key).name}`)
+              || context.modules.Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(src.node, context, src.key).name}`)
           }))
           .filter(pair => pair.key)
           .reduce((obj, pair) => ({
@@ -32,7 +33,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           }), {}))
       },
       input: {
-        input: () => Type.Pair.create(Core.Type.Unresolved.create())
+        input: (node: Engine.Node, context: Engine.Context) => Type.Pair.create(context.modules.Core.Type.Unresolved.create())
         // input: (node, other) => other && other.params.key
         // ? Type.Pair(type(node).params[other!.params.key.trim()])
         // : Type.Pair(Type.Unresolved)
@@ -52,11 +53,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             const inputType = unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
             if (inputType.name !== 'Unresolved') {
               return inputType.params[node.params.key.trim()]
-                || Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
+                || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
             }
           }
 
-          return Core.Type.Unresolved.create()
+          return context.modules.Core.Type.Unresolved.create()
         }
       },
       input: {
@@ -77,7 +78,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => Type.Pair.create(inputs(node).length > 0
           ? unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
-          : Core.Type.Unresolved.create())
+          : context.modules.Core.Type.Unresolved.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => type(node, context).params.value

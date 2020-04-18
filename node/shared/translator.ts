@@ -9,6 +9,7 @@ import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
 import * as ObjectModule from '@engine/modules/object'
 import * as ArrayModule from '@engine/modules/array'
+import * as Define from '@engine/modules/define'
 
 interface EditorGraph {
   nodes: Editor.Node[]
@@ -25,7 +26,8 @@ class Translator {
     Core,
     React,
     Array: ArrayModule,
-    Object: ObjectModule
+    Object: ObjectModule,
+    Define
   }
 
   @computed
@@ -40,7 +42,8 @@ class Translator {
     return {
       // definitions: this.definitions,
       modules: this.modules,
-      types: {}
+      types: {},
+      defines: this.defines
     }
   }
 
@@ -58,9 +61,8 @@ class Translator {
   @computed get defines(): Node[] {
     // console.log('nodes', this.editor.nodes)
     // console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
-    // return this.editor.nodes.filter(node => node.type === 'Define')
-    //   .map(node => this.getNode(node))
-    return []
+    return this.editor.nodes.filter(node => node.type === 'Define')
+      .map(node => this.getNode(node))
   }
 
   @transformer

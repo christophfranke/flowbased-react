@@ -7,9 +7,7 @@ import ObserverComponent from './observer-component'
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import * as Core from '@engine/modules/core'
-import * as Array from '@engine/modules/array'
-import * as Object from '@engine/modules/object'
+export const Dependencies = ['Core', 'Array', 'Object']
 
 export type Nodes = 'Tag' | 'Preview'
 export const Node: Engine.ModuleNodes<Nodes> = {
@@ -20,21 +18,27 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         output: () => Type.Element.create(),
       },
       input: {
-        input: () => Core.Type.Unresolved.create(),
-        classList: () => Array.Type.Array.create(Core.Type.String.create()),
-        style: () => Object.Type.Object.create({}),
-        props: () => Object.Type.Object.create({})
+        input: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Core.Type.Unresolved.create(),
+        classList: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Array.Type.Array.create(context.modules.Core.Type.String.create()),
+        style: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Object.Type.Object.create({}),
+        props: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Object.Type.Object.create({})
       }
     }
   },
   Preview: {
-    value: (node: Engine.Node, scope: Engine.Scope) => ObserverComponent(node, PreviewComponent, scope),
+    value: (node: Engine.Node, scope: Engine.Scope) =>
+      ObserverComponent(node, PreviewComponent, scope),
     type: {
       output: {
         output: () => Type.Element.create(),
       },
       input: {
-        input: () => Core.Type.Unresolved.create(),
+        input: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Core.Type.Unresolved.create(),
       }
     }
   }

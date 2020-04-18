@@ -13,6 +13,7 @@ import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
 import * as ObjectModule from '@engine/modules/object'
 import * as ArrayModule from '@engine/modules/array'
+import * as Define from '@engine/modules/define'
 
 class Store {
   connector: ConnectorFunctions
@@ -28,7 +29,8 @@ class Store {
     Core,
     React,
     Array: ArrayModule,
-    Object: ObjectModule
+    Object: ObjectModule,
+    Define
   }
 
   // @computed
