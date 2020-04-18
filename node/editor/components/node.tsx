@@ -98,20 +98,20 @@ class NodeView extends React.Component<Props> {
     if (keys.Shift) {
       if (this.isSelected) {
         // remove relevant nodes from selection
-        this.store.selectedNodes = this.store.selectedNodes
-          .filter(node => !relevantNodes.includes(node))
+        this.store.selectNodes(this.store.selectedNodes
+          .filter(node => !relevantNodes.includes(node)))
       } else {
         // add relevant nodes to selection
-        this.store.selectedNodes = this.store.selectedNodes
-          .concat(relevantNodes.filter(node => !this.store.selectedNodes.includes(node)))
+        this.store.selectNodes(this.store.selectedNodes
+          .concat(relevantNodes.filter(node => !this.store.selectedNodes.includes(node))))
       }
     } else {    
       if (!this.isSelected) {
-        this.store.selectedNodes = relevantNodes
+        this.store.selectNodes(relevantNodes)
       }
 
       if (this.isSelected && relevantNodes.length > 1) {
-        this.store.selectedNodes = relevantNodes
+        this.store.selectNodes(relevantNodes)
       }
     }
   }
@@ -202,6 +202,7 @@ class NodeView extends React.Component<Props> {
       position: 'absolute',
       borderRadius: '10px',
       cursor: 'move',
+      zIndex: this.props.node.zIndex,
       willChange: 'transform',
       transform: `translate(${this.props.node.position.x}px, ${this.props.node.position.y}px)`,
       color: colors.text.white,

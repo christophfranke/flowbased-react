@@ -48,16 +48,11 @@ export default class NodeFunctions {
   }
 
 
-
-  // getParamValue(node: Node, key: string): string {
-  //   const nameParam = node.params.find(param => param.key === key)
-  //   return nameParam && nameParam.value
-  // }
-
   createNode(position: Vector, module: string, nodeDefinition: NodeDefinition): Node {
     return {
       ...nodeDefinition.create(),
       module,
+      zIndex: 1,
       id: this.store.uid(),
       position
     } as Node    

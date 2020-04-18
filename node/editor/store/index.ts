@@ -22,6 +22,7 @@ class Store {
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentId: number = 0
+  @observable currentHighZ = 1
 
   modules = {
     Core,
@@ -97,11 +98,13 @@ class Store {
       // }))
 
       store.currentId = load(['editor', 'uid']) || 0
+      store.currentHighZ = load(['editor', 'highZ']) || 1
 
       // autosave immediately
       sync(['editor', 'connections'], store, 'connections')
       sync(['editor', 'nodes'], store, 'nodes')
       sync(['editor', 'uid'], store, 'currentId')
+      sync(['editor', 'highZ'], store, 'currentHighZ')
 
       Store.syncedInstance = store
     }
@@ -145,11 +148,16 @@ class Store {
     return childrenOfNode(node)
   }
 
-  // @transformer
-  // connectorsOfNode(node: Node): Connector[] {
-  //   // return flatten(Object.values(node.connectors))
-  //   return []
-  // }
+  @action selectNodes(nodes: Node[]) {
+    if (nodes.length > 0 && !nodes.every(node => this.selectedNodes.includes(node))) {
+      this.currentHighZ += 1
+      nodes.forEach(node => {
+        node.zIndex = this.currentHighZ
+      })
+    }
+
+    this.selectedNodes = nodes
+  }
 
   @action
   deleteNodes(nodes: Node[]) {

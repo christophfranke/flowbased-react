@@ -53,8 +53,6 @@ class Documentation extends React.Component<Props> {
       color: 'white'
     }
 
-    console.log(format(documentation.explanation))
-
     return <div style={this.props.style || {}}>
       <div style={style}>
         <div>

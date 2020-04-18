@@ -141,7 +141,7 @@ class EditorView extends React.Component {
       if (this.selectionRectangle) {
         this.selectionRectangle = null
       } else {
-        this.store.selectedNodes = []
+        this.store.selectNodes([])
       }
     }
   }
@@ -250,9 +250,9 @@ class EditorView extends React.Component {
       if (this.keys.Shift) {
         const stillSelected = this.initialSelection!.filter(node => !selected.includes(node))
         const freshSelected = selected.filter(node => !this.initialSelection!.includes(node))
-        this.store.selectedNodes = stillSelected.concat(freshSelected)
+        this.store.selectNodes(stillSelected.concat(freshSelected))
       } else {
-        this.store.selectedNodes = selected
+        this.store.selectNodes(selected)
       }
     } else {
       if (this.initialSelection) {
