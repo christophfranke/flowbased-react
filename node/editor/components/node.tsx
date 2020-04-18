@@ -85,7 +85,9 @@ class NodeView extends React.Component<Props> {
 
   @action
   hideHelp = (e) => {
-    this.isDocumentationVisible = false
+    if (!this.props['keys'][' ']) {
+      this.isDocumentationVisible = false
+    }
   }
 
   @action
@@ -198,6 +200,7 @@ class NodeView extends React.Component<Props> {
     const typeColor = typeColorBase[this.isSelected ? 'highlight': 'default']
 
     const nodeStyle: React.CSSProperties = {
+      pointerEvents: this.props['keys'][' '] ? 'none' : 'auto',
       padding: '10px',
       position: 'absolute',
       borderRadius: '10px',
