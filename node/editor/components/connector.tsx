@@ -216,8 +216,8 @@ class ConnectorView extends React.Component<Props> {
     const el = this.ref.current
     if (el) {
       this.props.connector.position = {
-        x: el.offsetLeft + 30,
-        y: el.offsetTop + 30
+        x: el.offsetLeft + 27,
+        y: el.offsetTop + 27
       }
     }
   }

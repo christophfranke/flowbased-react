@@ -3,6 +3,7 @@ import { computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
 import * as LA from '@editor/la'
+import Store from '@editor/store'
 
 import { Node, Connector, Mouse } from '@editor/types'
 import { colors } from '@editor/colors'
@@ -14,7 +15,7 @@ const BEZIER_DISTANCE = 100
 @observer
 class PendingConnections extends React.Component {
   mouse: Mouse = this.props['mouse']
-  store = this.props['store']
+  store: Store = this.props['store']
 
   path(connector: Connector): string {
     const node = connector.group.ports.node
@@ -42,7 +43,9 @@ class PendingConnections extends React.Component {
       pointerEvents: 'none',
       width: '100%',
       height: '100%',
-      overflow: 'visible'    }
+      overflow: 'visible',
+      zIndex: this.store.currentHighZ + 1
+    }
 
     return <svg style={style}>
       <g stroke={colors.connections} strokeWidth="2" fill="none">
