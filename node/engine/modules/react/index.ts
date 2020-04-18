@@ -44,15 +44,15 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Tag: {
     type: 'Component',
     documentation: {
-      explanation: 'This node create a *React Element*, that will be rendered to an HTML *Tag* (i.e. <img> or <div>).',
+      explanation: 'This node create a *React Element*, that will be rendered to an HTML *Tag*, i.e. `<img>` or `<div>`.',
       input: {
-        input: 'The children of this *React Element*. They will be placed inside the tag (if allowed), i.e. <div>{input1}{input2}{etc..}</div>. Although any type is allowed here, it is currently not possible to render *Objects*, that contain *React Elements*.',
-        classList: 'An *Array* of *Strings* for the classes of this *Tag*, i.e. <div class="{class1} {class2} {etc...}>',
-        style: 'An *Object* that describes the style of this *Tag*, i.e. <div style="{color: blue, textAlign: center}">. Please note, that these are used with React and therefore use camel case, instead of the default hyphen case, that is used for CSS.',
-        props: 'An *Object*, that describes all additional attributes for this *Tag* in the form <div {key}="{value}">, i.e. <div data-id="15"> or <img src="/path/to/image.jpg">'
+        input: 'The children of this *React Element*. They will be placed inside the tag (if allowed), i.e. `<div>{input1}{input2}{etc..}</div>`. Although any type is allowed here, it is currently not possible to render *Objects*, that contain *React Elements*.',
+        classList: 'An *Array* of *Strings* for the classes of this *Tag*, i.e. `<div class="{class1} {class2} {etc...}>`',
+        style: 'An *Object* that describes the style of this *Tag*, i.e. `<div style="{color: blue, textAlign: center}">`. Please note, that these are used with React and therefore use camel case, instead of the default hyphen case, that is used for CSS.',
+        props: 'An *Object*, that describes all additional attributes for this *Tag* in the form `<div {key}="{value}">`, i.e. `<div data-id="15">` or `<img src="/path/to/image.jpg">`'
       },
       params: {
-        tag: 'This describes the *Tag* name <{tagname}></{tagname}> or <{tagname}>, depending on the W3C specification for the tag name. Example: <div></div> or <img>'
+        tag: 'This describes the *Tag* name `<{tagname}></{tagname}>` or `<{tagname}>`, depending on the W3C specification for the tag name. Example: `<div></div>` or `<img>`'
       },
       output: {
         output: 'The *React Element*'

@@ -10,11 +10,27 @@ interface Props {
   style?: React.CSSProperties
 }
 
-const regex = /(\*[^\*]+\*)/
-const format = text => text.split(regex)
-  .map(token => token.match(regex)
-    ? <i>{token.substring(1, token.length - 1)}</i>
-    : token)
+const replacementMap = {
+  italic: {
+    all: '(\\*[^\*]+\\*)',
+    inner: /\*([^\*]+)\*/,
+    replace: token => <i>{token}</i>
+  },
+  code: {
+    all: '(`[^`]+`)',
+    inner: /`([^`]+)`/,
+    replace: token => <pre style={{ display: 'inline-block', backgroundColor: colors.background.editor, border: '1px solid rgba(255, 255, 255, 0.4)' }}>{token}</pre>
+  }
+}
+
+const format = text => text
+  .split(new RegExp(Object.values(replacementMap).map(rules => rules.all).join('|')))
+  .filter(token => !!token)
+  .map(token => Object.values(replacementMap)
+    .reduce((currentToken: any, rule) => typeof currentToken === 'string' && currentToken.match(rule.inner)
+      ? rule.replace(currentToken.match(rule.inner)![1])
+      : currentToken, token))
+
 
 @inject('store')
 @observer
@@ -51,9 +67,9 @@ class Documentation extends React.Component<Props> {
     const documentation = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType].documentation
 
     const style: React.CSSProperties = {
-      minWidth: '25vw',
-      maxWidth: '50vw',
-      maxHeight: '90vh',
+      minWidth: '20vw',
+      maxWidth: '60vw',
+      maxHeight: '75vh',
       overflowY: 'auto',
       backgroundColor: colors.background.default,
       padding: '20px',

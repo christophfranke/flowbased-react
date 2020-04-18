@@ -184,9 +184,10 @@ class ConnectorView extends React.Component<Props> {
     if (this.store.pendingConnector) {
       if (this.store.connector.state(this.props.connector) === 'hot') {
         if (this.store.connector.countConnections(this.props.connector) > 0 && ['duplicate', 'single'].includes(this.props.connector.group.mode)) {
-          this.connect()
-          this.store.pendingConnector = this.unconnect()
-          return
+          // this.connect()
+          // this.store.pendingConnector = this.unconnect()
+          // return
+          this.unconnect()
         }
 
         this.connect()
