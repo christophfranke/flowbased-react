@@ -57,21 +57,22 @@ function matchBasic(src: ValueType, target: ValueType, context: Context): ValueT
   }
 
   if (isBasic(src) && isBasic(target)) {
-    if (src.name === target.name) {
+    if (src.name === target.name && src.module === target.module) {
       const name = src.name
-      if (context.definitions.Type[name]) {
-        return context.definitions.Type[name].create()
+      const module = src.module
+      if (context.modules[module].Type[name]) {
+        return context.modules[module].Type[name].create()
       }
     }
 
-    return context.definitions.Type.Mismatch.create(`${src.name} is not ${target.name} `)
+    return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name} `)
   }
 
   return null
 }
 
 export function unionAll(types: ValueType[], context: Context): ValueType {
-  return types.reduce((result, type) => union(type, result, context), context.definitions.Type.Unresolved.create())
+  return types.reduce((result, type) => union(type, result, context), context.modules.Core.Type.Unresolved.create())
 }
 export function union(src: ValueType, target: ValueType, context: Context): ValueType {
   const basicMatch = matchBasic(src, target, context)
@@ -79,18 +80,19 @@ export function union(src: ValueType, target: ValueType, context: Context): Valu
     return basicMatch
   }
 
-  if (src.name === target.name) {
+  if (src.name === target.name && src.module === target.module) {
     const name = src.name
+    const module = src.module
 
-    if (name === 'Array') {
-      return context.definitions.Type.Array.create(union(src.params.items, target.params.items, context))
+    if (name === 'Array' && module === 'Array') {
+      return context.modules.Array.Type.Array.create(union(src.params.items, target.params.items, context))
     }
 
-    if (name === 'Pair') {
-      return context.definitions.Type.Pair.create(union(src.params.value, target.params.value, context))
+    if (name === 'Pair' && module === 'Object') {
+      return context.modules.Object.Type.Pair.create(union(src.params.value, target.params.value, context))
     }
 
-    if (name === 'Object') {
+    if (name === 'Object' && module === 'Object') {
       const srcParams = Object.keys(src.params)
       const targetParams = Object.keys(target.params)
       const keys = unique(srcParams.concat(targetParams))
@@ -98,8 +100,8 @@ export function union(src: ValueType, target: ValueType, context: Context): Valu
       const params = keys.map(key => ({
         key,
         type: union(
-          src.params[key] || context.definitions.Type.Unresolved.create(),
-          target.params[key] || context.definitions.Type.Unresolved.create(),
+          src.params[key] || context.modules.Core.Type.Unresolved.create(),
+          target.params[key] || context.modules.Core.Type.Unresolved.create(),
           context
         )
       })).reduce((obj, { key, type }) => ({
@@ -107,18 +109,18 @@ export function union(src: ValueType, target: ValueType, context: Context): Valu
         [key]: type
       }), {})
 
-      return context.definitions.Type.Object.create(params)
+      return context.modules.Object.Type.Object.create(params)
     }
 
     throw new Error(`Unknown generic type ${name}`)
   }
 
-  return context.definitions.Type.Mismatch.create(`${src.name} is not ${target.name}`)
+  return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name}`)
 }
 
 export function intersectAll(types: ValueType[], context: Context): ValueType {
   console.log('intersect', types)
-  return types.reduce((result, type) => intersect(type, result, context), context.definitions.Type.Unresolved.create())
+  return types.reduce((result, type) => intersect(type, result, context), context.modules.Core.Type.Unresolved.create())
 }
 export function intersect(src: ValueType, target: ValueType, context: Context): ValueType {
   const basicMatch = matchBasic(src, target, context)
@@ -126,18 +128,19 @@ export function intersect(src: ValueType, target: ValueType, context: Context): 
     return basicMatch
   }
 
-  if (src.name === target.name) {
+  if (src.name === target.name && src.module === target.module) {
     const name = src.name
+    const module = src.module
 
-    if (name === 'Array') {
-      return context.definitions.Type.Array.create(intersect(src.params.items, target.params.items, context))
+    if (name === 'Array' && module === 'Array') {
+      return context.modules.Array.Type.Array.create(intersect(src.params.items, target.params.items, context))
     }
 
-    if (name === 'Pair') {
-      return context.definitions.Type.Pair.create(intersect(src.params.value, target.params.value, context))
+    if (name === 'Pair' && module === 'Object') {
+      return context.modules.Object.Type.Pair.create(intersect(src.params.value, target.params.value, context))
     }
 
-    if (name === 'Object') {
+    if (name === 'Object' && module === 'Object') {
       const srcParams = Object.keys(src.params)
       const targetParams = Object.keys(target.params)
       const keys = srcParams.filter(key => targetParams.includes(key))
@@ -150,13 +153,13 @@ export function intersect(src: ValueType, target: ValueType, context: Context): 
         [key]: type
       }), {})
 
-      return context.definitions.Type.Object.create(params)
+      return context.modules.Object.Type.Object.create(params)
     }
 
     throw new Error(`Unknown generic type ${name}`)
   }
 
-  return context.definitions.Type.Mismatch.create(`${src.name} is not ${target.name}`)
+  return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name}`)
 }
 
 export function matchInto(src: ValueType, target: ValueType, context: Context): ValueType {
@@ -165,18 +168,19 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
     return basicMatch
   }
 
-  if (src.name === target.name) {
+  if (src.name === target.name && src.module === target.module) {
     const name = src.name
+    const module = src.module
 
-    if (name === 'Array') {
-      return context.definitions.Type.Array.create(matchInto(src.params.items, target.params.items, context))
+    if (name === 'Array' && module === 'Array') {
+      return context.modules.Array.Type.Array.create(matchInto(src.params.items, target.params.items, context))
     }
 
-    if (name === 'Pair') {
-      return context.definitions.Type.Pair.create(matchInto(src.params.value, target.params.value, context))
+    if (name === 'Pair' && module === 'Object') {
+      return context.modules.Object.Type.Pair.create(matchInto(src.params.value, target.params.value, context))
     }
 
-    if (name === 'Object') {
+    if (name === 'Object' && module === 'Object') {
       const srcParams = Object.keys(src.params)
       const targetParams = Object.keys(target.params)
       const keys = unique(srcParams.concat(targetParams))
@@ -184,8 +188,8 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
       const params = keys.map(key => ({
         key,
         type: matchInto(
-          src.params[key] || context.definitions.Type.Mismatch.create(`Expected Object with key ${key}`),
-          target.params[key] || context.definitions.Type.Unresolved.create(),
+          src.params[key] || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${key}`),
+          target.params[key] || context.modules.Core.Type.Unresolved.create(),
           context
         )
       })).reduce((obj, { key, type }) => ({
@@ -193,13 +197,13 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
         [key]: type
       }), {})
 
-      return context.definitions.Type.Object.create(params)
+      return context.modules.Object.Type.Object.create(params)
     }
 
     throw new Error(`Unknown generic type ${name}`)
   }
 
-  return context.definitions.Type.Mismatch.create(`${src.name} is not ${target.name}`)
+  return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name}`)
 }
 
 export function createEmptyValue(type: ValueType): any {

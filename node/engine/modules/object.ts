@@ -167,6 +167,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: (params: { [key: string]: Engine.ValueType }) => ({
       display: 'Object {}',
       name: 'Object',
+      module: 'Object',
       params
     }),
     emptyValue: () => {},
@@ -179,6 +180,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: (value: Engine.ValueType) => ({
       display: 'Pair<{value}>',
       name: 'Pair',
+      module: 'Object',
       params: {
         value
       }

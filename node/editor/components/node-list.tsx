@@ -2,8 +2,12 @@ import React from 'react'
 import { observable, computed, action } from 'mobx'
 import { inject, observer } from 'mobx-react'
 
+import Store from '@editor/store'
+
 import { Vector } from '@editor/types'
 import { colors } from '@editor/colors'
+
+import Documentation from '@editor/components/documentation'
 
 
 interface Props {
@@ -17,7 +21,7 @@ const MAX_ITEMS = 50
 @inject('store')
 @observer
 class NodeList extends React.Component<Props> {
-  store = this.props['store']
+  store: Store = this.props['store']
   inputRef = React.createRef<HTMLInputElement>()
 
   @observable searchString = ''
@@ -30,6 +34,12 @@ class NodeList extends React.Component<Props> {
   @computed get filteredNodeList() {
     const regex = new RegExp(this.searchString.split('').join('.*'), 'i')
     return this.store.node.nodeList.filter(node => !!node.name.match(regex)).slice(0, MAX_ITEMS)
+  }
+
+  @computed get selectedItem() {
+    return this.selectedShown >= 0
+      ? this.filteredNodeList[this.selectedShown]
+      : null
   }
 
   create = factory => {
@@ -69,8 +79,8 @@ class NodeList extends React.Component<Props> {
     }
 
     if (e.key === 'Enter') {
-      if (this.selectedShown >= 0) {
-        this.create(this.filteredNodeList[this.selectedShown].create)
+      if (this.selectedItem) {
+        this.create(this.selectedItem.create)
       }
     }
   }
@@ -98,7 +108,7 @@ class NodeList extends React.Component<Props> {
       display: 'flex',
       justifyContent: 'space-between',
       cursor: 'pointer',
-      padding: '0 5px'
+      padding: '3px 8px'
     }
 
     const inputStyle: React.CSSProperties = {
@@ -115,26 +125,29 @@ class NodeList extends React.Component<Props> {
     }
 
     return <div style={this.props.style}>
-      <ul>
-        <li><input style={inputStyle} ref={this.inputRef} value={this.searchString} onChange={this.handleChange} /></li>
-        {this.filteredNodeList.map((item, index) => {
-          const itemStyle = {
-            ...itemStyleTemplate,
-            borderTop: index > -1 ? `1px solid ${colors.nodeList.border}` : 'none',
-            backgroundColor: index === this.selectedShown ? colors.nodeList.background.selected : colors.nodeList.background.default,
-            color: index === this.selectedShown ? colors.nodeList.text.selected : colors.nodeList.text.default
-          }
+      <div style={{ display: 'flex' }}>
+        <ul>
+          <li><input style={inputStyle} ref={this.inputRef} value={this.searchString} onChange={this.handleChange} /></li>
+          {this.filteredNodeList.map((item, index) => {
+            const itemStyle = {
+              ...itemStyleTemplate,
+              borderTop: index > -1 ? `1px solid ${colors.nodeList.border}` : 'none',
+              backgroundColor: index === this.selectedShown ? colors.nodeList.background.selected : colors.nodeList.background.default,
+              color: index === this.selectedShown ? colors.nodeList.text.selected : colors.nodeList.text.default
+            }
 
-          const mouseOver = () => {
-            this.selected = index
-          }
+            const mouseOver = () => {
+              this.selected = index
+            }
 
-          return <li key={item.name} onClick={(e) => this.handleClick(e, item.create)} style={itemStyle} onMouseOver={mouseOver}>
-            <span style={nameStyle}>{item.name}</span>
-            <span style={{ fontStyle: 'italic' }}>{item.type}</span>
-          </li>
-        })}
-      </ul>
+            return <li key={item.name} onClick={(e) => this.handleClick(e, item.create)} style={itemStyle} onMouseOver={mouseOver}>
+              <span style={nameStyle}><span style={{ fontSize: '10px' }}>{item.module}</span>.{item.name}</span>
+              <span style={{ fontStyle: 'italic' }}>{item.type}</span>
+            </li>
+          })}
+        </ul>
+        {this.selectedItem && <Documentation style={{ marginLeft: '10px' }} nodeType={this.selectedItem.name} nodeModule={this.selectedItem.module} />}
+      </div>
     </div>
   }
 }

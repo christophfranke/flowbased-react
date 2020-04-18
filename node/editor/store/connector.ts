@@ -52,7 +52,7 @@ export default class ConnectorFunctions {
   }
 
   connectorOptions(node: Node, fn: ConnectorFunction, key: string): ConnectorOption[] {
-    const portConfig = this.store.definitions.EditorNode[node.type].ports
+    const portConfig = this.store.modules[node.module].EditorNode[node.type].ports
     if (portConfig) {
       const fnConfig = portConfig[fn]
       if (fnConfig) {
@@ -77,7 +77,7 @@ export default class ConnectorFunctions {
       }
     })
 
-    ports.input.main = Object.keys(this.store.definitions.Node[node.type].type.input || {})
+    ports.input.main = Object.keys(this.store.modules[node.module].Node[node.type].type.input || {})
       .filter(key => !this.connectorOptions(node, 'input', key).includes('side'))
       .map(key => this.createInput(
         key,
@@ -87,11 +87,11 @@ export default class ConnectorFunctions {
           : 'single'
         ))
 
-    ports.input.side = Object.keys(this.store.definitions.Node[node.type].type.input || {})
+    ports.input.side = Object.keys(this.store.modules[node.module].Node[node.type].type.input || {})
       .filter(key => this.connectorOptions(node, 'input', key).includes('side'))
       .map(key => this.createProperty(key, ports))
 
-    ports.output.main = Object.keys(this.store.definitions.Node[node.type].type.output || {})
+    ports.output.main = Object.keys(this.store.modules[node.module].Node[node.type].type.output || {})
       .map(key => this.createOutput(key, ports))
 
     return ports

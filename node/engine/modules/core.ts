@@ -111,6 +111,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'String',
       name: 'String',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => '',
@@ -120,6 +121,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'Number',
       name: 'Number',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => 0,
@@ -129,6 +131,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'Boolean',
       name: 'Boolean',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => false,
@@ -138,6 +141,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'Unresolved',
       name: 'Unresolved',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => undefined,
@@ -147,6 +151,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'Null',
       name: 'Null',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => null,
@@ -156,6 +161,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'Unknown',
       name: 'Unknown',
+      module: 'Core',
       params: {}
     }),
     emptyValue: () => undefined,
@@ -165,10 +171,12 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: (reason: string) => ({  
       display: 'TypeError: {msg}',
       name: 'Mismatch',
+      module: 'Core',
       params: {
         msg: {
           display: reason,
           name: 'Null',
+          module: 'Core',
           params: {}
         }
       }

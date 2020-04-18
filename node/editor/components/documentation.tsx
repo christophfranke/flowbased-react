@@ -6,6 +6,7 @@ import { colors } from '@editor/colors'
 
 interface Props {
   nodeType: string
+  nodeModule: string
   style?: React.CSSProperties
 }
 
@@ -28,8 +29,9 @@ class Documentation extends React.Component<Props> {
       `
 
       return <div>
-        <h2 style={{ fontSize: '20px', marginTop: '20px' }}>{key}</h2>
-        <div style={{ display: 'grid', gridTemplate }}>
+        <hr style={{ marginTop: '15px', borderColor: 'rgba(255, 255, 255, 0.1)' }} />
+        <h2 style={{ fontSize: '18px', marginTop: '15px', marginBottom: '5px' }}>{key}</h2>
+        <div style={{ display: 'grid', gridTemplate, fontSize: '14px' }}>
           {Object.entries(obj[key]).map(([type, description]: [string, string]) => <>
               <span key={type} style={{ marginRight: '10px', fontWeight: 'bold' }}>{[''].includes(type) ? 'default' : type}:</span>
               <span>{format(description)}</span>
@@ -40,14 +42,15 @@ class Documentation extends React.Component<Props> {
   }
 
   render() {
-    const documentation = this.store.definitions.EditorNode[this.props.nodeType].documentation
+    const documentation = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType].documentation
 
     const style: React.CSSProperties = {
       minWidth: '700px',
       backgroundColor: colors.background.default,
       padding: '20px',
       borderRadius: '8px',
-      border: '1px solid white'
+      border: '1px solid white',
+      color: 'white'
     }
 
     console.log(format(documentation.explanation))
@@ -55,7 +58,9 @@ class Documentation extends React.Component<Props> {
     return <div style={this.props.style || {}}>
       <div style={style}>
         <div>
-          <h1 style={{ fontSize: '24px'}}>{this.props.nodeType}</h1>
+          <h1 style={{ fontSize: '20px', marginBottom: '5px' }}>
+            <span style={{ fontSize: '14px'}}>{this.props.nodeModule}</span>.{this.props.nodeType}
+          </h1>
           {format(documentation.explanation)}
         </div>
         {this.renderConnectors(documentation, 'input')}

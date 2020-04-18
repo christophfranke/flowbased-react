@@ -6,11 +6,11 @@ import { computedFunction } from '@engine/util'
 import { matchInto, unionAll } from '@engine/type-functions'
 
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
-  return scope.context.definitions.Node[node.type].value(node, scope, key)
+  return scope.context.modules[node.module].Node[node.type].value(node, scope, key)
 })
 
 export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
-  return context.definitions.Node[node.type].type.output![key](node, context)
+  return context.modules[node.module].Node[node.type].type.output![key](node, context)
 })
 
 export const type = computedFunction(function(node: Node, context: Context, key: string = 'output'): ValueType {
@@ -29,5 +29,5 @@ export const numScopeResolvers = computedFunction(function (node: Node): number 
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
-  return context.definitions.Node[target.type].type.input![key](target, context)
+  return context.modules[target.module].Node[target.type].type.input![key](target, context)
 }

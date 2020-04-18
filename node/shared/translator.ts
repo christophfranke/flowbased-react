@@ -24,31 +24,22 @@ class Translator {
   modules = {
     Core,
     React,
-    ArrayModule,
-    ObjectModule
+    Array: ArrayModule,
+    Object: ObjectModule
   }
 
   @computed
   get definitions(): Module {
     return {
-      Node: {
-        ...Object.values(this.modules).reduce((all, module) => ({
-          ...all,
-          ...module.Node
-        }), {})
-      },
-      Type: {
-        ...Object.values(this.modules).reduce((all, module) => ({
-          ...all,
-          ...module.Type
-        }), {})
-      }
+      Node: {},
+      Type: {}
     }
   }
 
   @computed get context(): Context {
     return {
-      definitions: this.definitions
+      // definitions: this.definitions,
+      modules: this.modules
     }
   }
 
@@ -149,12 +140,12 @@ class Translator {
     return {
       id: editorNode.id,
       type: editorNode.type,
+      module: editorNode.module,
       get params() {
         return getParams()
       },
       connections: {
         get input() {
-          console.log('inputs', editorNode.type, editorNode.id, getInputs())
           return getInputs()
         },
         get output() {
@@ -162,32 +153,6 @@ class Translator {
         }
       }
     }
-    // const id = editorNode.id
-    // const inputs = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.input)
-    // const properties = () => this.getConnectionsOfConnectorsForInputs(editorNode.connectors.properties)
-    // const outputs = () => this.getConnectionsOfConnectorsForOutput(editorNode.connectors.output)
-
-    // return {
-    //   id: editorNode.id,
-    //   name: editorNode.type,
-    //   get params() {
-    //     return editorNode.params.reduce((obj, { key, value }) => ({
-    //       ...obj,
-    //       [key]: value
-    //     }), {})
-    //   },
-    //   connections: {
-    //     get input() {
-    //       return inputs()
-    //     },
-    //     get output() {
-    //       return outputs()
-    //     },
-    //     get properties() {
-    //       return properties()
-    //     },
-    //   }
-    // }
   }
 }
 

@@ -40,6 +40,7 @@ export type ValueType = ValueTypeTemplate<any>
 export interface ValueTypeTemplate<T> {
   readonly display: string
   readonly name: T
+  readonly module: string
   readonly params: {
     [key: string]: ValueType
   }
@@ -63,6 +64,7 @@ export interface Params {
 export interface Node {
   readonly id: number
   readonly type: string
+  readonly module: string
   readonly params: Params
   connections: {
     readonly input: {
@@ -75,10 +77,13 @@ export interface Node {
 }
 
 export interface Context {
-  definitions: {
-    Node: ModuleNodes<string>
-    Type: ModuleTypes<string>
+  modules: {
+    [key: string]: Module
   }
+  // definitions: {
+  //   Node: ModuleNodes<string>
+  //   Type: ModuleTypes<string>
+  // }
 }
 
 export interface Scope {

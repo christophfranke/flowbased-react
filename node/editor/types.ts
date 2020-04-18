@@ -105,6 +105,7 @@ export interface RawNode<T> {
 
 export interface Node extends RawNode<string> {
   id: number
+  module: string
   position: Vector
   boundingBox?: Rectangle
 }

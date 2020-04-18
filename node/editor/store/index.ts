@@ -26,33 +26,33 @@ class Store {
   modules = {
     Core,
     React,
-    ArrayModule,
-    ObjectModule
+    Array: ArrayModule,
+    Object: ObjectModule
   }
 
-  @computed
-  get definitions(): Module {
-    return {
-      Node: {
-        ...Object.values(this.modules).reduce((all, module) => ({
-          ...all,
-          ...module.Node
-        }), {})
-      },
-      Type: {
-        ...Object.values(this.modules).reduce((all, module) => ({
-          ...all,
-          ...module.Type
-        }), {})
-      },
-      EditorNode: {
-        ...Object.values(this.modules).reduce((all, module) => ({
-          ...all,
-          ...module.EditorNode
-        }), {})
-      }
-    }
-  }
+  // @computed
+  // get definitions(): Module {
+  //   return {
+  //     Node: {
+  //       ...Object.values(this.modules).reduce((all, module) => ({
+  //         ...all,
+  //         ...module.Node
+  //       }), {})
+  //     },
+  //     Type: {
+  //       ...Object.values(this.modules).reduce((all, module) => ({
+  //         ...all,
+  //         ...module.Type
+  //       }), {})
+  //     },
+  //     EditorNode: {
+  //       ...Object.values(this.modules).reduce((all, module) => ({
+  //         ...all,
+  //         ...module.EditorNode
+  //       }), {})
+  //     }
+  //   }
+  // }
 
   @computed get connectors(): Connector[] {
     return []

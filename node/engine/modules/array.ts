@@ -67,6 +67,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: (items: Engine.ValueType) => ({
       display: 'Array<{items}>',
       name: 'Array',
+      module: 'Array',
       params: {
         items
       }

@@ -99,6 +99,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: () => ({
       display: 'React Element',
       name: 'Element',
+      module: 'React',
       params: {}    
     }),
     emptyValue: () => React.createElement(React.Fragment),

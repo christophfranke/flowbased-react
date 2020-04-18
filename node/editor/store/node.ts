@@ -1,9 +1,10 @@
 import { computed } from 'mobx'
 import { Node, Vector, NodeDefinition } from '@editor/types'
 
+import { flatten } from '@shared/util'
 import Store from '@editor/store'
 
-interface nodeListItem {
+interface NodeListItem {
   name: string
   type: string
   module: string
@@ -27,20 +28,22 @@ export default class NodeFunctions {
   //     .filter(node => node.name)
   // }
 
-  @computed get nodeList() {
-   const list = Object.entries(this.store.definitions.EditorNode)
-      .map(([name, nodeDefinition]) => ({
-        name,
-        type: nodeDefinition.type,
-        module: 'Unknown',
-        create: position => this.createNode(position, nodeDefinition)
-      }));
+  @computed get nodeList(): NodeListItem[] {
+    const list = flatten(Object.entries(this.store.modules)
+     .map(([module, definitions]) =>
+        Object.entries(definitions.EditorNode)
+          .map(([name, nodeDefinition]) => ({
+            name,
+            type: nodeDefinition.type,
+            module,
+            create: position => this.createNode(position, module, nodeDefinition)
+          }))));
 
     return list.sort((a, b) => {
-      if (a.type === b.type) {
+      if (a.module === b.module) {
         return a.name < b.name ? -1 : 1
       }
-      return a.type < b.type ? -1 : 1
+      return a.module < b.module ? -1 : 1
     })
   }
 
@@ -51,9 +54,10 @@ export default class NodeFunctions {
   //   return nameParam && nameParam.value
   // }
 
-  createNode(position: Vector, nodeDefinition: NodeDefinition): Node {
+  createNode(position: Vector, module: string, nodeDefinition: NodeDefinition): Node {
     return {
       ...nodeDefinition.create(),
+      module,
       id: this.store.uid(),
       position
     } as Node    

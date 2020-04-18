@@ -85,7 +85,7 @@ class ConnectorView extends React.Component<Props> {
       return expectedType(node, this.props.connector.group.key, this.store.context)
     }
 
-    return this.store.context.definitions.Type.Unknown.create()
+    return this.store.modules.Core.Type.Unknown.create()
   }
 
   @computed get type(): ValueType {
@@ -111,7 +111,7 @@ class ConnectorView extends React.Component<Props> {
     }
 
 
-    return this.store.context.definitions.Type.Unknown.create()
+    return this.store.modules.Core.Type.Unknown.create()
   }
 
   @computed get typeDisplay(): string {
