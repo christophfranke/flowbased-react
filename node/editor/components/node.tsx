@@ -258,9 +258,7 @@ class NodeView extends React.Component<Props> {
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params' }}>
-            <div style={nameStyle} onClick={this.showHelp}>
-              <span style={{ fontSize: '14px' }}>{node.module}</span>.{node.name}
-            </div>
+            <div style={nameStyle} onClick={this.showHelp}>{node.name}</div>
             {this.isDocumentationVisible && <Documentation nodeType={this.props.node.type} nodeModule={this.props.node.module} style={documentationStyle} />}
             {this.params.map(param => {
               if (param.type === 'number') {
