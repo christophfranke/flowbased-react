@@ -50,14 +50,16 @@ class Store {
     return this.context.defines.reduce((obj, define) => {
       return {
         ...obj,
-        [define.params.name]: {        
+        [`define-${define.id}`]: {
           type: 'Local',
           documentation: {
             explanation: 'Locally defined node'
           },
           create: () => ({
-            name: define.params.name,
-            type: define.params.name,
+            get name() {
+              return define.params.name
+            },
+            type: `define-${define.id}`,
             params: [{
               name: 'Define',
               key: 'define',

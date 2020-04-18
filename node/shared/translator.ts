@@ -44,7 +44,7 @@ class Translator {
   @computed get localNodes() {
     const result = this.context.defines.reduce((obj, define) => ({
       ...obj,
-      [define.params.name]: {
+      [`define-${define.id}`]: {
         value: (node: Node, scope: Scope) => {
           return scope.context.modules.Define.Node.Proxy.value(node, scope, 'output')
         },
