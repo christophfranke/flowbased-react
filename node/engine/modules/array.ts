@@ -2,7 +2,7 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
-import { inputs, outputs, firstInput, flatFilteredSubForest } from '@engine/tree'
+import { inputs, outputs, firstInput, match } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core']
@@ -64,9 +64,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   },
   Collect: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
-      const forest = flatFilteredSubForest(node, candidate => candidate.type === 'Items')
-      if (forest.length > 0) {
-        const itemsNode = forest[0].node
+      const itemsNode = match(node,
+        candidate => candidate.type === 'Items',
+        candidate => candidate.type === 'Collect')
+
+      if (itemsNode) {
         const itemsInput = firstInput(itemsNode)
         const array = itemsInput
           ? value(itemsInput.node, scope, itemsInput.key)

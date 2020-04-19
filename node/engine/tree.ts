@@ -39,6 +39,16 @@ export function flatFilteredSubForest(root: Node, condition: Condition): NodeFor
   return flatten(children(root).map(child => filteredSubForest(child, condition)))
 }
 
+export const match = function(node: Node, flattener: Condition, deepener: Condition, depth = 0): Node | undefined {
+  const newDepth = depth + (flattener(node) ? -1 : 0) + (deepener(node) ? 1 : 0)
+
+  if (newDepth === 0) {
+    return node
+  }
+
+  return children(node).map(child => match(child, flattener, deepener, newDepth)).find(result => result)
+}
+
 export const outputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.output)
     .map(group => group.map(connection => connection.target)))
