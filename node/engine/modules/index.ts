@@ -1,3 +1,4 @@
+export default {}
 // import React from 'react'
 // import { Node, RenderProps, ValueType, Scope } from '@engine/types'
 // import { value, type, unmatchedType, expectedType } from '@engine/render'

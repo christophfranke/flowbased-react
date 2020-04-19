@@ -23,7 +23,7 @@ export default class NodeFunctions {
     const list = flatten(Object.entries(this.store.modules)
       .map(([module, definitions]) =>
         Object.entries(definitions.EditorNode)
-          .map(([type, nodeDefinition]) => ({
+          .map(([type, nodeDefinition]: [string, NodeDefinition]) => ({
             name: nodeDefinition.name,
             typeDisplay: nodeDefinition.type,
             type,
