@@ -48,7 +48,7 @@ export const type = computedFunction(function(node: Node, context: Context, key:
 })
 
 export const numScopeResolvers = computedFunction(function (node: Node): number {
-  console.warn('numScopeResolvers not implemented anymore')
+  // console.warn('numScopeResolvers not implemented anymore')
   return 0
 })
 
