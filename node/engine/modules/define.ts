@@ -30,8 +30,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   },
   Input: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
-      const input = scope.locals.input && scope.locals.input.input
-      return input.length > 0
+      const input = scope.locals.input && scope.locals.input[node.params.name]
+      return input && input.length > 0
         ? value(input[0].src.node, scope.parent || scope, input[0].src.key)
         : createEmptyValue(type(node, (scope.parent || scope).context))
     },
@@ -144,7 +144,12 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
     },
     create: () => ({
       type: 'Input',
-      params: []
+      params: [{
+        name: 'Name',
+        key: 'name',
+        value: 'input',
+        type: 'text'
+      }],
     })
   }
 }

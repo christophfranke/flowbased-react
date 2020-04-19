@@ -59,23 +59,20 @@ class Translator {
           get input() {
             const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
 
-            if (forest.length > 0) {
-              return {
-                input: (node: Node, context: Context) => {
-                  const newContext = {
-                    ...context,
-                    types: {
-                      ...context.types,
-                      [define.id]: type(node, context)
-                    }
+            return forest.reduce((obj, input) => ({
+              ...obj,
+              [input.node.params.name]: (node: Node, context: Context) => {
+                const newContext = {
+                  ...context,
+                  types: {
+                    ...context.types,
+                    [define.id]: type(node, context)
                   }
-
-                  return type(forest[0].node, newContext)
                 }
-              }
-            }
 
-            return {}
+                return type(input.node, newContext)
+              }
+            }), {})
           }
         }
       }
