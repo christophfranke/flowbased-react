@@ -7,6 +7,7 @@ import { Context } from '@engine/types'
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
 
+import { filteredSubForest } from '@engine/tree'
 import { flatten, transformer } from '@shared/util'
 
 import * as Core from '@engine/modules/core'
@@ -57,6 +58,15 @@ class Store {
           type: 'Local',
           documentation: {
             explanation: 'Locally defined node'
+          },
+          ports: {
+            get input() {
+              const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
+              return forest.reduce((obj, input) => ({
+                ...obj,
+                [input.node.params.name]: input.node.params.side ? 'side' : 'main'
+              }), {})
+            }
           },
           create: () => ({
             type: `define-${define.id}`,

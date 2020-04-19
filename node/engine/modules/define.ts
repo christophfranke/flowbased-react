@@ -37,14 +37,9 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     },
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => {
-          const result = context.types.input
-            ? context.types.input
-            : context.modules.Core.Type.Unresolved.create()
-
-          console.log('input type', result)
-          return result
-        }
+        output: (node: Engine.Node, context: Engine.Context) => context.types.input
+          ? context.types.input
+          : context.modules.Core.Type.Unresolved.create()
       }
     }
   },
@@ -87,23 +82,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             ? unmatchedType(define, newContext, 'output')
             : context.modules.Core.Type.Mismatch.create(`Cannot find define node ${node.params.define}`)
         }
-      },
-      // input: {
-        // input: (node: Engine.Node, context: Engine.Context) => {
-          // return context.modules.Core.Type.Null.create()
-          // const define = getStaticGlobalScope().locals.defines
-          //   .find(other => other.id === node.params.define)
-
-          // if (!define) {
-          //   return TypeDefinition.Null
-          // }
-
-          // const forest = filteredSubForest(define, candidate => candidate.name === 'Input')
-          // return forest.length > 0
-          //   ? unionAll(forest.map(tree => type(tree.node)))
-          //   : TypeDefinition.Null
-        // }
-      // }
+      }
     }
   }
 }
@@ -152,6 +131,11 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
         key: 'name',
         value: 'input',
         type: 'text'
+      }, {
+        name: 'Side',
+        key: 'side',
+        value: false,
+        type: 'checkbox'
       }],
     })
   }
