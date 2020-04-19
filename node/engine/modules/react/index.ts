@@ -46,6 +46,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Tag: {
+    name: 'React Tag',
     type: 'Component',
     documentation: {
       explanation: 'This node create a *React Element*, that will be rendered to an HTML *Tag*, i.e. `<img>` or `<div>`.',
@@ -71,7 +72,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'React Tag',
       type: 'Tag',
       params: [{
         name: 'Tag',
@@ -82,6 +82,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Preview: {
+    name: 'Preview',
     type: 'Preview',
     options: ['singleton'],
     documentation: {
@@ -96,7 +97,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Preview',
       type: 'Preview',
       params: [],
     })

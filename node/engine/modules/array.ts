@@ -38,6 +38,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Array: {
+    name: 'Array',
     type: 'Value',
     documentation: {
       explanation: 'Creates an *Array* value. An *Array* is a collection of items, that all share the same type.',
@@ -54,7 +55,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Array',
       type: 'Array',
       params: [],
     })    

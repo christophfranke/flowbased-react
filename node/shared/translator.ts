@@ -58,8 +58,6 @@ class Translator {
       }
     }), {})
 
-    console.log(result)
-
     return result
   }
 
@@ -89,7 +87,7 @@ class Translator {
   @computed get defines(): Node[] {
     // console.log('nodes', this.editor.nodes)
     // console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
-    return this.editor.nodes.filter(node => node.type === 'Define' && node.params.find(param => param.key === 'name' && param.value))
+    return this.editor.nodes.filter(node => node.type === 'Define')
       .map(node => this.getNode(node))
   }
 

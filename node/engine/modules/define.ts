@@ -102,6 +102,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
   Define: {
+    name: 'Define',
     type: 'Define',
     documentation: {
       explanation: '',
@@ -118,7 +119,6 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
       }
     },
     create: () => ({
-      name: 'Define',
       type: 'Define',
       params: [{
         name: 'Name',
@@ -129,6 +129,7 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
     })    
   },
   Input: {
+    name: 'Input',
     type: 'Input',
     documentation: {
       explanation: '',
@@ -137,7 +138,6 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
       }
     },
     create: () => ({
-      name: 'Input',
       type: 'Input',
       params: []
     })

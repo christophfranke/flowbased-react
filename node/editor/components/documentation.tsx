@@ -19,7 +19,11 @@ const replacementMap = {
   code: {
     all: '(`[^`]+`)',
     inner: /`([^`]+)`/,
-    replace: token => <pre style={{ display: 'inline-block', backgroundColor: colors.background.editor, border: '1px solid rgba(255, 255, 255, 0.4)' }}>{token}</pre>
+    replace: token => <pre style={{
+        display: 'inline-block',
+        backgroundColor: colors.background.editor,
+        border: '1px solid rgba(255, 255, 255, 0.4)'
+      }}>{token}</pre>
   }
 }
 
@@ -64,7 +68,8 @@ class Documentation extends React.Component<Props> {
   }
 
   render() {
-    const documentation = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType].documentation
+    const definition = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType]
+    const documentation = definition.documentation
 
     const style: React.CSSProperties = {
       minWidth: '30vw',
@@ -83,7 +88,7 @@ class Documentation extends React.Component<Props> {
       <div style={style} onWheel={this.handleWheel}>
         <div>
           <h1 style={{ fontSize: '20px', marginBottom: '5px' }}>
-            <span style={{ fontSize: '14px'}}>{this.props.nodeModule}</span>.{this.props.nodeType}
+            <span style={{ fontSize: '14px'}}>{this.props.nodeModule}</span>.{definition.name}
           </h1>
           {format(documentation.explanation)}
         </div>

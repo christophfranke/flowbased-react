@@ -12,6 +12,7 @@ export type ModuleNodes<NodeName extends keyof any> = {
 export type NodeOption = 'singleton'
 export interface NodeDefinition<T = string> {
   type: string
+  name: string
   options?: NodeOption[]
   documentation: {
     explanation: string
@@ -100,7 +101,6 @@ export interface Parameter {
 }
 
 export interface RawNode<T> {
-  name: string
   type: T
   params: Parameter[]  
 }

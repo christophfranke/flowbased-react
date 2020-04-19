@@ -6,6 +6,7 @@ import Store from '@editor/store'
 
 interface NodeListItem {
   name: string
+  typeDisplay: string
   type: string
   module: string
   create: (position: Vector) => void
@@ -22,11 +23,12 @@ export default class NodeFunctions {
     const list = flatten(Object.entries(this.store.modules)
       .map(([module, definitions]) =>
         Object.entries(definitions.EditorNode)
-          .map(([name, nodeDefinition]) => ({
-            name,
-            type: nodeDefinition.type,
+          .map(([type, nodeDefinition]) => ({
+            name: nodeDefinition.name,
+            typeDisplay: nodeDefinition.type,
+            type,
             module,
-            create: position => this.createNode(position, module, name)
+            create: position => this.createNode(position, module, type)
           }))))
 
     return list.sort((a, b) => {
@@ -35,27 +37,6 @@ export default class NodeFunctions {
       }
       return a.module < b.module ? -1 : 1
     })
-  }
-
-  createProxy(position, define) {
-    const node: Node = {
-      id: this.store.uid(),
-      type: 'Proxy',
-      params: [{
-        name: 'Define',
-        key: 'define',
-        value: define.id,
-        type: 'hidden'
-      }],
-      module: 'Define',
-      position,
-      zIndex: 1,
-      get name() {
-        return define.params.find(param => param.key === 'name').value
-      },
-    }
-
-    this.store.nodes.push(node)
   }
 
 

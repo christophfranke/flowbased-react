@@ -51,14 +51,14 @@ class Store {
       return {
         ...obj,
         [`define-${define.id}`]: {
+          get name() {
+            return define.params.name.trim() || 'Anonymous'
+          },
           type: 'Local',
           documentation: {
             explanation: 'Locally defined node'
           },
           create: () => ({
-            get name() {
-              return define.params.name
-            },
             type: `define-${define.id}`,
             params: [{
               name: 'Define',
@@ -128,6 +128,11 @@ class Store {
   uid(): number {
     this.currentId += 1
     return this.currentId
+  }
+
+  @transformer
+  editorNodeDefinition(node: Node): NodeDefinition<string> {
+    return this.modules[node.module].EditorNode[node.type]
   }
 
   @transformer

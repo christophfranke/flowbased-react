@@ -89,6 +89,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Object: {
+    name: 'Object',
     type: 'Value',
     documentation: {
       explanation: 'This node creates an *Object* value. An *Object* is a collection of key - value *Pairs*. The values can have any type (including *Object*) and may be all different. You can later use a *Key* node, to get access a value inside an object. *Objects* are useful, to bundle many values in a structured way.',
@@ -105,12 +106,12 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Object',
       type: 'Object',
       params: [],
     })
   },
   Pair: {
+    name: 'Pair',
     type: 'Value',
     documentation: {
       explanation: 'A key - value *Pair*. Its primary use is to feed an *Object*.',
@@ -125,7 +126,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Pair',
       type: 'Pair',
       params: [{
         name: 'Key',
@@ -136,6 +136,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })    
   },
   Key: {
+    name: 'Key',
     type: 'Value',
     documentation: {
       explanation: 'This node gets the value of a key from an *Object*.',
@@ -150,7 +151,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create:() => ({
-      name: 'Key',
       type: 'Key',
       params: [{
         name: 'Key',

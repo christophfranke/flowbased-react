@@ -57,6 +57,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   String: {
+    name: 'String',
     type: 'Value',
     documentation: {
       explanation: 'Creates a *String* value. A *String* is a string of characters (i.e. letters) that form a text.',
@@ -68,7 +69,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'String',
       type: 'String',
       params: [{
         name: '',
@@ -79,6 +79,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Number: {
+    name: 'Number',
     type: 'Value',
     documentation: {
       explanation: 'Creates a *Number* value. This can be any real number, but not infinity.',
@@ -90,7 +91,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Number',
       type: 'Number',
       params: [{
         name: '',
@@ -101,6 +101,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Boolean: {
+    name: 'Boolean',
     type: 'Value',
     documentation: {
       explanation: 'Creates a *Boolean* value. A *Boolean* can either be *True* or *False*.',
@@ -112,7 +113,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Boolean',
       type: 'Boolean',
       params: [{
         name: '',
@@ -123,6 +123,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     })
   },
   Type: {
+    name: 'Type',
     type: 'Type',
     ports: {
       input: {
@@ -140,7 +141,6 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      name: 'Type',
       type: 'Type',
       params: []
     })
