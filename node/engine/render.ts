@@ -47,10 +47,11 @@ export const numScopeResolvers = computedFunction(function (node: Node): number 
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
-  const input = context.modules[target.module].Node[target.type].type.input
+  const definitions = context.modules[target.module].Node[target.type]
+  const input = definitions.type.input
   if (input && input[key]) {
-    return context.modules[target.module].Node[target.type].type.input![key](target, context)
+    return definitions.type.input![key](target, context)
   }
 
-  return context.modules.Core.Type.Null.create()
+  return context.modules.Core.Type.Mismatch.create(`Connection target ${target.type}.id-${target.id} is missingn input key ${key}`)
 }
