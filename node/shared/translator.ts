@@ -12,6 +12,7 @@ import * as React from '@engine/modules/react'
 import * as ObjectModule from '@engine/modules/object'
 import * as ArrayModule from '@engine/modules/array'
 import * as Define from '@engine/modules/define'
+import * as Input from '@engine/modules/input'
 
 interface EditorGraph {
   nodes: Editor.Node[]
@@ -34,6 +35,7 @@ class Translator {
       Array: ArrayModule,
       Object: ObjectModule,
       Define,
+      Input,
       get Local() {
         return {
           Node: self.localNodes,
