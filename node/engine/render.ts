@@ -47,5 +47,10 @@ export const numScopeResolvers = computedFunction(function (node: Node): number 
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
-  return context.modules[target.module].Node[target.type].type.input![key](target, context)
+  const input = context.modules[target.module].Node[target.type].type.input
+  if (input && input[key]) {
+    return context.modules[target.module].Node[target.type].type.input![key](target, context)
+  }
+
+  return context.modules.Core.Type.Null.create()
 }

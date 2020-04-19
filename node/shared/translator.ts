@@ -58,7 +58,6 @@ class Translator {
           },
           get input() {
             const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
-            console.log(forest)
 
             if (forest.length > 0) {
               return {

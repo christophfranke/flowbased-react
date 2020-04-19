@@ -139,11 +139,11 @@ class ConnectionPath extends React.Component<Props> {
   }
 
   render() {
-    const diff = this.diff
-    if (!diff || !this.srcConnector || !this.targetConnector) {
+    if (!this.srcConnector || !this.targetConnector || !this.diff) {
       return null
     }
 
+    const diff = this.diff
     const width = 3 + 6 * this.numScopeResolvers
     const fromColor = this.fromColor
     const toColor = this.toColor
