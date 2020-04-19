@@ -2,7 +2,7 @@ import { computed, observable } from 'mobx'
 
 import * as Editor from '@editor/types'
 
-import { Node, Connection, Scope, Context, Module } from '@engine/types'
+import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
 import { flatten, transformer, unique } from '@shared/util'
 import { filteredSubForest } from '@engine/tree'
 import { type } from '@engine/render'
@@ -24,7 +24,7 @@ class Translator {
     this.editor = editor
   }
 
-  @computed get modules() {
+  @computed get modules(): { [key: string]: Module } {
     // old school bind this to self
     const self = this
 
@@ -82,6 +82,11 @@ class Translator {
     }), {})
 
     return result
+  }
+
+  @transformer
+  nodeDefinition(node: NodeIdentifier): NodeDefinition {
+    return this.modules[node.module].Node[node.type]
   }
 
   @computed get localTypes() {

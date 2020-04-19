@@ -61,10 +61,13 @@ export interface Params {
   [key: string]: any
 }
 
-export interface Node {
-  readonly id: number
+export interface NodeIdentifier {  
   readonly type: string
   readonly module: string
+}
+
+export interface Node extends NodeIdentifier {
+  readonly id: number
   readonly params: Params
   connections: {
     readonly input: {

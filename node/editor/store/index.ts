@@ -84,32 +84,15 @@ class Store {
     this.node = new NodeFunctions(this)
 
     this.translated = new Translator(this)
-
-    autorun(this.addInputConnectors)
-    autorun(this.removeDuplicatePreviews)
   }
 
   static syncedInstance: Store
   static createFromLocalStorage(): Store {
     if (!Store.syncedInstance) {
       const store = new Store()
+
       store.nodes = load(['editor', 'nodes']) || []
-
-      // the connectors map reassures that strict equality comparisions
-      // work because two connections with the same id will be the same objects
-      // const connectorsMap = store.connectors.reduce((obj, connector) => ({
-      //   ...obj,
-      //   [connector.id]: connector
-      // }), {})
-
-      // take the connectors from the map
       store.connections = load(['editor', 'connections']) || []
-      // store.connections = connections.map(connection => ({
-      //   ...connection,
-      //   from: connectorsMap[connection.from.id],
-      //   to: connectorsMap[connection.to.id]
-      // }))
-
       store.currentId = load(['editor', 'uid']) || 0
       store.currentHighZ = load(['editor', 'highZ']) || 1
 
@@ -131,7 +114,7 @@ class Store {
   }
 
   @transformer
-  editorNodeDefinition(node: Node): NodeDefinition<string> {
+  nodeDefinition(node: Node): NodeDefinition<string> {
     return this.modules[node.module].EditorNode[node.type]
   }
 
@@ -196,32 +179,6 @@ class Store {
     //   this.pendingConnector = null
     // }
     this.nodes = this.nodes.filter(other => other !== node)
-  }
-
-  @computed get nodesWithDuplicateSetting(): Node[] {
-    return []
-    // return this.nodes.filter(node =>
-    //   node.connectors.input.length > 0
-    //   && node.connectors.input[0].mode === 'duplicate')
-  }
-
-  addInputConnectors = () => {
-    // this.nodesWithDuplicateSetting
-    //   .filter(node => node.connectors.input.every(connector => this.connector.countConnections(connector) > 0))
-    //   .forEach(node => {        
-    //     node.connectors.input.push(this.connector.cloneConnector(node.connectors.input[0]))
-    //   })
-  }
-
-  removeDuplicatePreviews = () => {
-    // const previews = this.nodes.filter(node => node.type === 'Preview')
-    // if (previews.length > 1) {
-    //   previews.reverse().forEach((preview, index) => {
-    //     if (index > 0) {
-    //       this.deleteNode(preview)
-    //     }
-    //   })
-    // }
   }
 }
 

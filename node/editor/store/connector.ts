@@ -81,7 +81,12 @@ export default class ConnectorFunctions {
       }
     })
 
-    ports.input.main = Object.keys(this.store.modules[node.module].Node[node.type].type.input || {})
+    const definition = this.store.translated.nodeDefinition(node)
+    if (!definition) {
+      return ports
+    }
+
+    ports.input.main = Object.keys(definition.type.input || {})
       .filter(key => !this.connectorOptions(node, 'input', key).includes('side'))
       .map(key => this.createInput(
         key,
@@ -91,11 +96,11 @@ export default class ConnectorFunctions {
           : 'single'
         ))
 
-    ports.input.side = Object.keys(this.store.modules[node.module].Node[node.type].type.input || {})
+    ports.input.side = Object.keys(definition.type.input || {})
       .filter(key => this.connectorOptions(node, 'input', key).includes('side'))
       .map(key => this.createProperty(key, ports))
 
-    ports.output.main = Object.keys(this.store.modules[node.module].Node[node.type].type.output || {})
+    ports.output.main = Object.keys(definition.type.output || {})
       .map(key => this.createOutput(
         key,
         this.hasConnectorOption(node, 'output', key, 'hidden')

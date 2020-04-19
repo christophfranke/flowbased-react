@@ -1,12 +1,19 @@
 import React from 'react'
-import { Node, ValueType, Scope, Context, Connection } from '@engine/types'
+import { Node, NodeIdentifier, NodeDefinition, ValueType, Scope, Context, Connection } from '@engine/types'
 import { outputs } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
 import { matchInto, unionAll } from '@engine/type-functions'
 
+export const identifyNode = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition | null {
+  return context.modules[node.module].Node[node.type]
+})
+
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
-  return scope.context.modules[node.module].Node[node.type].value(node, scope, key)
+  const definitions = identifyNode(node, scope.context)
+  return definitions
+    ? definitions.value(node, scope, key)
+    : null
 })
 
 export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
@@ -22,8 +29,13 @@ export const unmatchedType = computedFunction(function(node: Node, context: Cont
     }
   }
 
+  const definitions = identifyNode(node, context)
+  if (!definitions) {
+    return context.modules.Core.Type.Mismatch.create('Node definition not found')
+  }
+
   return matchInto(
-    context.modules[node.module].Node[node.type].type.output![key](node, newContext),
+    definitions.type.output![key](node, newContext),
     unionAll(outputs(node).map(
       target => expectedType(target.node, target.key, newContext)),
     newContext),
@@ -32,13 +44,7 @@ export const unmatchedType = computedFunction(function(node: Node, context: Cont
 })
 
 export const type = computedFunction(function(node: Node, context: Context, key: string = 'output'): ValueType {
-  return matchInto(
-    unmatchedType(node, context, key),
-    unionAll(outputs(node).map(
-      target => expectedType(target.node, target.key, context)),
-    context),
-    context
-  )
+  return unmatchedType(node, context, key)
 })
 
 export const numScopeResolvers = computedFunction(function (node: Node): number {
@@ -47,7 +53,11 @@ export const numScopeResolvers = computedFunction(function (node: Node): number 
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
-  const definitions = context.modules[target.module].Node[target.type]
+  const definitions = identifyNode(target, context)
+  if (!definitions) {
+    return context.modules.Core.Type.Mismatch.create('Node definition not found')
+  }
+
   const input = definitions.type.input
   if (input && input[key]) {
     return definitions.type.input![key](target, context)
