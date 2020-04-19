@@ -34,7 +34,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Type: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const input = node.connections.input.input
-        .find(connection => connection.target.key === 'input')
+        && node.connections.input.input
+          .find(connection => connection.target.key === 'input')
 
       return input
         ? value(input.src.node, scope, input.src.key)
