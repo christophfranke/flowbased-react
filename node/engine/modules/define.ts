@@ -29,9 +29,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   Input: {
-    value: (node: Engine.Node, scope: Engine.Scope) => scope.locals.input.length > 0
-        ? value(scope.locals.input[0].src.node, scope.parent || scope, scope.locals.input[0].src.key)
-        : createEmptyValue(type(node, (scope.parent || scope).context)),
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const input = scope.locals.input && scope.locals.input.input
+      return input.length > 0
+        ? value(input[0].src.node, scope.parent || scope, input[0].src.key)
+        : createEmptyValue(type(node, (scope.parent || scope).context))
+    },
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
