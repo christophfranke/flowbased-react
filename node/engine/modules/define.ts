@@ -38,9 +38,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          return context.types.input
+          const result = context.types.input
             ? context.types.input
             : context.modules.Core.Type.Unresolved.create()
+
+          console.log('input type', result)
+          return result
         }
       }
     }
