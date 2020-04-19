@@ -4,6 +4,8 @@ import * as Editor from '@editor/types'
 
 import { Node, Connection, Scope, Context, Module } from '@engine/types'
 import { flatten, transformer, unique } from '@shared/util'
+import { filteredSubForest } from '@engine/tree'
+import { type } from '@engine/render'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
@@ -53,6 +55,28 @@ class Translator {
             output: (node: Node, context: Context) => {
               return context.modules.Define.Node.Proxy.type.output!.output!(node, context)
             }
+          },
+          get input() {
+            const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
+            console.log(forest)
+
+            if (forest.length > 0) {
+              return {
+                input: (node: Node, context: Context) => {
+                  const newContext = {
+                    ...context,
+                    types: {
+                      ...context.types,
+                      [define.id]: type(node, context)
+                    }
+                  }
+
+                  return type(forest[0].node, newContext)
+                }
+              }
+            }
+
+            return {}
           }
         }
       }

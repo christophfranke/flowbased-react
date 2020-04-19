@@ -26,6 +26,19 @@ export function filteredSubForest(root: Node, condition: Condition): NodeForest 
   return flatten(children(root).map(child => filteredSubForest(child, condition)))
 }
 
+// same as filteredSubForest, but does not recurse
+// into children of nodes the satisfy the condition
+export function flatFilteredSubForest(root: Node, condition: Condition): NodeForest {
+  if (condition(root)) {
+    return [{
+      node: root,
+      children: []
+    }]
+  }
+
+  return flatten(children(root).map(child => filteredSubForest(child, condition)))
+}
+
 export const outputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.output)
     .map(group => group.map(connection => connection.target)))

@@ -24,7 +24,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         )
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => context.modules.Core.Type.Unresolved.create()
+        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
       }
     }
   },
@@ -35,7 +35,9 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          return context.modules.Core.Type.Unresolved.create()
+          return context.types.input
+            ? context.types.input
+            : context.modules.Core.Type.Unresolved.create()
         }
       }
     }
