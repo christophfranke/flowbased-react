@@ -2,12 +2,12 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
-import { inputs, outputs } from '@engine/tree'
-import { intersectAll } from '@engine/type-functions'
+import { inputs, outputs, firstInput, flatFilteredSubForest } from '@engine/tree'
+import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core']
 
-export type Nodes = 'Array'
+export type Nodes = 'Array' | 'Items' | 'Collect'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Array: {
     value: (node: Engine.Node, current: Engine.Scope) =>
@@ -30,6 +30,81 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
           return type(node, context).params.items
             || context.modules.Core.Type.Mismatch.create(`Expected Array, got ${nodeType.name}`)
+        }
+      }
+    }
+  },
+  Items: {
+    value: (node: Engine.Node, scope: Engine.Scope) => scope.locals.item
+      ? scope.locals.item
+      : createEmptyValue(type(node, scope.context)),
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => {
+          if (inputs(node).length > 0) {
+            const input = inputs(node)[0]
+            const type = unmatchedType(input.node, context, input.key)
+            if (type.name === 'Unresolved') {
+              return context.modules.Core.Type.Unresolved.create()
+            }
+            if (type.name !== 'Array') {
+              return context.modules.Core.Type.Mismatch.create(`Expected Array, got ${type.name}`)
+            }
+
+            return type.params.items
+          }
+
+          return context.modules.Core.Type.Unresolved.create()
+        }
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => Type.Array.create(type(node, context)),
+      }
+    }
+  },
+  Collect: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const forest = flatFilteredSubForest(node, candidate => candidate.type === 'Items')
+      if (forest.length > 0) {
+        const itemsNode = forest[0].node
+        const itemsInput = firstInput(itemsNode)
+        const array = itemsInput
+          ? value(itemsInput.node, scope, itemsInput.key)
+          : []
+
+        const scopes = array.map(item => ({
+          ...scope,
+          parent: scope,
+          locals: {
+            ...scope.locals,
+            item
+          }
+        }))
+
+        return scopes.map(childScope => value(firstInput(node)!.node, childScope, firstInput(node)!.key))
+      }
+
+      return []
+    },
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) =>
+          Type.Array.create(firstInput(node)
+            ? unmatchedType(firstInput(node)!.node, context, firstInput(node)!.key)
+            : context.modules.Core.Type.Unresolved.create())
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => {
+          const outputType = type(node, context)
+          if (outputType.name === 'Unresolved') {
+            return outputType
+          }
+
+          if (outputType.name === 'Array') {
+            return outputType.params.items  
+          }
+
+          return context.modules.Core.Type.Mismatch.create(`Expected Array, got ${type(node, context).name}`)
         }
       }
     }
@@ -58,6 +133,40 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'Array',
       params: [],
     })    
+  },
+  Items: {
+    name: 'Items',
+    type: 'Iterator',
+    documentation: {
+      explanation: 'Extracts the items out of an *Array* by creating a new *Scope* for each item.',
+      input: {
+        input: 'Any *Array*'
+      },
+      output: {
+        output: 'The item of the current iteration scope.'
+      }
+    },
+    create: () => ({
+      type: 'Items',
+      params: [],
+    })
+  },
+  Collect: {
+    name: 'Collect',
+    type: 'Iterator',
+    documentation: {
+      explanation: 'Collects the extracted items of the *Items* Iterator and resolves its *Scope*.',
+      input: {
+        input: 'Anything that uses the *Items Scope*.'
+      },
+      output: {
+        output: 'Outputs an *Array* with the transformed values.'
+      }
+    },
+    create: () => ({
+      type: 'Collect',
+      params: []
+    })
   }
 }
 

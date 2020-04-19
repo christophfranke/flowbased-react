@@ -48,3 +48,7 @@ export const inputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.input)
     .map(group => group.map(connection => connection.src)))
 })
+
+export const firstInput = computedFunction(function(node: Node): Port | undefined {
+  return inputs(node)[0]
+})
