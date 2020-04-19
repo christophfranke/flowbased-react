@@ -70,7 +70,16 @@ class Translator {
                   }
                 }
 
-                return type(input.node, newContext)
+                const expectedType = type(input.node, newContext)
+                if (input.node.params.duplicate) {
+                  if (expectedType.name !== 'Array') {
+                    return context.modules.Core.Type.Mismatch.create(`Array expected but got ${expectedType.name}`)
+                  }
+
+                  return expectedType.params.items
+                }
+
+                return expectedType
               }
             }), {})
           }

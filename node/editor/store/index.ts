@@ -64,7 +64,9 @@ class Store {
               const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
               return forest.reduce((obj, input) => ({
                 ...obj,
-                [input.node.params.name]: input.node.params.side ? 'side' : 'main'
+                [input.node.params.name]:
+                  (input.node.params.side ? ['side'] : [])
+                  .concat(input.node.params.duplicate ? ['duplicate'] : [])
               }), {})
             }
           },

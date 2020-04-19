@@ -31,15 +31,28 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Input: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const input = scope.locals.input && scope.locals.input[node.params.name]
+
+      if (node.params.duplicate) {
+        return input && input.length > 0
+          ? input.map(input => value(input.src.node, scope.parent || scope, input.src.key))
+          : createEmptyValue(type(node, (scope.parent || scope).context))
+      }
+
       return input && input.length > 0
         ? value(input[0].src.node, scope.parent || scope, input[0].src.key)
         : createEmptyValue(type(node, (scope.parent || scope).context))
     },
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => context.types.input
-          ? context.types.input
-          : context.modules.Core.Type.Unresolved.create()
+        output: (node: Engine.Node, context: Engine.Context) => {
+          const inputType = context.types.input
+            ? context.types.input
+            : context.modules.Core.Type.Unresolved.create()
+
+          return node.params.duplicate
+            ? context.modules.Array.Type.Array.create(inputType)
+            : inputType
+        }
       }
     }
   },
@@ -134,6 +147,11 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
       }, {
         name: 'Side',
         key: 'side',
+        value: false,
+        type: 'checkbox'
+      }, {
+        name: 'Multiple',
+        key: 'duplicate',
         value: false,
         type: 'checkbox'
       }],
