@@ -1,6 +1,18 @@
 import { computed, observable } from 'mobx'
 
-import { Connector, ConnectorOption, ConnectorGroup, Ports, Connection, ConnectorState, ConnectorDescription, ConnectorFunction, ValueType, Node } from '@editor/types'
+import {
+  Connector,
+  ConnectorOption,
+  ConnectorGroup,
+  Ports,
+  Connection,
+  ConnectorState,
+  ConnectorDescription,
+  ConnectorFunction,
+  ValueType,
+  Node,
+  Vector
+} from '@editor/types'
 import Store from '@editor/store'
 import { type, expectedType } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
@@ -93,12 +105,20 @@ export default class ConnectorFunctions {
         ports,
         this.connectorOptions(node, 'input', key).includes('duplicate')
           ? 'duplicate'
-          : 'single'
-        ))
+          : 'single',
+        { x: 0, y: -1 }
+      ))
 
     ports.input.side = Object.keys(definition.type.input || {})
       .filter(key => this.connectorOptions(node, 'input', key).includes('side'))
-      .map(key => this.createProperty(key, ports))
+      .map(key => this.createInput(
+        key,
+        ports,
+        this.connectorOptions(node, 'input', key).includes('duplicate')
+          ? 'duplicate'
+          : 'single',
+        { x: -1, y: 0 }
+      ))
 
     ports.output.main = Object.keys(definition.type.output || {})
       .map(key => this.createOutput(
@@ -111,7 +131,7 @@ export default class ConnectorFunctions {
     return ports
   }
 
-  createInput = (key: string, ports: Ports, mode: 'duplicate' | 'single'): ConnectorGroup<'input', 'single' | 'duplicate'> => {
+  createInput = (key: string, ports: Ports, mode: 'duplicate' | 'single', direction: Vector): ConnectorGroup<'input', 'single' | 'duplicate'> => {
     const group: ConnectorGroup<'input', 'single' | 'duplicate'> = observable({
       key,
       ports,
@@ -119,7 +139,7 @@ export default class ConnectorFunctions {
       mode,
       name: key,
       function: 'input',
-      direction: { x: 0, y: -1 },
+      direction,
     })
 
     if (mode === 'single') {    

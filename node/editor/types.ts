@@ -66,7 +66,7 @@ export interface Ports {
   node: Node
   input: {
     main: ConnectorGroup<'input', 'single' | 'duplicate'>[]
-    side: ConnectorGroup<'input', 'single'>[]
+    side: ConnectorGroup<'input', 'single' | 'duplicate'>[]
   }
   output: {
     main: ConnectorGroup<'output', 'multiple' | 'hidden'>[]
