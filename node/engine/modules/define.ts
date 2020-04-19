@@ -5,7 +5,7 @@ import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
-export const Dependencies = ['Core']
+export const Dependencies = ['Core', 'Array']
 
 export type Nodes = 'Define' | 'Proxy' | 'Input'
 export const Node: Engine.ModuleNodes<Nodes> = {
