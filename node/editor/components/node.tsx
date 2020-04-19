@@ -258,26 +258,28 @@ class NodeView extends React.Component<Props> {
           <div style={{ gridArea: 'params', textAlign: 'center' }}>
             <div style={nameStyle} onClick={this.showHelp}>{definition.name}</div>
             {this.isDocumentationVisible && <Documentation nodeType={this.props.node.type} nodeModule={this.props.node.module} style={documentationStyle} />}
-            {this.params.map(param => {
-              if (param.type === 'number') {
-                return <NumberInput key={param.key} param={param} typeColor={typeColor} />
-              }
-              if (param.type === 'checkbox') {
-                return <CheckboxInput key={param.key} param={param} typeColor={typeColor} />
-              }
-              if (param.type === 'textarea') {
-                return <TextareaInput key={param.key} param={param} typeColor={typeColor} />
-              }
-              if (param.type === 'textlist') {
-                return <TextlistInput key={param.key} param={param} typeColor={typeColor} />
-              }
-              if (param.type === 'pairs') {
-                return <TextpairsInput key={param.key} param={param} typeColor={typeColor} />
-              }
-              if (param.type === 'text') {
-                return <TextInput key={param.key} param={param} typeColor={typeColor} />
-              }
-            })}
+            <div style={{ display: 'grid', gridTemplate: '"label input" auto / auto auto', gridGap: '4px 8px', alignItems: 'center', textAlign: 'left' }}>
+              {this.params.map(param => {
+                if (param.type === 'number') {
+                  return <NumberInput key={param.key} param={param} typeColor={typeColor} />
+                }
+                if (param.type === 'checkbox') {
+                  return <CheckboxInput key={param.key} param={param} typeColor={typeColor} />
+                }
+                if (param.type === 'textarea') {
+                  return <TextareaInput key={param.key} param={param} typeColor={typeColor} />
+                }
+                if (param.type === 'textlist') {
+                  return <TextlistInput key={param.key} param={param} typeColor={typeColor} />
+                }
+                if (param.type === 'pairs') {
+                  return <TextpairsInput key={param.key} param={param} typeColor={typeColor} />
+                }
+                if (param.type === 'text') {
+                  return <TextInput key={param.key} param={param} typeColor={typeColor} />
+                }
+              })}
+            </div>
           </div>
         </div>
       </div>

@@ -27,16 +27,15 @@ class TextInput extends React.Component<Props> {
       backgroundColor: colors.background.default,
       minWidth: '120px',
       width: '100%',
-      margin: '8px',
       fontSize: fontSize.input,
       borderBottom: `1px solid ${this.props.typeColor}`,
     }
 
     const param = this.props.param
-    return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    return <>
       <label style={labelStyle}>{param.name}</label>
       <input type="text" style={inputStyle} value={param.value || ''} onChange={(e) => param.value = e.target.value} onMouseDown={this.stop} />
-    </div>    
+    </>
   }
 }
 

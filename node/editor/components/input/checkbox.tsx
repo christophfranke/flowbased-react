@@ -24,14 +24,13 @@ class CheckboxInput extends React.Component<Props> {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
       fontSize: fontSize.label,
-      marginRight: '8px'
     }
 
     const boxStyle: React.CSSProperties = {
       backgroundColor: colors.background.default,
       cursor: 'pointer',
-      marginBottom: '8px',
       minWidth: '85px',
+      width: '100%',
       display: 'inline',
       fontSize: fontSize.input,
       borderBottom: `1px solid ${this.props.typeColor}`,
@@ -42,10 +41,10 @@ class CheckboxInput extends React.Component<Props> {
       ? <label style={labelStyle}>{param.name}</label>
       : null
 
-    return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    return <>
       {label}
       <div style={boxStyle} onMouseDown={this.stop} onClick={this.handleClick}>{param.value ? 'True' : 'False'}</div>
-    </div>    
+    </>
   }
 }
 

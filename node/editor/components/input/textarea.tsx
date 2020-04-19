@@ -25,7 +25,8 @@ class TextareaInput extends React.Component<Props> {
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: fontSize.label
+      fontSize: fontSize.label,
+      gridArea: 'label'
     }
 
     const inputStyle: React.CSSProperties = {

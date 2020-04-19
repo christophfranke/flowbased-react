@@ -24,7 +24,7 @@ class NumberInput extends React.Component<Props> {
   render() {
     const labelStyle: React.CSSProperties = {
       color: colors.text.dim,
-      fontSize: fontSize.label
+      fontSize: fontSize.label,
     }
 
     const inputStyle: React.CSSProperties = {
@@ -32,16 +32,15 @@ class NumberInput extends React.Component<Props> {
       backgroundColor: colors.background.default,
       minWidth: '100px',
       width: '100%',
-      margin: '8px',
       fontSize: fontSize.input,
       borderBottom: `1px solid ${this.props.typeColor}`,
     }
 
     const param = this.props.param
-    return <div key={param.key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    return <>
       <label style={labelStyle}>{param.name}</label>
       <input type="number" style={inputStyle} value={param.value} onChange={this.handleChange} onMouseDown={this.stop} />
-    </div>    
+    </>    
   }
 }
 
