@@ -1,6 +1,6 @@
 import React from 'react'
 import { Node, NodeIdentifier, NodeDefinition, ValueType, Scope, Context, Connection } from '@engine/types'
-import { outputs } from '@engine/tree'
+import { outputs, children } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
 import { matchInto, unionAll } from '@engine/type-functions'
@@ -47,9 +47,11 @@ export const type = computedFunction(function(node: Node, context: Context, key:
   return unmatchedType(node, context, key)
 })
 
-export const numScopeResolvers = computedFunction(function (node: Node): number {
-  // console.warn('numScopeResolvers not implemented anymore')
-  return 0
+export const numIterators = computedFunction(function (node: Node): number {
+  return Math.max(0, children(node).reduce(
+    (sum, child) => numIterators(child) + sum,
+    (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0)
+  ))
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {

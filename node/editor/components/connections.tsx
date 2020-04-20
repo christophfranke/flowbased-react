@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
-import { type, expectedType, numScopeResolvers } from '@engine/render'
+import { type, expectedType, numIterators } from '@engine/render'
 import { transformer } from '@shared/util'
 
 import * as LA from '@editor/la'
@@ -66,9 +66,9 @@ class ConnectionPath extends React.Component<Props> {
     return colorOfType(type(node, this.store.context)).default
   }
 
-  @computed get numScopeResolvers(): number {
-    return this.targetNode
-      ? numScopeResolvers(this.store.translated.getNode(this.targetNode))
+  @computed get numIterators(): number {
+    return this.srcNode
+      ? numIterators(this.store.translated.getNode(this.srcNode))
       : 0
   }
 
@@ -144,7 +144,7 @@ class ConnectionPath extends React.Component<Props> {
     }
 
     const diff = this.diff
-    const width = 3 + 6 * this.numScopeResolvers
+    const width = 3 + 8 * this.numIterators
     const fromColor = this.fromColor
     const toColor = this.toColor
 

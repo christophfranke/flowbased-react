@@ -8,7 +8,7 @@ interface NodeTree {
 }
 type NodeForest = NodeTree[]
 
-function children(node: Node): Node[] {
+export function children(node: Node): Node[] {
   return unique(
     flatten(Object.values(node.connections.input).map(group => group.map(con => con.src.node)))
   )  
