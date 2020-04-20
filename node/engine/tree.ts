@@ -62,3 +62,4 @@ export const inputs = computedFunction(function(node: Node): Port[] {
 export const firstInput = computedFunction(function(node: Node): Port | undefined {
   return inputs(node)[0]
 })
+

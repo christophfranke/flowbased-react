@@ -5,7 +5,7 @@ import { value, type, unmatchedType } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { inputs } from '@engine/tree'
 
-export type Nodes = 'String' | 'Number' | 'Boolean' | 'Type'
+export type Nodes = 'String' | 'Number' | 'Boolean' | 'Type' | 'If'
 export const Node: Engine.ModuleNodes<Nodes> = {
   String: {
     value: (node: Engine.Node) => node.params.value,
@@ -51,6 +51,41 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           inputs(node).map(input => unmatchedType(input.node, context, input.key)),
           context
         )
+      }
+    }
+  },
+  If: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const conditionInput = node.connections.input.condition
+        && node.connections.input.condition[0]
+      const ifTrueInput = node.connections.input.whenTrue
+        && node.connections.input.whenTrue[0]
+      const ifFalseInput = node.connections.input.whenFalse
+        && node.connections.input.whenFalse[0]
+
+      return (conditionInput && value(conditionInput.src.node, scope, conditionInput.src.key))
+        ? (ifTrueInput
+          ? value(ifTrueInput.src.node, scope, ifTrueInput.src.key)
+          : createEmptyValue(type(node, scope.context)))
+        : (ifFalseInput
+          ? value(ifFalseInput.src.node, scope, ifFalseInput.src.key)
+          : createEmptyValue(type(node, scope.context)))
+    },
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => intersectAll(
+          [node.connections.input.whenTrue, node.connections.input.whenFalse]
+            .filter(ports => ports)
+            .map(ports => ports[0])
+            .filter(port => port)
+            .map(port => unmatchedType(port.src.node, context, port.src.key)),
+          context
+        )
+      },
+      input: {
+        whenTrue: (node: Engine.Node, context: Engine.Context) => type(node, context),
+        whenFalse: (node: Engine.Node, context: Engine.Context) => type(node, context),
+        condition: () => Type.Boolean.create()
       }
     }
   }
@@ -145,8 +180,31 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'Type',
       params: []
     })
-  }
-}
+  },
+  If: {
+    name: 'If',
+    type: 'If',
+    ports: {
+      input: {
+        condition: ['side']
+      }
+    },
+    documentation: {
+      explanation: 'This nodes resolves either to the *whenTrue* or to the *whenFalse* input, depending on the condition.',
+      input: {
+        whenTrue: 'This input is chosen when the *condition* is *True*',
+        whenFalse: 'This input is chosen when the *condition* is *False*',
+        condition: 'The condition deciding the output. Defaults to *false*'
+      },
+      output: {
+        output: 'Outputs the selected input.'
+      }
+    },
+    create: () => ({
+      type: 'If',
+      params: []
+    })
+  }}
 
 export type Types = 'String'
   | 'Number'
