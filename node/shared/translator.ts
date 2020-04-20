@@ -77,7 +77,7 @@ class Translator {
                         ...obj,
                         [tree.node.id]: node.connections.input[tree.node.params.name]
                           ? type(node.connections.input[tree.node.params.name][0].src.node, context)
-                          : context.modules.Core.Type.Unresolved.create()
+                          : undefined
                       }), {})
                   }
                 }
