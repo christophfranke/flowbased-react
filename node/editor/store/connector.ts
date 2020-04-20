@@ -14,9 +14,10 @@ import {
   Vector
 } from '@editor/types'
 import Store from '@editor/store'
-import { type, expectedType } from '@engine/render'
+import { type, expectedType, numIterators } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
 import { transformer } from '@shared/util'
+import { flatFilteredSubForest, children } from '@engine/tree'
 
 import * as Engine from '@engine/types'
 
@@ -217,6 +218,31 @@ export default class ConnectorFunctions {
     return !!src && !!dest && this.store.getSubtree(src).includes(dest)
   }
 
+  iteratorsAreCompatatible(src: Node, dest: Node): boolean {
+    if (numIterators(this.store.translated.getNode(src)) === 0
+      || numIterators(this.store.translated.getNode(dest)) === 0) {
+      return true
+    }
+
+    const destNode = this.store.translated.getNode(dest)
+    const dependingIterator = children(destNode)
+      .map(child => flatFilteredSubForest(child, candidate => candidate.type === 'Items'))
+      .filter(forest => forest.length > 0)
+      .map(forest => forest.find(tree => tree.node))
+      .map(tree => tree && tree.node)
+      .find(node => node)
+
+    if (!dependingIterator) {
+      return true
+    }
+
+    if (dependingIterator === this.store.translated.getNode(src)) {
+      return true
+    }
+
+    return false
+  }
+
   @transformer
   isSrc(group: ConnectorGroup): group is ConnectorGroup<'output'> {
     return group.function === 'output'
@@ -230,6 +256,7 @@ export default class ConnectorFunctions {
       && !this.willProduceLoop(src.group.ports.node, dest.group.ports.node)
       && !(src.group.mode === 'multiple' && dest.group.mode === 'multiple')
       && this.valuesAreCompatible(src.group, dest.group)
+      && this.iteratorsAreCompatatible(src.group.ports.node, dest.group.ports.node)
   }
 
   @transformer
