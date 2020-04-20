@@ -5,7 +5,8 @@ import * as Editor from '@editor/types'
 import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
 import { flatten, transformer, unique } from '@shared/util'
 import { filteredSubForest } from '@engine/tree'
-import { type } from '@engine/render'
+import { type, unmatchedType } from '@engine/render'
+import { intersectAll } from '@engine/type-functions'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
@@ -70,7 +71,14 @@ class Translator {
                   ...context,
                   types: {
                     ...context.types,
-                    [define.id]: type(node, context)
+                    [define.id]: type(node, context),
+                    ...forest.filter(tree => tree !== input)
+                      .reduce((obj, tree) => ({
+                        ...obj,
+                        [tree.node.id]: node.connections.input[tree.node.params.name]
+                          ? type(node.connections.input[tree.node.params.name][0].src.node, context)
+                          : context.modules.Core.Type.Unresolved.create()
+                      }), {})
                   }
                 }
 
