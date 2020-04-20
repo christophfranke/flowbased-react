@@ -225,18 +225,22 @@ export default class ConnectorFunctions {
     }
 
     const destNode = this.store.translated.getNode(dest)
-    const dependingIterator = children(destNode)
+    const dependingChildrenIterator = node => children(node)
       .map(child => flatFilteredSubForest(child, candidate => candidate.type === 'Items'))
       .filter(forest => forest.length > 0)
       .map(forest => forest.find(tree => tree.node))
       .map(tree => tree && tree.node)
       .find(node => node)
 
-    if (!dependingIterator) {
+    const dependingDest = dependingChildrenIterator(destNode) 
+    if (!dependingDest) {
       return true
     }
 
-    if (dependingIterator === this.store.translated.getNode(src)) {
+    const dependingIterator = node => flatFilteredSubForest(node, candidate => candidate.type === 'Items')
+      .find(tree => tree.node)!.node
+    const dependingSrc = dependingIterator(this.store.translated.getNode(src))
+    if (dependingSrc && dependingDest.id === dependingSrc.id) {
       return true
     }
 
