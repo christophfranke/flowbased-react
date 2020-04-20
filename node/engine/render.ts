@@ -16,6 +16,12 @@ export const value = computedFunction(function(node: Node, scope: Scope, key: st
     : null
 })
 
+export const inputValue = computedFunction(function(node: Node, key: string, scope: Scope): any {
+  return node.connections.input[key]
+    && node.connections.input[key][0]
+    && value(node.connections.input[key][0].src.node, scope, node.connections.input[key][0].src.key)  
+})
+
 export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
   if (context.types[node.id]) {
     return context.types[node.id]
