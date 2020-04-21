@@ -61,8 +61,26 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       const define = scope.context.defines
         .find(other => other.id === Number(node.params.define))
 
+      if (!define) {
+        return createEmptyValue(type(node, scope.context), scope.context)
+      }
+
       const newScope = {
         ...scope,
+        context: {
+          ...scope.context,
+          types: {
+            ...scope.context.types,
+            [define.id]: type(node, scope.context),
+            input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
+              ...obj,
+              [key]: intersectAll(
+                group.map(con => unmatchedType(con.src.node, scope.context, con.src.key)),
+                scope.context
+              )
+            }), {})
+          }
+        },
         parent: scope,
         locals: {
           ...scope.locals,
@@ -70,9 +88,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         }
       }
 
-      return define
-        ? value(define, newScope, 'output')
-        : createEmptyValue(type(node, scope.context), scope.context)
+      return value(define, newScope, 'output')
     },
     type: {
       output: {
