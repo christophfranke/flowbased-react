@@ -5,7 +5,7 @@ import { value, type, unmatchedType } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { inputs } from '@engine/tree'
 
-export type Nodes = 'String' | 'Number' | 'Boolean' | 'Type' | 'If'
+export type Nodes = 'String' | 'Number' | 'Boolean' | 'SetType' | 'MatchType' | 'If'
 export const Node: Engine.ModuleNodes<Nodes> = {
   String: {
     value: (node: Engine.Node) => node.params.value,
@@ -31,7 +31,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       }
     }
   },
-  Type: {
+  SetType: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const input = node.connections.input.input
         && node.connections.input.input
@@ -54,7 +54,20 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       }
     }
   },
-  If: {
+  MatchType: {
+    value: (node: Engine.Node, scope: Engine.Scope) => createEmptyValue(type(node, scope.context)),
+    type: {
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
+      },
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => intersectAll(
+          inputs(node).map(input => unmatchedType(input.node, context, input.key)),
+          context
+        )
+      }
+    }
+  },  If: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const conditionInput = node.connections.input.condition
         && node.connections.input.condition[0]
@@ -158,9 +171,9 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }],
     })
   },
-  Type: {
-    name: 'Type',
-    type: 'Type',
+  SetType: {
+    name: 'Set Type',
+    type: 'SetType',
     ports: {
       input: {
         type: ['side']
@@ -177,7 +190,29 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      type: 'Type',
+      type: 'SetType',
+      params: []
+    })
+  },
+  MatchType: {
+    name: 'Match Type',
+    type: 'MatchType',
+    ports: {
+      input: {
+        input: ['duplicate']
+      },
+      output: {
+        output: ['hidden']
+      }
+    },
+    documentation: {
+      explanation: 'This node ensures all of its inputs to have the same type.',
+      input: {
+        input: 'All inputs will be forced to the same type.',
+      },
+    },
+    create: () => ({
+      type: 'MatchType',
       params: []
     })
   },
