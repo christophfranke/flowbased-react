@@ -3,7 +3,7 @@ import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
-import { intersectAll, createEmptyValue } from '@engine/type-functions'
+import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 
 export const Dependencies = ['Core']
@@ -45,7 +45,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       return inputs(node).length > 0
         ? value(inputs(node)[0].node, scope, inputs(node)[0].key)[node.params.key.trim()]
-        : createEmptyValue(type(node, scope.context))
+        : createEmptyValue(type(node, scope.context), scope.context)
     },
     type: {
       output: {
@@ -73,7 +73,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       key: node.params.key.trim(),
       value: inputs(node).length > 0
         ? value(inputs(node)[0].node, scope, inputs(node)[0].key)
-        : createEmptyValue(type(node, scope.context).params.value)
+        : createEmptyValue(type(node, scope.context).params.value, scope.context)
     }),
     type: {
       output: {
@@ -180,10 +180,13 @@ export const Type: Engine.ModuleTypes<Types> = {
       module: 'Object',
       params
     }),
-    emptyValue: () => {},
-    test: value => {
-      console.warn('Object test not implemented')
-      return true
+    emptyValue: (type: Engine.ValueType, context: Engine.Context) => Object.entries(type.params).reduce((obj, [key, param]) => ({
+      ...obj,
+      [key]: createEmptyValue(param, context)
+    }), {}),
+    test: (value, type: Engine.ValueType, context: Engine.Context) => {
+      return !Array.isArray(value) && typeof value === 'object'
+        && Object.entries(type.params).every(([key, param]) => testValue(value[key], param, context))
     }
   },
   Pair: {
@@ -195,11 +198,11 @@ export const Type: Engine.ModuleTypes<Types> = {
         value
       }
     }),
-    emptyValue: () => {
+    emptyValue: (type: Engine.ValueType, context: Engine.Context) => {
       console.warn('empty pair create not implemented yet')
       return {
         key: '',
-        value: ''
+        value: createEmptyValue(type, context)
       }
     },
     test: (value) => {

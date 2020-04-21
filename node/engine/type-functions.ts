@@ -205,37 +205,12 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
   return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name}`)
 }
 
-export function createEmptyValue(type: ValueType): any {
-  const name = type.name
-  if (name === 'Element') {
-    return React.createElement(React.Fragment)
-  }
-  if (name === 'String')  {
-    return ''
-  }
-  if (name === 'Boolean') {
-    return false
-  }
-  if (name === 'Array') {
-    return []
-  }
-  if (name === 'Object') {
-    return Object.entries(type.params).reduce((obj, [key, paramType]) => ({
-      [key]: createEmptyValue(paramType)
-    }), {})
-  }
-  if (name === 'Number') {
-    return 0
-  }
-  if (name === 'Pair') {
-    return {
-      key: '',
-      value: createEmptyValue(type.params.value)
-    }
-  }
-  if (['Unresolved', 'Null', 'Mismatch', 'Unknown'].includes(name)) {
-    return null
-  }
 
-  throw new Error(`Unknown base type ${name}`)
+export const testValue = function(value: any, type: ValueType, context: Context): boolean {
+  return context.modules[type.module].Type[type.name].test(value, type, context)
 }
+
+export function createEmptyValue(type: ValueType, context: Context): any {
+  return context.modules[type.module].Type[type.name].emptyValue(type, context)
+}
+

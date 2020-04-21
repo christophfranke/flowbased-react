@@ -14,7 +14,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       const input = inputs(node)[0]
       return input
         ? value(input.node, scope, input.key)
-        : createEmptyValue(scope.context.modules.Core.Type.Unresolved.create())
+        : createEmptyValue(scope.context.modules.Core.Type.Unresolved.create(), scope.context)
     },
     type: {
       output: {
@@ -35,12 +35,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       if (node.params.duplicate) {
         return input && input.length > 0
           ? input.map(input => value(input.src.node, scope.parent || scope, input.src.key))
-          : createEmptyValue(type(node, (scope.parent || scope).context))
+          : createEmptyValue(type(node, (scope.parent || scope).context), (scope.parent || scope).context)
       }
 
       return input && input.length > 0
         ? value(input[0].src.node, scope.parent || scope, input[0].src.key)
-        : createEmptyValue(type(node, (scope.parent || scope).context))
+        : createEmptyValue(type(node, (scope.parent || scope).context), (scope.parent || scope).context)
     },
     type: {
       output: {
@@ -72,7 +72,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
       return define
         ? value(define, newScope, 'output')
-        : createEmptyValue(type(node, scope.context))
+        : createEmptyValue(type(node, scope.context), scope.context)
     },
     type: {
       output: {

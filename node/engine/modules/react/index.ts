@@ -114,8 +114,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     }),
     emptyValue: () => React.createElement(React.Fragment),
     test: (value) => {
-      console.warn('test for React Element not yet implemented and will always return true')
-      return true
+      return React.isValidElement(value)
     }
   }
 }

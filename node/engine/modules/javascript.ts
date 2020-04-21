@@ -2,13 +2,13 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType, inputValue } from '@engine/render'
-import { inputs, outputs } from '@engine/tree'
-import { intersectAll, createEmptyValue } from '@engine/type-functions'
+import { inputs, outputs, firstInput } from '@engine/tree'
+import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 
 export const Dependencies = ['Core']
 
-export type Nodes = 'Expression'
+export type Nodes = 'Expression' | 'TypeGuard'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Expression: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
@@ -37,6 +37,30 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       },
       output: {
         output: (node: Engine.Node, context: Engine.Context) => context.modules.Core.Type.Unknown.create()
+      }
+    }
+  },
+  TypeGuard: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const input = firstInput(node)
+      const typ = type(node, scope.context)
+      if (input) {
+        const val = value(input.node, scope, input.key)
+        return testValue(val, typ, scope.context)
+          ? val
+          : createEmptyValue(typ, scope.context)
+      }
+
+      return createEmptyValue(typ, scope.context)
+    },
+    type: {
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Core.Type.Unknown.create()
+      },
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Core.Type.Unresolved.create()        
       }
     }
   }
@@ -68,6 +92,17 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         value: '',
         type: 'text'
       }],
+    })
+  },
+  TypeGuard: {
+    name: 'Type Guard',
+    type: 'TypeGuard',
+    documentation: {
+      explanation: 'Checks an unkown type and returns a known type'
+    },
+    create: () => ({
+      type: 'TypeGuard',
+      params: []
     })
   }
 }

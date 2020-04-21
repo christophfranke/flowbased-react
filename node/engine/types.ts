@@ -32,8 +32,8 @@ export type ModuleTypes<TypeName extends keyof any> = {
 
 export interface ValueTypeDefinition<name> {
   create: (...args) => ValueTypeTemplate<name>
-  emptyValue: () => any
-  test: (any) => boolean
+  emptyValue: (type: ValueType, context: Context) => any
+  test: (value: any, type: ValueType, context: Context) => boolean
 }
 
 export type ValueType = ValueTypeTemplate<any>

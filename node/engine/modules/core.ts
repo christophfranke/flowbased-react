@@ -39,7 +39,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
       return input
         ? value(input.src.node, scope, input.src.key)
-        : createEmptyValue(type(node, scope.context))
+        : createEmptyValue(type(node, scope.context), scope.context)
     },
     type: {
       input: {
@@ -55,7 +55,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   MatchType: {
-    value: (node: Engine.Node, scope: Engine.Scope) => createEmptyValue(type(node, scope.context)),
+    value: (node: Engine.Node, scope: Engine.Scope) => createEmptyValue(type(node, scope.context), scope.context),
     type: {
       input: {
         input: (node: Engine.Node, context: Engine.Context) => type(node, context)
@@ -79,10 +79,10 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       return (conditionInput && value(conditionInput.src.node, scope, conditionInput.src.key))
         ? (ifTrueInput
           ? value(ifTrueInput.src.node, scope, ifTrueInput.src.key)
-          : createEmptyValue(type(node, scope.context)))
+          : createEmptyValue(type(node, scope.context), scope.context))
         : (ifFalseInput
           ? value(ifFalseInput.src.node, scope, ifFalseInput.src.key)
-          : createEmptyValue(type(node, scope.context)))
+          : createEmptyValue(type(node, scope.context), scope.context))
     },
     type: {
       output: {
@@ -298,7 +298,7 @@ export const Type: Engine.ModuleTypes<Types> = {
       params: {}
     }),
     emptyValue: () => null,
-    test: value => true
+    test: value => typeof value === 'undefined' || value === null
   },
   Unknown: {
     create: () => ({
@@ -324,7 +324,7 @@ export const Type: Engine.ModuleTypes<Types> = {
         }
       }
     }),
-    emptyValue: () => { throw new Error(); },
+    emptyValue: (type: Engine.ValueType) => { throw new Error(type.display); },
     test: value => false
   }
 }

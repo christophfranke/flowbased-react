@@ -3,7 +3,7 @@ import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
 import { inputs, outputs, firstInput, match } from '@engine/tree'
-import { intersectAll, createEmptyValue } from '@engine/type-functions'
+import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core']
 
@@ -37,7 +37,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Items: {
     value: (node: Engine.Node, scope: Engine.Scope) => scope.locals.item
       ? scope.locals.item
-      : createEmptyValue(type(node, scope.context)),
+      : createEmptyValue(type(node, scope.context), scope.context),
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
@@ -184,6 +184,7 @@ export const Type: Engine.ModuleTypes<Types> = {
       }
     }),
     emptyValue: () => [],
-    test: value => Array.isArray(value)
+    test: (value, type: Engine.ValueType, context: Engine.Context) =>
+      Array.isArray(value) && value.every(value => testValue(value, type.params.items, context))
   },
 }
