@@ -76,7 +76,7 @@ class Translator {
                       .reduce((obj, tree) => ({
                         ...obj,
                         [tree.node.id]: node.connections.input[tree.node.params.name]
-                          ? type(node.connections.input[tree.node.params.name][0].src.node, context)
+                          ? type(node.connections.input[tree.node.params.name][0].src.node, context) // this context might need the define type in some edge cases.
                           : undefined
                       }), {})
                   }
