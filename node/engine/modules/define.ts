@@ -45,8 +45,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          const inputType = context.types.input
-            ? context.types.input
+          const inputType = context.types.input && context.types.input[node.params.name]
+            ? context.types.input[node.params.name]
             : context.modules.Core.Type.Unresolved.create()
 
           return node.params.duplicate
@@ -81,10 +81,13 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             ...context,
             types: {
               ...context.types,
-              input: intersectAll(
-                inputs(node).map(src => unmatchedType(src.node, context, src.key)),
-                context
-              )
+              input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
+                ...obj,
+                [key]: intersectAll(
+                  group.map(con => unmatchedType(con.src.node, context, con.src.key)),
+                  context
+                )
+              }), {})
             }
           }
 

@@ -85,7 +85,7 @@ export interface Context {
   }
   types: {
     [key: number]: ValueType
-    [key: string]: ValueType
+    [key: string]: any
   }
   defines: Node[]
 }
