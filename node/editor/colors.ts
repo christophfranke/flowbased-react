@@ -22,7 +22,7 @@ export function colorOfType(type: ValueType): ColorMap {
     Object: 'complex',
     Unresolved: 'unresolved',
     Element: 'render',
-    Unknown: 'error',
+    Unknown: 'unknown',
     Mismatch: 'error'
   }[type.name]
 
@@ -72,6 +72,11 @@ export const colors = {
     unresolved: {
       default: 'rgb(255, 192, 203)',
       highlight: 'rgb(255, 222, 235)',
+      hover: 'white'
+    },
+    unknown: {
+      default: 'rgb(212, 157, 80)',
+      highlight: 'rgb(250, 187, 100)',
       hover: 'white'
     }
   },
