@@ -6,11 +6,14 @@ const handler = nextConnect();
 handler.use(middleware);
 
 handler.get(async (req, res) => {
+  try {
+    let doc = await req.db.collection('daily').findOne()
+    res.json(doc);
+    console.log(doc);
+    return
+  } catch(e) {}
 
-    // let doc = await req.db.collection('daily').findOne()
-    // console.log(doc);
-    // res.json(doc);
-    res.json({ hellox: 'world data' })
+  res.json({ hellox: 'world data' })
 });
 
 export default handler;
