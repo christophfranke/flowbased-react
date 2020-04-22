@@ -67,7 +67,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         )
       }
     }
-  },  If: {
+  },
+  If: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const conditionInput = node.connections.input.condition
         && node.connections.input.condition[0]
