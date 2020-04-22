@@ -14,7 +14,7 @@ services:
     volumes: 
       - /usr/src/app/.next
       - /usr/src/app/node_modules
-      - ./node:/usr/src/app:rw
+      - ./node:/usr/src/app:delegated
     ports:
       - 3000:3000
     environment:
