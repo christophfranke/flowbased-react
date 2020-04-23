@@ -7,15 +7,11 @@ handler.use(middleware)
 
 handler.get(async (req, res) => {
   try {
-    let doc = await req.db.collection('documents').findOne({
+    await req.db.collection('documents').deleteOne({
       _id: new ObjectID(req.query.id)
     })
 
-    if (doc) {
-      res.json(doc)
-    } else {
-      res.json({ ok: false, error: 'not found', status: 404 })
-    }
+    res.json({ ok: true })
   } catch(e) {
     console.log(e)
     res.json({ error: "didn't work", status: 500 })

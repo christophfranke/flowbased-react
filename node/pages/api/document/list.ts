@@ -7,15 +7,9 @@ handler.use(middleware)
 
 handler.get(async (req, res) => {
   try {
-    let doc = await req.db.collection('documents').findOne({
-      _id: new ObjectID(req.query.id)
-    })
+    let doc = await req.db.collection('documents').find({}).toArray()
 
-    if (doc) {
-      res.json(doc)
-    } else {
-      res.json({ ok: false, error: 'not found', status: 404 })
-    }
+    res.json(doc)
   } catch(e) {
     console.log(e)
     res.json({ error: "didn't work", status: 500 })

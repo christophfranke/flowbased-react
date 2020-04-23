@@ -18,7 +18,7 @@ handler.get(async (req, res) => {
     res.json({ ok: true })
   } catch(e) {
     console.log(e)
-    res.json({ error: "didn't work" })
+    res.json({ error: "didn't work", status: 500 })
   }
 })
 
