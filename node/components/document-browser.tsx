@@ -57,7 +57,7 @@ class EditorLoad extends React.Component<Props> {
           <Link href='/editor/[id]' as={`/editor/${document._id}`}>
             <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{document.name || 'Unnamed'}</div>
           </Link>)}
-        <Link href='/editor/index'><div style={linkStyle}>Create Graph</div></Link>
+        <Link href='/editor/index'><div style={linkStyle}>Create new Graph</div></Link>
       </div>
     </div>
   }

@@ -29,20 +29,39 @@ class EditorLoad extends React.Component {
   }
 
   @observable id: string
+  @observable documentBrowserKey = 1
 
   changeFilename = (e) => {
     this.filenames[this.id] = e.target.value
   }
 
-  clickSave = async () => {
+  clickDelete = async () => {
     if (!this.loading) {    
       this.loading = true
-      await this.saveData()
+      await this.deleteGraph()
       this.loading = false
     }
   }
 
-  async saveData() {
+  clickSave = async () => {
+    if (!this.loading) {    
+      this.loading = true
+      await this.saveGraph()
+      this.loading = false
+      this.documentBrowserKey += 1
+    }
+  }
+
+  async deleteGraph() {
+    if (this.id) {
+      const result = await fetch(`/api/documents/${this.id}`, {
+        method: 'DELETE',
+      })
+      this.documentBrowserKey += 1
+    }
+  }
+
+  async saveGraph() {
     if (this.id) {
       const result = await fetch(`/api/documents/${this.id}`, {
         method: 'POST',
@@ -104,11 +123,14 @@ class EditorLoad extends React.Component {
           <h2 style={{ fontSize: '24px' }}>Loading...</h2>
         </div>}
       </Viewport>
-      <DocumentBrowser selectedId={this.id} />
+      <DocumentBrowser selectedId={this.id} key={this.documentBrowserKey} />
       <input value={this.filename} style={filenameStyle} onChange={this.changeFilename} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
         <button disabled={this.loading} onClick={this.clickSave} style={buttonStyles}>
           Save
+        </button>
+        <button disabled={this.loading} onClick={this.clickDelete} style={buttonStyles}>
+          Delete
         </button>
         <a href={`/preview/${this.id}`} target="_blank" style={buttonStyles}>
           Preview
