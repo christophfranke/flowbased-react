@@ -75,9 +75,11 @@ class Translator {
                     ...forest.filter(tree => tree !== input)
                       .reduce((obj, tree) => ({
                         ...obj,
-                        [tree.node.id]: node.connections.input[tree.node.params.name]
-                          ? type(node.connections.input[tree.node.params.name][0].src.node, context) // this context might need the define type in some edge cases.
-                          : undefined
+                        input: {
+                          [tree.node.params.name]: node.connections.input[tree.node.params.name]
+                            ? type(node.connections.input[tree.node.params.name][0].src.node, context) // this context might need the define type in some edge cases.
+                            : undefined
+                          }
                       }), {})
                   }
                 }
