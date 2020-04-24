@@ -54,6 +54,7 @@ handler.post(async (req, res) => {
       _id: new ObjectID(req.query.id)
     }, {
       $set: {
+        name: data!['name'],
         nodes: data!['nodes'],
         connections: data!['connections'],
         currentId: data!['currentId'], 

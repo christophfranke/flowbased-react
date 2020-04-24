@@ -7,11 +7,17 @@ import { Vector, Rectangle, Node, Connector, Connection, Mouse } from '@editor/t
 import { colors } from '@editor/colors'
 import * as LA from '@editor/la'
 
+import Store from '@editor/store'
+
 import NodeView from '@editor/components/node'
 import PendingConnections from '@editor/components/pennding-connections'
 import Connections from '@editor/components/connections'
 import NodeList from '@editor/components/node-list'
 
+
+interface Props {
+  store: Store
+}
 
 const clamp = (value, min, max) => Math.min(max, Math.max(value, min))
 
@@ -20,12 +26,11 @@ const RIGHT_MOUSE_BUTTON = 2
 const MAX_ZOOM = 2
 const MIN_ZOOM = 0.1
 
-@inject('store')
 @observer
-class EditorView extends React.Component {
+class EditorView extends React.Component<Props> {
   backgroundColor = colors.background.editor
   dispose: IReactionDisposer
-  store = this.props['store']
+  store: Store = this.props.store
 
   initialSelection: Node[] | null
   @observable points: Vector[] = []
@@ -338,7 +343,7 @@ class EditorView extends React.Component {
       onMouseOut={this.handleMouseOut}
       onClick={this.handleClick}
      >
-      <Provider mouse={this.mouse} keys={this.keys}>
+      <Provider mouse={this.mouse} keys={this.keys} store={this.store}>
           <div style={innerStyle}>
             <Connections />
             {this.store.nodes.map(node => <NodeView key={node.id} node={node} />)}

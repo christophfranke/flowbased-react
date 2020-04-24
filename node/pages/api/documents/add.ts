@@ -7,6 +7,7 @@ handler.use(middleware)
 handler.post(async (req, res) => {
   try {
     const result = await req.db.collection('documents').insertOne({
+      name: 'Unnamed',
       nodes: [],
       connections: [],
       currentId: 0,
