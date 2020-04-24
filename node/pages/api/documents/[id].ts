@@ -42,12 +42,22 @@ handler.delete(async (req, res) => {
 })
 
 handler.post(async (req, res) => {
+  let data = null
+  try {
+    data = JSON.parse(req.body)
+  } catch(e) {
+    res.json({ ok: false, error: "no valid json", status: 500 })
+    return
+  }
   try {
     await req.db.collection('documents').updateOne({
       _id: new ObjectID(req.query.id)
     }, {
       $set: {
-        data: Math.random()
+        nodes: data!['nodes'],
+        connections: data!['connections'],
+        currentId: data!['currentId'], 
+        currentHighZ: data!['currentHighZ']
       }
     })
 

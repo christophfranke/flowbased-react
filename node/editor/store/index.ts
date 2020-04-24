@@ -29,6 +29,15 @@ class Store {
   @observable currentId = 0
   @observable currentHighZ = 1
 
+  get data() {
+    return {
+      nodes: this.nodes,
+      connections: this.connections,
+      currentId: this.currentId,
+      currentHighZ: this.currentHighZ
+    }
+  }
+
   @computed get modules() {
     // old school bind this to self
     const self = this
