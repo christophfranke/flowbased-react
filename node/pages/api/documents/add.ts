@@ -4,9 +4,13 @@ import middleware from '@middleware/database'
 const handler = nextConnect()
 handler.use(middleware)
 
-handler.get(async (req, res) => {
+handler.post(async (req, res) => {
   try {
     const result = await req.db.collection('documents').insertOne({
+      nodes: [],
+      connections: [],
+      currentId: 0,
+      currentHighZ: 1
     })
 
     res.json({
@@ -15,7 +19,7 @@ handler.get(async (req, res) => {
     })
   } catch(e) {
     console.log(e)
-    res.json({ error: "didn't work", status: 500 })
+    res.json({ ok: false, error: "didn't work", status: 500 })
   }
 })
 

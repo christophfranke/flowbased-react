@@ -124,6 +124,16 @@ class Store {
     return Store.syncedInstance
   }
 
+  static createFromData(data) {
+    const store = new Store()
+    store.nodes = data.nodes || []
+    store.connections = data.connections || []
+    store.currentId = data.currentId || 0
+    store.currentHighZ = data.currentHighZ || 1
+
+    return store
+  }
+
   uid(): number {
     this.currentId += 1
     return this.currentId
