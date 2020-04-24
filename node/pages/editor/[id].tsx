@@ -22,9 +22,11 @@ class EditorLoad extends React.Component {
   router = this.props['router']
 
   clickSave = async () => {
-    this.loading = true
-    await this.saveData()
-    this.loading = false
+    if (!this.loading) {    
+      this.loading = true
+      await this.saveData()
+      this.loading = false
+    }
   }
 
   async saveData() {
@@ -33,7 +35,6 @@ class EditorLoad extends React.Component {
         method: 'POST',
         body: JSON.stringify(this.store.data)
       })
-      console.log(result)
     }
   }
 
@@ -43,8 +44,6 @@ class EditorLoad extends React.Component {
       const data = await result.json()
       
       this.store = Store.createFromData(data)
-    } else {
-      console.log(this.router, this.router.asPath, this.router.query)
     }
   }
 
@@ -66,8 +65,8 @@ class EditorLoad extends React.Component {
           </Viewport>
         </Provider>
         <div style={{ position: 'fixed', top: '1vw', right: '1vw' }}>
-          <button disabled={this.loading} onClick={this.clickSave} style={{ backgroundColor: 'pink', padding: '8px 15px', borderRadius: '8px', cursor: this.loading ? 'progress' : 'pointer' }}>
-            {this.loading ? '...' : 'Save'}
+          <button disabled={this.loading} onClick={this.clickSave} style={{ backgroundColor: 'rgba(25, 25, 25, 0.7)', color: 'white', border: '1px solid white', padding: '8px 15px', borderRadius: '8px', cursor: this.loading ? 'progress' : 'pointer', opacity: this.loading ? 0.5 : 1 }}>
+            Save
           </button>
         </div>
       </div>
