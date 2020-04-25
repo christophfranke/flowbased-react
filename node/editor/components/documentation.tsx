@@ -69,7 +69,9 @@ class Documentation extends React.Component<Props> {
 
   render() {
     const module = this.store.modules[this.props.nodeModule]
+      || this.store.modules.Error
     const definition = module.EditorNode[this.props.nodeType]
+      || this.store.modules.Error.EditorNode.ModuleNotFound
     const documentation = definition.documentation
 
     const style: React.CSSProperties = {
