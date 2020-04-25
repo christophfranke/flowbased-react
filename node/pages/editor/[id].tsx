@@ -10,6 +10,7 @@ import DocumentBrowser from '@components/document-browser'
 
 import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
+import loadDependencies from '@service/load-dependencies'
 
 const currentId = () => window.location.pathname.split('/')[2]
 
@@ -80,7 +81,9 @@ class EditorLoad extends React.Component {
       const result = await fetch(`/api/documents/${this.id}`)
       const data = await result.json()
       
-      graphStorage.stores[this.id] = Store.createFromData(data)
+      const store = Store.createFromData(data)
+      graphStorage.stores[this.id] = store
+      await loadDependencies(store)
       this.loading = false
     }
   }
@@ -119,7 +122,7 @@ class EditorLoad extends React.Component {
 
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-        {this.store && <EditorView key={this.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {this.store && !this.loading && <EditorView key={this.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h2 style={{ fontSize: '24px' }}>{this.loading ? 'Loading...' : 'No Graph'}</h2>
         </div>}
       </Viewport>

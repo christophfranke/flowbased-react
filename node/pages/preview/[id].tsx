@@ -10,6 +10,7 @@ import Viewport from '@editor/components/viewport'
 import Store from '@editor/store'
 
 import graphStorage from '@service/graph-storage'
+import loadDependencies from '@service/load-dependencies'
 
 const currentId = () => window.location.pathname.split('/')[2]
 
@@ -40,12 +41,7 @@ class EditorLoad extends React.Component {
   async fetchData() {
     this.loading = true
     const store = await this.fetchStore(this.id)
-    await Promise.all<any>(store.nodes.map(node => {
-      if (!graphStorage.modules[node.module]) {
-        return this.fetchStore(node.module)
-      }
-      return Promise.resolve()
-    }))
+    await loadDependencies(store)
 
     this.loading = false
   }
