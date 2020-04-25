@@ -9,6 +9,7 @@ interface NodeListItem {
   typeDisplay: string
   type: string
   module: string
+  moduleName: string
   create: (position: Vector) => void
 }
 
@@ -28,6 +29,7 @@ export default class NodeFunctions {
             typeDisplay: editorDefinition.type,
             type,
             module,
+            moduleName: definitions.name,
             create: position => this.createNode(position, module, type)
           }))))
 

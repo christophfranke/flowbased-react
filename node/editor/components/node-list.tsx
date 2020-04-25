@@ -141,7 +141,7 @@ class NodeList extends React.Component<Props> {
             }
 
             return <li key={`${item.module}.${item.type}`} onClick={(e) => this.handleClick(e, item.create)} style={itemStyle} onMouseOver={mouseOver}>
-              <span style={nameStyle}><span style={{ fontSize: '10px' }}>{item.module}</span>.{item.name}</span>
+              <span style={nameStyle}><span style={{ fontSize: '10px' }}>{item.moduleName}</span>.{item.name}</span>
               <span style={{ fontStyle: 'italic' }}>{item.typeDisplay}</span>
             </li>
           })}

@@ -68,7 +68,8 @@ class Documentation extends React.Component<Props> {
   }
 
   render() {
-    const definition = this.store.modules[this.props.nodeModule].EditorNode[this.props.nodeType]
+    const module = this.store.modules[this.props.nodeModule]
+    const definition = module.EditorNode[this.props.nodeType]
     const documentation = definition.documentation
 
     const style: React.CSSProperties = {
@@ -88,7 +89,7 @@ class Documentation extends React.Component<Props> {
       <div style={style} onWheel={this.handleWheel}>
         <div>
           <h1 style={{ fontSize: '20px', marginBottom: '5px' }}>
-            <span style={{ fontSize: '14px'}}>{this.props.nodeModule}</span>.{definition.name}
+            <span style={{ fontSize: '14px'}}>{module.name}</span>.{definition.name}
           </h1>
           {format(documentation.explanation)}
         </div>
