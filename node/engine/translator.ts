@@ -7,6 +7,7 @@ import { flatten, transformer, unique } from '@engine/util'
 import { filteredSubForest } from '@engine/tree'
 import { type, unmatchedType } from '@engine/render'
 import { intersectAll } from '@engine/type-functions'
+import { module } from '@engine/module'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
@@ -15,15 +16,20 @@ import * as ArrayModule from '@engine/modules/array'
 import * as Define from '@engine/modules/define'
 import * as Input from '@engine/modules/input'
 import * as Javascript from '@engine/modules/javascript'
+import * as ErrorModule from '@engine/modules/error'
 
 interface EditorGraph {
+  name: string
   nodes: Editor.Node[]
   connections: Editor.Connection[]
 }
 
 class Translator {
   @observable editor: EditorGraph
+  @observable name: string
+
   constructor(editor: EditorGraph) {
+    this.name = editor.name
     this.editor = editor
   }
 
@@ -34,12 +40,12 @@ class Translator {
     Object: ObjectModule,
     Define,
     Input,
-    Javascript
+    Javascript,
+    Error: ErrorModule
   }
 
-  @transformer
-  nodeDefinition(node: NodeIdentifier): NodeDefinition {
-    return this.modules[node.module].Node[node.type]
+  @computed get export(): Module {
+    return module(this.name, this.context)
   }
 
   @computed get context(): Context {
@@ -63,7 +69,7 @@ class Translator {
       .map(node => this.getNode(node))
   }
 
-
+  @transformer
   getEditorNode(id: number): Editor.Node {
     const node = this.editor.nodes.find(node => node.id === id)
     if (node) {

@@ -189,7 +189,7 @@ class NodeView extends React.Component<Props> {
     }
 
     const node = this.props.node
-    const definition = this.store.nodeDefinition(node) || {}
+    const definition = this.store.editorDefinition(node)
     const typeColorBase = colorOfType(this.type)
     const typeColor = typeColorBase[this.isSelected ? 'highlight': 'default']
 

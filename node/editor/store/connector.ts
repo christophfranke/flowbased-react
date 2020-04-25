@@ -14,7 +14,7 @@ import {
   Vector
 } from '@editor/types'
 import Store from '@editor/store'
-import { type, expectedType, numIterators } from '@engine/render'
+import { type, expectedType, numIterators, nodeDefinition } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
 import { transformer } from '@engine/util'
 import { flatFilteredSubForest, children } from '@engine/tree'
@@ -94,7 +94,7 @@ export default class ConnectorFunctions {
       }
     })
 
-    const definition = this.store.translated.nodeDefinition(node)
+    const definition = nodeDefinition(node, this.store.context)
     if (!definition) {
       return ports
     }

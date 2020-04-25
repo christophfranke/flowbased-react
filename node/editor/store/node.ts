@@ -1,5 +1,5 @@
 import { computed } from 'mobx'
-import { Node, Vector, NodeDefinition } from '@editor/types'
+import { Node, Vector, EditorDefinition } from '@editor/types'
 
 import { flatten } from '@engine/util'
 import Store from '@editor/store'
@@ -23,9 +23,9 @@ export default class NodeFunctions {
     const list = flatten(Object.entries(this.store.modules)
       .map(([module, definitions]) =>
         Object.entries(definitions.EditorNode)
-          .map(([type, nodeDefinition]: [string, NodeDefinition]) => ({
-            name: nodeDefinition.name,
-            typeDisplay: nodeDefinition.type,
+          .map(([type, editorDefinition]: [string, EditorDefinition]) => ({
+            name: editorDefinition.name,
+            typeDisplay: editorDefinition.type,
             type,
             module,
             create: position => this.createNode(position, module, type)
@@ -41,17 +41,17 @@ export default class NodeFunctions {
 
 
   createNode(position: Vector, module: string, name: string) {
-    const nodeDefinition = this.store.modules[module].EditorNode[name]
+    const editorDefinition = this.store.editorDefinition({ type: name, module })
 
     const node: Node = {
-      ...nodeDefinition.create(),
+      ...editorDefinition.create(),
       module,
       zIndex: 1,
       id: this.store.uid(),
       position
     }
 
-    if (nodeDefinition.options && nodeDefinition.options.includes('singleton')) {
+    if (editorDefinition.options && editorDefinition.options.includes('singleton')) {
       const singletonNodes = this.store.nodes.filter(node => node.type === name)
       this.store.deleteNodes(singletonNodes)
     }

@@ -9,6 +9,7 @@ import * as Editor from '@editor/types'
 
 export const Dependencies = ['Core', 'Array', 'Object']
 
+export const name = 'React'
 export type Nodes = 'Tag' | 'Preview'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Tag: {

@@ -3,7 +3,7 @@ import { observable, computed } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
 import { Node, Connection } from '@editor/types'
-import Translator from '@shared/translator'
+import Translator from '@engine/translator'
 
 import { value } from '@engine/render'
 

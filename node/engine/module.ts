@@ -1,12 +1,13 @@
-import { Module, Context, Node, Scope } from '@engine/types'
+import { Module, Context, Node, Scope, ModuleNodes } from '@engine/types'
 import { filteredSubForest } from '@engine/tree'
 import { type } from '@engine/render'
 import { computedFunction } from '@engine/util'
 
-export function module(context): Module {
+export function module(name: string, context: Context): Module {
   return {
+    name,
     Type: {},
-    Node: context.defines.reduce((obj, define) => ({
+    Node: context.defines.reduce((obj: ModuleNodes<string>, define: Node): ModuleNodes<string> => ({
       ...obj,
       [`define-${define.id}`]: {
         value: (node: Node, scope: Scope) => {
@@ -56,6 +57,6 @@ export function module(context): Module {
           }
         }
       }
-    }))
+    }), {})
   }
 }

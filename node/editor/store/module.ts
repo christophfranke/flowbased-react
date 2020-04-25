@@ -3,9 +3,9 @@ import * as Editor from '@editor/types'
 import { filteredSubForest } from '@engine/tree'
 import * as EngineModule from '@engine/module'
 
-export function module(context: Engine.Context): Editor.Module {
+export function module(name: string, context: Engine.Context): Editor.Module {
   return {
-    ...EngineModule.module(context),
+    ...EngineModule.module(name, context),
     EditorNode: context.defines.reduce((obj, define) => {
       return {
         ...obj,

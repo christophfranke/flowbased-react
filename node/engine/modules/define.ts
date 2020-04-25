@@ -7,6 +7,7 @@ import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core', 'Array']
 
+export const name = 'Define'
 export type Nodes = 'Define' | 'Proxy' | 'Input'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Define: {

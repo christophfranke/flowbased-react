@@ -5,6 +5,7 @@ type TypeResolver = (node: Node, context: Context) => ValueType
 type ContextResolver = (node: Node, context: Context) => Context
 
 export interface Module {
+  name: string
   Type: ModuleTypes<string>
   Node: ModuleNodes<string> 
 }

@@ -7,6 +7,7 @@ import { inputs } from '@engine/tree'
 
 export const Dependencies = ['Core', 'Array', 'Object']
 
+export const name = 'Input'
 export type Nodes = 'Textarea' | 'StringRecord' | 'List'
 export const Node: Engine.ModuleNodes<Nodes> = {
   List: {

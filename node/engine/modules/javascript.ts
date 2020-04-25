@@ -8,6 +8,7 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 
 export const Dependencies = ['Core']
 
+export const name = 'Javascript'
 export type Nodes = 'Expression' | 'TypeGuard'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Expression: {

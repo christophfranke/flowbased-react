@@ -5,15 +5,14 @@ import { computedFunction } from '@engine/util'
 
 import { matchInto, unionAll } from '@engine/type-functions'
 
-export const identifyNode = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition | null {
-  return context.modules[node.module].Node[node.type]
+export const nodeDefinition = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition {
+  return context.modules[node.module]
+    ? context.modules[node.module].Node[node.type]
+    : context.modules.Error.Node.ModuleNotFound
 })
 
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
-  const definitions = identifyNode(node, scope.context)
-  return definitions
-    ? definitions.value(node, scope, key)
-    : null
+  return nodeDefinition(node, scope.context).value(node, scope, key)
 })
 
 export const inputValue = computedFunction(function(node: Node, key: string, scope: Scope): any {
@@ -35,11 +34,7 @@ export const unmatchedType = computedFunction(function(node: Node, context: Cont
     }
   }
 
-  const definitions = identifyNode(node, context)
-  if (!definitions) {
-    return context.modules.Core.Type.Mismatch.create('Node definition not found')
-  }
-
+  const definitions = nodeDefinition(node, context)
   return matchInto(
     definitions.type.output![key](node, newContext),
     unionAll(outputs(node).map(
@@ -61,12 +56,9 @@ export const numIterators = computedFunction(function (node: Node): number {
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
-  const definitions = identifyNode(target, context)
-  if (!definitions) {
-    return context.modules.Core.Type.Mismatch.create('Node definition not found')
-  }
-
+  const definitions = nodeDefinition(target, context)
   const input = definitions.type.input
+
   if (input && input[key]) {
     return definitions.type.input![key](target, context)
   }

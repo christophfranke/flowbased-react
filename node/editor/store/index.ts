@@ -1,7 +1,7 @@
 import { observable, computed, autorun, action } from 'mobx'
-import { Connection, Node, Connector, ConnectorState, Module, NodeDefinition } from '@editor/types'
+import { Connection, Node, Connector, ConnectorState, Module, EditorDefinition, NodeIdentifier } from '@editor/types'
 import { sync, load } from '@shared/local-storage-sync'
-import Translator from '@shared/translator'
+import Translator from '@engine/translator'
 import { Context } from '@engine/types'
 
 import ConnectorFunctions from '@editor/store/connector'
@@ -22,6 +22,7 @@ class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
 
+  @observable name = ''
   @observable connections: Connection[] = []
   @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
@@ -68,11 +69,13 @@ class Store {
       store.nodes = load(['editor', 'nodes']) || []
       store.connections = load(['editor', 'connections']) || []
       store.currentHighZ = load(['editor', 'highZ']) || 1
+      store.name = load(['editor', 'name']) || ''
 
       // autosave immediately
       sync(['editor', 'connections'], store, 'connections')
       sync(['editor', 'nodes'], store, 'nodes')
       sync(['editor', 'highZ'], store, 'currentHighZ')
+      sync(['editor', 'name'], store, 'name')
 
       Store.syncedInstance = store
     }
@@ -85,6 +88,7 @@ class Store {
     store.nodes = data.nodes || []
     store.connections = data.connections || []
     store.currentHighZ = data.currentHighZ || 1
+    store.name = data.name || ''
 
     return store
   }
@@ -94,7 +98,7 @@ class Store {
   }
 
   @transformer
-  nodeDefinition(node: Node): NodeDefinition<string> {
+  editorDefinition(node: NodeIdentifier): EditorDefinition<string> {
     return this.modules[node.module].EditorNode[node.type]
   }
 

@@ -8,6 +8,7 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 
 export const Dependencies = ['Core']
 
+export const name = 'Object'
 export type Nodes = 'Object' | 'Pair' | 'Key'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {

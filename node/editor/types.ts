@@ -6,11 +6,11 @@ export interface Module extends Engine.Module {
   EditorNode: ModuleNodes<string>
 }
 export type ModuleNodes<NodeName extends keyof any> = {
-  [key in NodeName]: NodeDefinition<key>
+  [key in NodeName]: EditorDefinition<key>
 }
 
 export type NodeOption = 'singleton'
-export interface NodeDefinition<T = string> {
+export interface EditorDefinition<T = string> {
   type: string
   name: string
   options?: NodeOption[]
@@ -105,9 +105,13 @@ export interface RawNode<T> {
   params: Parameter[]  
 }
 
-export interface Node extends RawNode<string> {
-  id: number
+export interface NodeIdentifier {
   module: string
+  type: string
+}
+
+export interface Node extends RawNode<string>, NodeIdentifier {
+  id: number
   position: Vector
   zIndex: number
   boundingBox?: Rectangle

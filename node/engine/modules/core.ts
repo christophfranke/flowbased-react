@@ -5,6 +5,9 @@ import { value, type, unmatchedType } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { inputs } from '@engine/tree'
 
+export const Dependencies = []
+
+export const name = 'Core'
 export type Nodes = 'String' | 'Number' | 'Boolean' | 'SetType' | 'MatchType' | 'If'
 export const Node: Engine.ModuleNodes<Nodes> = {
   String: {
