@@ -13,6 +13,7 @@ class Preview extends React.Component {
   store: {
     nodes: Node[]
     connections: Connection[]
+    name: string
   } = this.props['store']
 
   ref = React.createRef<HTMLDivElement>()

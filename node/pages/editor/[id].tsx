@@ -22,17 +22,16 @@ class EditorLoad extends React.Component {
   }
 
   @observable stores: { [key: string]: Store } = {}
-  @observable filenames: { [key: string]: string } = {}
   @observable loading = false
-  @computed get filename(): string {
-    return this.filenames[this.id] || ''
+  @computed get graphName(): string {
+    return (this.stores[this.id] || { name: '' }).name
   }
 
   @observable id: string
   @observable documentBrowserKey = 1
 
-  changeFilename = (e) => {
-    this.filenames[this.id] = e.target.value
+  changeGraphName = (e) => {
+    this.stores[this.id].name = e.target.value
   }
 
   clickDelete = async () => {
@@ -69,7 +68,7 @@ class EditorLoad extends React.Component {
         method: 'POST',
         body: JSON.stringify({
           ...this.store.data,
-          name: this.filename
+          name: this.graphName
         })
       })
     }
@@ -83,9 +82,6 @@ class EditorLoad extends React.Component {
       
       this.stores[this.id] = Store.createFromData(data)
       this.loading = false
-      if (data.name) {
-        this.filenames[this.id] = data.name
-      }
     }
   }
 
@@ -108,7 +104,7 @@ class EditorLoad extends React.Component {
       opacity: this.loading ? 0.5 : 1
     }
 
-    const filenameStyle: React.CSSProperties = {
+    const graphNameStyle: React.CSSProperties = {
       color: 'white',
       position: 'fixed',
       left: '50%',
@@ -128,12 +124,12 @@ class EditorLoad extends React.Component {
         </div>}
       </Viewport>
       <DocumentBrowser selectedId={this.id} documentsKey={this.documentBrowserKey} />
-      <input value={this.filename} style={filenameStyle} onChange={this.changeFilename} />
+      <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
-        <button disabled={this.loading} onClick={this.clickSave} style={buttonStyles}>
+        <button disabled={this.loading || !this.store} onClick={this.clickSave} style={buttonStyles}>
           Save
         </button>
-        <button disabled={this.loading} onClick={this.clickDelete} style={buttonStyles}>
+        <button disabled={this.loading || !this.store} onClick={this.clickDelete} style={buttonStyles}>
           Delete
         </button>
         <a href={`/preview/${this.id}`} target="_blank" style={buttonStyles}>
