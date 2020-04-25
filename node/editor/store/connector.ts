@@ -23,7 +23,7 @@ import * as Engine from '@engine/types'
 
 
 export default class ConnectorFunctions {
-  store: Store
+  readonly store: Store
   constructor(store: Store) {
     this.store = store
   }
@@ -32,7 +32,7 @@ export default class ConnectorFunctions {
   connector<F extends ConnectorFunction>(description: ConnectorDescription<F>): Connector<F> | null {
     const node = this.store.getNodeById(description.nodeId)
     if (!node) {
-      console.warn('node not found', description)
+      console.warn('node not found', description.nodeId)
       return null
     }
 
@@ -263,7 +263,6 @@ export default class ConnectorFunctions {
       && this.iteratorsAreCompatatible(src.group.ports.node, dest.group.ports.node)
   }
 
-  @transformer
   state(connector: Connector): ConnectorState {
     if (this.store.pendingConnector) {
       if (this.areSame(this.description(this.store.pendingConnector), this.description(connector))) {

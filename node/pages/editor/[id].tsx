@@ -119,7 +119,7 @@ class EditorLoad extends React.Component {
 
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-        {this.store && <EditorView key={this.filename} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {this.store && <EditorView key={this.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h2 style={{ fontSize: '24px' }}>Loading...</h2>
         </div>}
       </Viewport>

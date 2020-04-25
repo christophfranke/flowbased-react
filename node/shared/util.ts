@@ -2,14 +2,19 @@ import { createTransformer } from 'mobx-utils'
 
 export function transformer(target, key, descriptor) {
   const fn = target[key]
-  target.$transformerId = target.$transformerId || Math.random()
-  target.$transformed = target.$transformed || {}
   descriptor.value = function(...args) {
-    if (!target.$transformed[key]) {
-      target.$transformed[key] = createTransformer(fn.bind(this))
+    if (this) {    
+      this.$transformerId = this.$transformerId || Math.random()
+      this.$transformed = this.$transformed || {}
+      if (!this.$transformed[key]) {
+        this.$transformed[key] = createTransformer(fn.bind(this))
+      }
+      return this.$transformed[key](...args)
     }
-    return target.$transformed[key](...args)
+
+    return fn(...args)
   }
+
   descriptor.writable = false
   return descriptor
 }
