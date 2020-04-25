@@ -25,7 +25,7 @@ class EditorLoad extends React.Component {
   @observable filenames: { [key: string]: string } = {}
   @observable loading = false
   @computed get filename(): string {
-    return this.filenames[this.id]
+    return this.filenames[this.id] || ''
   }
 
   @observable id: string

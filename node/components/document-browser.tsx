@@ -54,7 +54,7 @@ class EditorLoad extends React.Component<Props> {
       <h2 style={{ fontSize: '20px' }}>Graphs</h2>
       <div style={{ padding: '10px 0 0 10px' }}>
         {this.documents.map(document =>
-          <Link href='/editor/[id]' as={`/editor/${document._id}`}>
+          <Link key={document._id} href='/editor/[id]' as={`/editor/${document._id}`}>
             <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{document.name || 'Unnamed'}</div>
           </Link>)}
         <Link href='/editor/index'><div style={linkStyle}>Create new Graph</div></Link>

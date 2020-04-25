@@ -14,7 +14,7 @@ const replacementMap = {
   italic: {
     all: '(\\*[^\*]+\\*)',
     inner: /\*([^\*]+)\*/,
-    replace: token => <i>{token}</i>
+    replace: token => <i key={Math.random()}>{token}</i>
   },
   code: {
     all: '(`[^`]+`)',
