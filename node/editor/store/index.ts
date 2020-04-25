@@ -26,14 +26,12 @@ class Store {
   @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
-  @observable currentId = 0
   @observable currentHighZ = 1
 
   get data() {
     return {
       nodes: this.nodes,
       connections: this.connections,
-      currentId: this.currentId,
       currentHighZ: this.currentHighZ
     }
   }
@@ -118,13 +116,11 @@ class Store {
 
       store.nodes = load(['editor', 'nodes']) || []
       store.connections = load(['editor', 'connections']) || []
-      store.currentId = load(['editor', 'uid']) || 0
       store.currentHighZ = load(['editor', 'highZ']) || 1
 
       // autosave immediately
       sync(['editor', 'connections'], store, 'connections')
       sync(['editor', 'nodes'], store, 'nodes')
-      sync(['editor', 'uid'], store, 'currentId')
       sync(['editor', 'highZ'], store, 'currentHighZ')
 
       Store.syncedInstance = store
@@ -137,15 +133,13 @@ class Store {
     const store = new Store()
     store.nodes = data.nodes || []
     store.connections = data.connections || []
-    store.currentId = data.currentId || 0
     store.currentHighZ = data.currentHighZ || 1
 
     return store
   }
 
   uid(): number {
-    this.currentId += 1
-    return this.currentId
+    return Math.random()
   }
 
   @transformer

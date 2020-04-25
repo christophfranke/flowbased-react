@@ -57,7 +57,6 @@ handler.post(async (req, res) => {
         name: data!['name'],
         nodes: data!['nodes'],
         connections: data!['connections'],
-        currentId: data!['currentId'], 
         currentHighZ: data!['currentHighZ']
       }
     })

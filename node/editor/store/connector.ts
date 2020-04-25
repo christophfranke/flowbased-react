@@ -266,7 +266,7 @@ export default class ConnectorFunctions {
   @transformer
   state(connector: Connector): ConnectorState {
     if (this.store.pendingConnector) {
-      if (this.store.pendingConnector === connector) {
+      if (this.areSame(this.description(this.store.pendingConnector), this.description(connector))) {
         return 'pending'
       }
       if (this.canConnect(this.store.pendingConnector, connector)) {

@@ -10,7 +10,6 @@ handler.post(async (req, res) => {
       name: 'Unnamed',
       nodes: [],
       connections: [],
-      currentId: 0,
       currentHighZ: 1
     })
 
