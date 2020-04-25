@@ -8,7 +8,7 @@ import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
 
 import { filteredSubForest } from '@engine/tree'
-import { flatten, transformer } from '@shared/util'
+import { flatten, transformer } from '@engine/util'
 
 import * as Core from '@engine/modules/core'
 import * as React from '@engine/modules/react'
@@ -36,63 +36,14 @@ class Store {
     }
   }
 
-  @computed get modules() {
-    // old school bind this to self
-    const self = this
-
-    return {
-      Core,
-      React,
-      Array: ArrayModule,
-      Object: ObjectModule,
-      Define,
-      Input,
-      Javascript,
-      get Local() {
-        return {
-          Node: self.translated.context.modules.Local.Node,
-          Type: self.translated.context.modules.Local.Type,
-          EditorNode: self.localEditorNodes
-        } as Module
-      }
-    }
-  }
-
-  @computed get localEditorNodes(): { [key: string]: NodeDefinition } {
-    return this.context.defines.reduce((obj, define) => {
-      return {
-        ...obj,
-        [`define-${define.id}`]: {
-          get name() {
-            return define.params.name.trim() || 'Anonymous'
-          },
-          type: 'Local',
-          documentation: {
-            explanation: 'Locally defined node'
-          },
-          ports: {
-            get input() {
-              const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
-              return forest.reduce((obj, input) => ({
-                ...obj,
-                [input.node.params.name]:
-                  (input.node.params.side ? ['side'] : [])
-                  .concat(input.node.params.duplicate ? ['duplicate'] : [])
-              }), {})
-            }
-          },
-          create: () => ({
-            type: `define-${define.id}`,
-            params: [{
-              name: 'Define',
-              key: 'define',
-              value: define.id,
-              type: 'hidden'
-            }]
-          })
-        }
-      }
-    }, {})
+  modules: { [key: string]: Module } = {
+    Core,
+    React,
+    Array: ArrayModule,
+    Object: ObjectModule,
+    Define,
+    Input,
+    Javascript
   }
 
 

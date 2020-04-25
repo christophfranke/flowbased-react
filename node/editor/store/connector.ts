@@ -16,7 +16,7 @@ import {
 import Store from '@editor/store'
 import { type, expectedType, numIterators } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
-import { transformer } from '@shared/util'
+import { transformer } from '@engine/util'
 import { flatFilteredSubForest, children } from '@engine/tree'
 
 import * as Engine from '@engine/types'

@@ -1,6 +1,6 @@
 import { Node, Port } from '@engine/types'
 import { computedFunction } from '@engine/util'
-import { unique, flatten } from '@shared/util'
+import { unique, flatten } from '@engine/util'
 
 interface NodeTree {
   node: Node,

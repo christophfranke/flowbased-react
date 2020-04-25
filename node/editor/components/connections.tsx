@@ -6,7 +6,7 @@ import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
 import { type, expectedType, numIterators } from '@engine/render'
-import { transformer } from '@shared/util'
+import { transformer } from '@engine/util'
 
 import * as LA from '@editor/la'
 

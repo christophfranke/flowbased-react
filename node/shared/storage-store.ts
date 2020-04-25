@@ -1,6 +1,6 @@
 import { observable, computed } from 'mobx'
 import { Node, Connection, Connector } from '@editor/types'
-import { flatten } from '@shared/util'
+import { flatten } from '@engine/util'
 import { load } from '@shared/local-storage-sync'
 
 export default class StorageEditor {

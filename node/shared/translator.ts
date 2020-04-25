@@ -3,7 +3,7 @@ import { computed, observable } from 'mobx'
 import * as Editor from '@editor/types'
 
 import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
-import { flatten, transformer, unique } from '@shared/util'
+import { flatten, transformer, unique } from '@engine/util'
 import { filteredSubForest } from '@engine/tree'
 import { type, unmatchedType } from '@engine/render'
 import { intersectAll } from '@engine/type-functions'
@@ -27,90 +27,19 @@ class Translator {
     this.editor = editor
   }
 
-  @computed get modules(): { [key: string]: Module } {
-    // old school bind this to self
-    const self = this
-
-    return {
-      Core,
-      React,
-      Array: ArrayModule,
-      Object: ObjectModule,
-      Define,
-      Input,
-      Javascript,
-      get Local() {
-        return {
-          Node: self.localNodes,
-          Type: self.localTypes,
-        } as Module
-      }
-    }
-  }
-
-  @computed get localNodes() {
-    const result = this.context.defines.reduce((obj, define) => ({
-      ...obj,
-      [`define-${define.id}`]: {
-        value: (node: Node, scope: Scope) => {
-          return scope.context.modules.Define.Node.Proxy.value(node, scope, 'output')
-        },
-        type: {
-          output: {
-            output: (node: Node, context: Context) => {
-              return context.modules.Define.Node.Proxy.type.output!.output!(node, context)
-            }
-          },
-          get input() {
-            const forest = filteredSubForest(define, candidate => candidate.type === 'Input')
-
-            return forest.reduce((obj, input) => ({
-              ...obj,
-              [input.node.params.name]: (node: Node, context: Context) => {
-                const newContext = {
-                  ...context,
-                  types: {
-                    ...context.types,
-                    [define.id]: type(node, context),
-                    ...forest.filter(tree => tree !== input)
-                      .reduce((obj, tree) => ({
-                        ...obj,
-                        input: {
-                          [tree.node.params.name]: node.connections.input[tree.node.params.name]
-                            ? type(node.connections.input[tree.node.params.name][0].src.node, context) // this context might need the define type in some edge cases.
-                            : undefined
-                          }
-                      }), {})
-                  }
-                }
-
-                const expectedType = type(input.node, newContext)
-                if (input.node.params.duplicate) {
-                  if (expectedType.name !== 'Array') {
-                    return context.modules.Core.Type.Mismatch.create(`Array expected but got ${expectedType.name}`)
-                  }
-
-                  return expectedType.params.items
-                }
-
-                return expectedType
-              }
-            }), {})
-          }
-        }
-      }
-    }), {})
-
-    return result
+  @observable modules: { [key: string]: Module } = {
+    Core,
+    React,
+    Array: ArrayModule,
+    Object: ObjectModule,
+    Define,
+    Input,
+    Javascript
   }
 
   @transformer
   nodeDefinition(node: NodeIdentifier): NodeDefinition {
     return this.modules[node.module].Node[node.type]
-  }
-
-  @computed get localTypes() {
-    return {}
   }
 
   @computed get context(): Context {
@@ -122,9 +51,6 @@ class Translator {
   }
 
   @computed get scope(): Scope {
-    // const defines = () => this.editor.nodes.filter(node => node.type === 'Define')
-    //   .map(node => this.getNode(node))
-
     return {    
       locals: {},
       context: this.context,
@@ -133,17 +59,8 @@ class Translator {
   }
 
   @computed get defines(): Node[] {
-    // console.log('nodes', this.editor.nodes)
-    // console.log('defines', this.editor.nodes.filter(node => node.type === 'Define'))
     return this.editor.nodes.filter(node => node.type === 'Define')
       .map(node => this.getNode(node))
-  }
-
-  @transformer
-  getConnections(connector: Editor.Connector): Editor.Connection[] {
-    // return this.editor.connections
-    //   .filter(connection => connection.from.id === connector.id || connection.to.id === connector.id)
-    return []
   }
 
 

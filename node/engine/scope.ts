@@ -1,5 +1,5 @@
 import { Scope, Node } from '@engine/types'
-import { flatten, unique } from '@shared/util'
+import { flatten, unique } from '@engine/util'
 
 
 // // TODO: For a decent collect node, we need a tree here

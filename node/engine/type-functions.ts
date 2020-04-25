@@ -2,7 +2,7 @@ import React from 'react'
 import { ValueType, Context } from '@engine/types'
 
 import { expectedType } from '@engine/render'
-import { unique } from '@shared/util'
+import { unique } from '@engine/util'
 
 import * as Core from '@engine/modules/core'
 

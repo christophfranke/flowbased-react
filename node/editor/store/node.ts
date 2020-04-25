@@ -1,7 +1,7 @@
 import { computed } from 'mobx'
 import { Node, Vector, NodeDefinition } from '@editor/types'
 
-import { flatten } from '@shared/util'
+import { flatten } from '@engine/util'
 import Store from '@editor/store'
 
 interface NodeListItem {
