@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+
+  mongo:
+    image: mongo:4.2.3-bionic
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  node:
+    build:
+      context: ./node
+    volumes: 
+      - /usr/src/app/.next
+      - /usr/src/app/node_modules
+      - ./node:/usr/src/app:delegated
+    ports:
+      - 80:3000
+    environment:
+      MONGODB_USERNAME: root
+      MONGODB_PASSWORD: example
+    command: npm start
