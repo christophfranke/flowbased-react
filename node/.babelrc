@@ -10,6 +10,7 @@
           "@engine": "./engine",
           "@editor": "./editor",
           "@shared": "./shared",
+          "@service": "./service",
           "@store": "./store",
           "@pages": "./pages",
           "@css": "./css",

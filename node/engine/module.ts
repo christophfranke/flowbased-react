@@ -3,11 +3,11 @@ import { filteredSubForest } from '@engine/tree'
 import { type } from '@engine/render'
 import { computedFunction } from '@engine/util'
 
-export function module(name: string, context: Context): Module {
+export function module(name: string, defines: Node[]): Module {
   return {
     name,
     Type: {},
-    Node: context.defines.reduce((obj: ModuleNodes<string>, define: Node): ModuleNodes<string> => ({
+    Node: defines.reduce((obj: ModuleNodes<string>, define: Node): ModuleNodes<string> => ({
       ...obj,
       [`define-${define.id}`]: {
         value: (node: Node, scope: Scope) => {

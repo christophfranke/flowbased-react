@@ -65,7 +65,7 @@ export default class ConnectorFunctions {
   }
 
   connectorOptions(node: Node, fn: ConnectorFunction, key: string): ConnectorOption[] {
-    const portConfig = this.store.modules[node.module].EditorNode[node.type].ports
+    const portConfig = this.store.editorDefinition(node).ports
     if (portConfig) {
       const fnConfig = portConfig[fn]
       if (fnConfig) {

@@ -9,6 +9,7 @@ import Viewport from '@editor/components/viewport'
 import DocumentBrowser from '@components/document-browser'
 
 import Store from '@editor/store'
+import graphStorage from '@service/graph-storage'
 
 const currentId = () => window.location.pathname.split('/')[2]
 
@@ -18,20 +19,19 @@ class EditorLoad extends React.Component {
   router = this.props['router']
  
   @computed get store(): Store {
-    return this.stores[this.id]
+    return graphStorage.stores[this.id]
   }
 
-  @observable stores: { [key: string]: Store } = {}
   @observable loading = false
   @computed get graphName(): string {
-    return (this.stores[this.id] || { name: '' }).name
+    return (graphStorage.stores[this.id] || { name: '' }).name
   }
 
   @observable id: string
   @observable documentBrowserKey = 1
 
   changeGraphName = (e) => {
-    this.stores[this.id].name = e.target.value
+    graphStorage.stores[this.id].name = e.target.value
   }
 
   clickDelete = async () => {
@@ -57,7 +57,7 @@ class EditorLoad extends React.Component {
         method: 'DELETE',
       })
 
-      delete this.stores[this.id]
+      delete graphStorage.stores[this.id]
       this.documentBrowserKey += 1
     }
   }
@@ -80,7 +80,7 @@ class EditorLoad extends React.Component {
       const result = await fetch(`/api/documents/${this.id}`)
       const data = await result.json()
       
-      this.stores[this.id] = Store.createFromData(data)
+      graphStorage.stores[this.id] = Store.createFromData(data)
       this.loading = false
     }
   }

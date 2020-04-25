@@ -9,11 +9,7 @@ import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
 
 import Store from '@editor/store'
-
-interface Document {
-  _id: string
-  name: string
-}
+import graphStorage from '@service/graph-storage'
 
 interface Props {
   selectedId: string
@@ -23,9 +19,6 @@ interface Props {
 @observer
 class EditorLoad extends React.Component<Props> {
   router = this.props['router']
-
-  @observable documents: Document[] = []
-
 
   addDocument = async () => {    
     const result = await fetch('/api/documents/add', {
@@ -42,7 +35,7 @@ class EditorLoad extends React.Component<Props> {
 
   async fetchData() {
     const result = await fetch('/api/documents')
-    this.documents = await result.json()
+    graphStorage.documents = await result.json()
   }
 
   componentDidMount() {
@@ -71,7 +64,7 @@ class EditorLoad extends React.Component<Props> {
     return <div style={panelStyle}>
       <h2 style={{ fontSize: '20px' }}>Graphs</h2>
       <div style={{ padding: '10px 0 0 10px' }}>
-        {this.documents.map(document =>
+        {graphStorage.documents.map(document =>
           <Link key={document._id} href='/editor/[id]' as={`/editor/${document._id}`}>
             <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{document.name || 'Unnamed'}</div>
           </Link>)}

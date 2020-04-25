@@ -3,10 +3,10 @@ import * as Editor from '@editor/types'
 import { filteredSubForest } from '@engine/tree'
 import * as EngineModule from '@engine/module'
 
-export function module(name: string, context: Engine.Context): Editor.Module {
+export function module(name: string, defines: Engine.Node[]): Editor.Module {
   return {
-    ...EngineModule.module(name, context),
-    EditorNode: context.defines.reduce((obj, define) => {
+    ...EngineModule.module(name, defines),
+    EditorNode: defines.reduce((obj, define) => {
       return {
         ...obj,
         [`define-${define.id}`]: {

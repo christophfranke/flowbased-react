@@ -45,7 +45,7 @@ class Translator {
   }
 
   @computed get export(): Module {
-    return module(this.name, this.context)
+    return module(this.name, this.defines)
   }
 
   @computed get context(): Context {

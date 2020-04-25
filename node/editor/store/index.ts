@@ -6,17 +6,13 @@ import { Context } from '@engine/types'
 
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
+import { module } from '@editor/store/module'
 
 import { filteredSubForest } from '@engine/tree'
 import { flatten, transformer } from '@engine/util'
 
-import * as Core from '@engine/modules/core'
-import * as React from '@engine/modules/react'
-import * as ObjectModule from '@engine/modules/object'
-import * as ArrayModule from '@engine/modules/array'
-import * as Define from '@engine/modules/define'
-import * as Input from '@engine/modules/input'
-import * as Javascript from '@engine/modules/javascript'
+import graphStorage from '@service/graph-storage'
+
 
 class Store {
   connector: ConnectorFunctions
@@ -37,19 +33,12 @@ class Store {
     }
   }
 
-  modules: { [key: string]: Module } = {
-    Core,
-    React,
-    Array: ArrayModule,
-    Object: ObjectModule,
-    Define,
-    Input,
-    Javascript
+  @computed get modules(): { [key: string]: Module } {
+    return graphStorage.editorModules
   }
 
-
   @computed get context(): Context {
-    return this.translated.context
+    return graphStorage.context
   }
 
   translated: Translator
@@ -99,6 +88,9 @@ class Store {
 
   @transformer
   editorDefinition(node: NodeIdentifier): EditorDefinition<string> {
+    if (!this.modules[node.module]) {
+      console.warn('cannot find module', node.module, 'in', this.modules)
+    }
     return this.modules[node.module].EditorNode[node.type]
   }
 
