@@ -123,7 +123,7 @@ class EditorLoad extends React.Component {
           <h2 style={{ fontSize: '24px' }}>Loading...</h2>
         </div>}
       </Viewport>
-      <DocumentBrowser selectedId={this.id} key={this.documentBrowserKey} />
+      <DocumentBrowser selectedId={this.id} documentsKey={this.documentBrowserKey} />
       <input value={this.filename} style={filenameStyle} onChange={this.changeFilename} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
         <button disabled={this.loading} onClick={this.clickSave} style={buttonStyles}>

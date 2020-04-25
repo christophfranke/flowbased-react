@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer, Provider } from 'mobx-react'
-import { observable, computed } from 'mobx'
+import { observable, computed, autorun } from 'mobx'
 import Router, { withRouter } from 'next/router'
 import fetch from 'isomorphic-fetch'
 import Link from 'next/link'
@@ -17,13 +17,28 @@ interface Document {
 
 interface Props {
   selectedId: string
+  documentsKey: number
 }
 
 @observer
 class EditorLoad extends React.Component<Props> {
+  router = this.props['router']
+
   @observable documents: Document[] = []
 
-  router = this.props['router']
+
+  addDocument = async () => {    
+    const result = await fetch('/api/documents/add', {
+      method: 'post'
+    })
+
+    const data = await result.json()
+    if (data.id) {
+      Router.push('/editor/[id]', `/editor/${data.id}`)
+    }
+
+    this.fetchData()
+  }
 
   async fetchData() {
     const result = await fetch('/api/documents')
@@ -31,7 +46,10 @@ class EditorLoad extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.fetchData()
+    autorun(() => {
+      const id = this.props.documentsKey
+      this.fetchData()
+    })
   }
 
   render() {
@@ -57,7 +75,7 @@ class EditorLoad extends React.Component<Props> {
           <Link key={document._id} href='/editor/[id]' as={`/editor/${document._id}`}>
             <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{document.name || 'Unnamed'}</div>
           </Link>)}
-        <Link href='/editor/index'><div style={linkStyle}>Create new Graph</div></Link>
+        <div style={{ ...linkStyle, marginTop: '8px' }} onClick={this.addDocument}>Create new Graph</div>
       </div>
     </div>
   }

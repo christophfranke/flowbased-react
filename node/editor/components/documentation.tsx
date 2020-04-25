@@ -52,10 +52,10 @@ class Documentation extends React.Component<Props> {
         <hr style={{ marginTop: '15px', borderColor: 'rgba(255, 255, 255, 0.1)' }} />
         <h2 style={{ fontSize: '18px', marginTop: '15px', marginBottom: '5px' }}>{key}</h2>
         <div style={{ display: 'grid', gridTemplate, fontSize: '16px', gridGap: '10px' }}>
-          {Object.entries(obj[key]).map(([type, description]: [string, string]) => <>
-              <span key={type} style={{ fontWeight: 'bold' }}>{type}:</span>
+          {Object.entries(obj[key]).map(([type, description]: [string, string]) => <React.Fragment key={type}>
+              <span style={{ fontWeight: 'bold' }}>{type}:</span>
               <span>{format(description)}</span>
-            </>)}
+            </React.Fragment>)}
         </div>
       </div>
     }
