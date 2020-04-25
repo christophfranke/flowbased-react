@@ -40,7 +40,6 @@ class EditorLoad extends React.Component<Props> {
     this.fetchData()
   }
 
-
   async fetchData() {
     const result = await fetch('/api/documents')
     this.documents = await result.json()
