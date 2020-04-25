@@ -6,15 +6,19 @@ import { Node, Connection } from '@editor/types'
 import Translator from '@engine/translator'
 
 import { value } from '@engine/render'
+import graphStorage from '@service/graph-storage'
 
-@inject('store')
-@observer
-class Preview extends React.Component {
+interface Props {
   store: {
+    name: string
     nodes: Node[]
     connections: Connection[]
-    name: string
-  } = this.props['store']
+  }
+}
+
+@observer
+class Preview extends React.Component<Props> {
+  store = this.props.store
 
   ref = React.createRef<HTMLDivElement>()
 
@@ -37,7 +41,7 @@ class Preview extends React.Component {
       const root = this.translator.getNode(this.preview) 
            
       return <div style={{ overflowY: 'auto', height: '100%' }}>
-        {value(root, this.translator.scope, 'output')}
+        {value(root, graphStorage.scope, 'output')}
       </div>
     }
 

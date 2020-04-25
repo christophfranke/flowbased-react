@@ -2,7 +2,7 @@ import Store from '@editor/store'
 import { observable, computed } from 'mobx'
 
 import { flatten } from '@engine/util'
-import { Module, Context } from '@engine/types'
+import { Module, Context, Scope } from '@engine/types'
 import { module } from '@engine/module'
 import Translator from '@engine/translator'
 
@@ -59,17 +59,22 @@ class GraphStorage {
     return Object.entries(this.stores).reduce((obj, [key, store]) => ({
       ...obj,
       [key]: store.translated.export
-    }), {})
+    }), defaultModules)
   }
 
   @computed get context(): Context {
     return {
-      modules: {
-        ...this.defaultContext.modules,
-        ...this.modules
-      },
+      modules: this.modules,
       types: {},
       defines: flatten(Object.values(this.stores).map(store => store.translated.defines))
+    }
+  }
+
+  @computed get scope(): Scope {    
+    return {
+      locals: {},
+      context: this.context,
+      parent: null
     }
   }
 }

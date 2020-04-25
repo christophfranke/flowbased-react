@@ -57,7 +57,7 @@ class Translator {
   }
 
   @computed get scope(): Scope {
-    return {    
+    return {
       locals: {},
       context: this.context,
       parent: null

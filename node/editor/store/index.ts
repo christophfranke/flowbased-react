@@ -90,6 +90,7 @@ class Store {
   editorDefinition(node: NodeIdentifier): EditorDefinition<string> {
     if (!this.modules[node.module]) {
       console.warn('cannot find module', node.module, 'in', this.modules)
+      return this.modules.Error.EditorNode.ModuleNotFound
     }
     return this.modules[node.module].EditorNode[node.type]
   }

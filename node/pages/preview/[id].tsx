@@ -9,44 +9,57 @@ import Viewport from '@editor/components/viewport'
 
 import Store from '@editor/store'
 
+import graphStorage from '@service/graph-storage'
+
+const currentId = () => window.location.pathname.split('/')[2]
+
 @(withRouter as any)
 @observer
 class EditorLoad extends React.Component {
-  @observable store: Store
-  @observable loading = false
+  @observable loading = true
+  
+  @computed get store(): Store | null {
+    return graphStorage.stores[this.id] || null
+  }
 
   @observable savedId: null
   @computed get id():string {
-    return this.router.query.id || Router.query.id || this.savedId
+    return typeof window !== 'undefined'
+      ? currentId()
+      : ''
   }
-  router = this.props['router']
+
+  async fetchStore(id: string) {
+    const result = await fetch(`/api/documents/${id}`)
+    const data = await result.json()      
+    graphStorage.stores[id] = Store.createFromData(data)
+
+    return graphStorage.stores[id]
+  }
 
   async fetchData() {
-    if (this.id) {    
-      const result = await fetch(`/api/documents/${this.id}`)
-      const data = await result.json()
-      
-      this.store = Store.createFromData(data)
-    }
+    this.loading = true
+    const store = await this.fetchStore(this.id)
+    await Promise.all<any>(store.nodes.map(node => {
+      if (!graphStorage.modules[node.module]) {
+        return this.fetchStore(node.module)
+      }
+      return Promise.resolve()
+    }))
+
+    this.loading = false
   }
 
   componentDidMount() {
-    // we have to do it this really stupid way
-    // because otherwise the router wont give away the real url
-    requestAnimationFrame(() => {
-      this.savedId = Router.query.id || this.router.id
-      this.fetchData()
-    })
+    this.fetchData()
   }
 
   render() {
-    if (this.store) {
+    if (!this.loading && this.store) {
       return <div>
-        <Provider store={this.store}>
-          <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-            <Preview />
-          </Viewport>
-        </Provider>
+        <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
+          <Preview store={this.store}/>
+        </Viewport>
       </div>
 
     }
