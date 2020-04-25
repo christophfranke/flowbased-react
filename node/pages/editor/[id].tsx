@@ -57,6 +57,8 @@ class EditorLoad extends React.Component {
       const result = await fetch(`/api/documents/${this.id}`, {
         method: 'DELETE',
       })
+
+      delete this.stores[this.id]
       this.documentBrowserKey += 1
     }
   }
@@ -75,10 +77,12 @@ class EditorLoad extends React.Component {
 
   async fetchData() {
     if (this.id && !this.store) {
+      this.loading = true
       const result = await fetch(`/api/documents/${this.id}`)
       const data = await result.json()
       
       this.stores[this.id] = Store.createFromData(data)
+      this.loading = false
       if (data.name) {
         this.filenames[this.id] = data.name
       }
@@ -120,7 +124,7 @@ class EditorLoad extends React.Component {
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
         {this.store && <EditorView key={this.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '24px' }}>Loading...</h2>
+          <h2 style={{ fontSize: '24px' }}>{this.loading ? 'Loading...' : 'No Graph'}</h2>
         </div>}
       </Viewport>
       <DocumentBrowser selectedId={this.id} documentsKey={this.documentBrowserKey} />
