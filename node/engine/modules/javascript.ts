@@ -97,7 +97,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   TypeGuard: {
     name: 'Type Guard',
-    type: 'TypeGuard',
+    type: 'Type',
     documentation: {
       explanation: 'Checks an unkown type and returns a known type'
     },

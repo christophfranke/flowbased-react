@@ -32,8 +32,9 @@ class NodeList extends React.Component<Props> {
   }
 
   @computed get filteredNodeList() {
-    const regex = new RegExp(this.searchString.split('').join('.*'), 'i')
-    return this.store.node.nodeList.filter(node => !!node.name.match(regex)).slice(0, MAX_ITEMS)
+    const regex = new RegExp(this.searchString.split('').filter(l => l !== ' ').map(l => l === '.' ? '\\.' : l).join('.*'), 'i')
+    const nodeString = node => `${node.moduleName}.${node.name}:${node.type}`
+    return this.store.node.nodeList.filter(node => !!nodeString(node).match(regex)).slice(0, MAX_ITEMS)
   }
 
   @computed get selectedItem() {
