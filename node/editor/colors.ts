@@ -11,7 +11,6 @@ export function colorOfType(type: ValueType): ColorMap {
   // if (isMismatch(type)) {
   //   return colors.types.error
   // }
-
   const key = {
     Number: 'primitive',
     String: 'primitive',
@@ -23,8 +22,15 @@ export function colorOfType(type: ValueType): ColorMap {
     Unresolved: 'unresolved',
     Element: 'render',
     Unknown: 'unknown',
-    Mismatch: 'error'
+    Mismatch: 'error',
+    Trigger: 'trigger',
+    Event: 'trigger'
   }[type.name]
+
+  if (!key) {
+    console.warn(type)
+    return colors.types.error
+  }
 
   return colors.types[key]
 }
@@ -62,6 +68,12 @@ export const colors = {
     complex: {
       default: 'rgb(14, 136, 201)',
       highlight: 'rgb(42, 174, 245)',
+      hover: 'white'
+    },
+    trigger: {
+      // default: 'rgb(136, 227, 70)',
+      default: 'rgb(91, 199, 64)',
+      highlight: 'rgb(119, 240, 89)',
       hover: 'white'
     },
     error: {

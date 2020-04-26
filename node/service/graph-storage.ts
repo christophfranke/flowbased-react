@@ -17,6 +17,8 @@ import * as Define from '@engine/modules/define'
 import * as Input from '@engine/modules/input'
 import * as Javascript from '@engine/modules/javascript'
 import * as ErrorModule from '@engine/modules/error'
+import * as Trigger from '@engine/modules/trigger'
+
 
 const defaultModules = {
   Core,
@@ -26,7 +28,8 @@ const defaultModules = {
   Define,
   Input,
   Javascript,
-  Error: ErrorModule
+  Error: ErrorModule,
+  Trigger
 }
 
 
