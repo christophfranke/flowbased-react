@@ -9,7 +9,7 @@ export type ModuleNodes<NodeName extends keyof any> = {
   [key in NodeName]: EditorDefinition<key>
 }
 
-export type NodeOption = 'singleton' | 'nocreation'
+export type NodeOption = 'singleton' | 'nocreation' | 'side-effect'
 export interface EditorDefinition<T = string> {
   type: string
   name: string

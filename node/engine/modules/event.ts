@@ -7,7 +7,7 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 
 export const Dependencies = ['Core']
 
-export const name = 'Trigger'
+export const name = 'Event'
 export type Nodes = 'Watch'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Watch: {
@@ -28,8 +28,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             return nodeType
           }
 
-          return type(node, context).params.argument
-            || context.modules.Core.Type.Mismatch.create(`Expected Trigger, got ${nodeType.name}`)
+          if (nodeType.name === 'Trigger') {
+            return nodeType.params.argument
+          }
+
+          return context.modules.Core.Type.Mismatch.create(`Expected Trigger, got ${nodeType.name}`)
         }
       }
     }
@@ -67,7 +70,7 @@ export const Type: Engine.ModuleTypes<Types> = {
     create: (argument: Engine.ValueType) => ({
       display: 'Trigger<{argument}>',
       name: 'Trigger',
-      module: 'Trigger',
+      module: 'Event',
       params: {
         argument
       }

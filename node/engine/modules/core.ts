@@ -3,12 +3,12 @@ import * as Editor from '@editor/types'
 
 import { value, type, unmatchedType } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
-import { inputs } from '@engine/tree'
+import { inputs, firstInput } from '@engine/tree'
 
 export const Dependencies = []
 
 export const name = 'Core'
-export type Nodes = 'String' | 'Number' | 'Boolean' | 'SetType' | 'MatchType' | 'If'
+export type Nodes = 'String' | 'Number' | 'Boolean' | 'SetType' | 'MatchType' | 'If' | 'Log'
 export const Node: Engine.ModuleNodes<Nodes> = {
   String: {
     value: (node: Engine.Node) => node.params.value,
@@ -103,6 +103,26 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         whenTrue: (node: Engine.Node, context: Engine.Context) => type(node, context),
         whenFalse: (node: Engine.Node, context: Engine.Context) => type(node, context),
         condition: () => Type.Boolean.create()
+      }
+    }
+  },
+  Log: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      inputs(node).forEach(port => {
+        console.log(value(port.node, scope, port.key))
+      })
+    },
+    type: {    
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => {
+          const input = firstInput(node)
+          return input
+            ? unmatchedType(input.node, context, input.key)
+            : Type.Unresolved.create()
+        }
+      },
+      input: {
+        input: () => Type.Unresolved.create()
       }
     }
   }
@@ -243,7 +263,28 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'If',
       params: []
     })
-  }}
+  },
+  Log: {
+    name: 'Log',
+    type: 'Console',
+    ports: {
+      output: {
+        output: ['hidden']
+      }
+    },
+    options: ['side-effect'],
+    documentation: {
+      explanation: 'Logs all inputs to the console. Whenever those values change, they will be logged again.',
+      input: {
+        input: 'Values to log'
+      }
+    },
+    create: () => ({
+      type: 'Log',
+      params: []
+    })
+  }
+}
 
 export type Types = 'String'
   | 'Number'
