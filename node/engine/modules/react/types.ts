@@ -5,6 +5,9 @@ export interface RenderProps {
   properties: {
     [key: string]: any
   }
+  listeners: {
+    [key: string]: any
+  }
   params: Params
 }
 

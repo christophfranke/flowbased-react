@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value } from '@engine/render'
+import { value, deliveredType } from '@engine/render'
 import { inputs, outputs, firstInput, match } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -11,11 +11,21 @@ export const name = 'Event'
 export type Nodes = 'Listen'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Listen: {
-    value: (node: Engine.Node, current: Engine.Scope) =>
-      null,
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const input = firstInput(node)
+      if (input) {
+        const emitter = value(input.node, scope, input.key)
+        emitter.subscribe('click', () => {
+          console.log('got click')
+        })
+      }
+
+      return createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
+    },
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => Type.Event.create()
+        output: (node: Engine.Node, context: Engine.Context) =>
+          Type.Trigger.create(context.modules.Core.Type.Unresolved.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {

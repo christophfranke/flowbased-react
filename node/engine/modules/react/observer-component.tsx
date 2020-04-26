@@ -59,8 +59,15 @@ const HOC = (Component, scope: Scope) => {
       return this.props.node.params
     }
 
+    @computed get listeners() {
+      return scope.locals[this.props.node.id]
+        ? scope.locals[this.props.node.id].listeners
+        : {}
+    }
+
+
     render() {
-      return <Component params={this.params} properties={this.properties}>
+      return <Component params={this.params} properties={this.properties} listeners={this.listeners}>
         {this.children}
       </Component>
     }

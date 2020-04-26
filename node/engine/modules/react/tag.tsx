@@ -28,6 +28,7 @@ class Tag extends React.Component<RenderProps> {
     const tagProps = {
       ...(props.properties.props || {}),
       style: props.properties.style,
+      ...(this.props.listeners || {})
     }
     if (props.properties.classList) {
       tagProps.className = props.properties.classList.join(' ')

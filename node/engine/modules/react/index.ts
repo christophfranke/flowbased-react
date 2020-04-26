@@ -1,4 +1,5 @@
 import React from 'react'
+import { observable } from 'mobx'
 
 import PreviewComponent from './preview'
 import TagComponent from './tag'
@@ -15,10 +16,15 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Tag: {
     value: (node: Engine.Node, scope: Engine.Scope, key: string) => {
       if (!scope.locals[node.id]) {
+        const component = ObserverComponent(node, TagComponent, scope)
+        const listeners = observable({})
         scope.locals[node.id] = {
-          component: ObserverComponent(node, TagComponent, scope),
+          component,
+          listeners,
           events: {
-            click: {}
+            subscribe: (name, fn) => {
+              listeners[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
+            }
           }
         }
       }
