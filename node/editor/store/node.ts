@@ -24,6 +24,7 @@ export default class NodeFunctions {
     const list = flatten(Object.entries(this.store.modules)
       .map(([module, definitions]) =>
         Object.entries(definitions.EditorNode)
+          .filter(([type, editorDefinition]) => !(editorDefinition.options && editorDefinition.options.includes('nocreation')))
           .map(([type, editorDefinition]: [string, EditorDefinition]) => ({
             name: editorDefinition.name,
             typeDisplay: editorDefinition.type,

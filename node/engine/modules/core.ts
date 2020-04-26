@@ -177,7 +177,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   SetType: {
     name: 'Set Type',
-    type: 'SetType',
+    type: 'Type',
     ports: {
       input: {
         type: ['side']
@@ -200,7 +200,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   MatchType: {
     name: 'Match Type',
-    type: 'MatchType',
+    type: 'Type',
     ports: {
       input: {
         input: ['duplicate']
@@ -222,7 +222,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   },
   If: {
     name: 'If',
-    type: 'If',
+    type: 'Logic',
     ports: {
       input: {
         condition: ['side']

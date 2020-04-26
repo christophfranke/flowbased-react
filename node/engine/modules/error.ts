@@ -24,6 +24,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   ModuleNotFound: {
     name: 'Module not Found',
     type: 'Error',
+    options: ['nocreation'],
     documentation: {
       explanation: 'The module of this node could not be resolved.',
     },
