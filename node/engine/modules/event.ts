@@ -15,8 +15,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       const input = firstInput(node)
       if (input) {
         const emitter = value(input.node, scope, input.key)
-        emitter.subscribe('click', () => {
-          console.log('got click')
+        emitter.subscribe(node.params.event, (e) => {
+          console.log(node.params.event, 'got it', e)
         })
       }
 
@@ -69,7 +69,12 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     },
     create: () => ({
       type: 'Listen',
-      params: [],
+      params: [{
+        name: 'Event',
+        key: 'event',
+        value: 'click',
+        type: 'text'
+      }],
     })    
   }
 }

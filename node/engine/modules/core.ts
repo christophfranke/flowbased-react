@@ -109,7 +109,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Log: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       inputs(node).forEach(port => {
-        console.log(value(port.node, scope, port.key))
+        console.log('Log:', value(port.node, scope, port.key))
       })
     },
     type: {    

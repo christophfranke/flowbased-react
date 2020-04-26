@@ -22,8 +22,10 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           component,
           listeners,
           events: {
-            subscribe: (name, fn) => {
-              listeners[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
+            subscribe: (name: string, fn) => {
+              if (name) {
+                listeners[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
+              }
             }
           }
         }
