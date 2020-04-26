@@ -125,12 +125,12 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
     name: 'Define',
     type: 'Define',
     documentation: {
-      explanation: '',
+      explanation: 'Defines a new node type.',
       input: {
-        input: ''
+        input: 'The output of the new node type.'
       },
-      output: {
-        output: ''
+      params: {
+        name: 'The name of the new node type. When creating a new node, you can select it using this name.'
       }
     },
     ports: {
@@ -152,9 +152,14 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
     name: 'Input',
     type: 'Input',
     documentation: {
-      explanation: '',
+      explanation: 'Defines an input to a node type defined using the *Define* node.',
       output: {
-        output: ''
+        output: 'This value will be requested by the new node type.'
+      },
+      params: {
+        name: 'The name of the input. Warning: If you change this, any connections to this input may be dangling and eventually lost.',
+        side: 'Wether the input will appear on the side or at the top of the node.',
+        multiple: 'When this option is selected, the node type will create multiple ports depending on the incmoing connections. The output of this node will be an *Array* of the connected inputs.'
       }
     },
     create: () => ({
