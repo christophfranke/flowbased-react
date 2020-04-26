@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType } from '@engine/render'
+import { value, deliveredType } from '@engine/render'
 import { inputs, outputs, firstInput, match } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -17,19 +17,19 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => Type.Array.create(
           intersectAll(
-            inputs(node).map(src => unmatchedType(src.node, context, src.key)),
+            inputs(node).map(src => deliveredType(src.node, src.key, context)),
             context
           )
         )
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          const nodeType = type(node, context)
+          const nodeType = deliveredType(node, 'output', context)
           if (nodeType.name === 'Unresolved') {
             return nodeType
           }
 
-          return type(node, context).params.items
+          return nodeType.params.items
             || context.modules.Core.Type.Mismatch.create(`Expected Array, got ${nodeType.name}`)
         }
       }
@@ -38,13 +38,13 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Items: {
     value: (node: Engine.Node, scope: Engine.Scope) => scope.locals.item
       ? scope.locals.item
-      : createEmptyValue(type(node, scope.context), scope.context),
+      : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context),
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
           if (inputs(node).length > 0) {
             const input = inputs(node)[0]
-            const type = unmatchedType(input.node, context, input.key)
+            const type = deliveredType(input.node, input.key, context)
             if (type.name === 'Unresolved') {
               return context.modules.Core.Type.Unresolved.create()
             }
@@ -59,7 +59,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         }
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => Type.Array.create(type(node, context)),
+        input: (node: Engine.Node, context: Engine.Context) => Type.Array.create(deliveredType(node, 'output', context)),
       }
     }
   },
@@ -93,12 +93,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
           Type.Array.create(firstInput(node)
-            ? unmatchedType(firstInput(node)!.node, context, firstInput(node)!.key)
+            ? deliveredType(firstInput(node)!.node, firstInput(node)!.key, context)
             : context.modules.Core.Type.Unresolved.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          const outputType = type(node, context)
+          const outputType = deliveredType(node, 'output', context)
           if (outputType.name === 'Unresolved') {
             return outputType
           }
@@ -107,7 +107,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             return outputType.params.items  
           }
 
-          return context.modules.Core.Type.Mismatch.create(`Expected Array, got ${type(node, context).name}`)
+          return context.modules.Core.Type.Mismatch.create(`Expected Array, got ${deliveredType(node, 'output', context).name}`)
         }
       }
     }

@@ -8,7 +8,7 @@ import * as LA from '@editor/la'
 import { colors, colorOfType } from '@editor/colors'
 import { isServer } from '@editor/util'
 import Store from '@editor/store'
-import { type } from '@engine/render'
+import { deliveredType } from '@engine/render'
 
 import ConnectorGroup from '@editor/components/connector-group'
 import Documentation from '@editor/components/documentation'
@@ -53,7 +53,7 @@ class NodeView extends React.Component<Props> {
   }
 
   @computed get type(): ValueType {
-    return type(this.store.translated.getNode(this.props.node), this.store.context)
+    return deliveredType(this.store.translated.getNode(this.props.node), 'output', this.store.context)
   }
 
   @action

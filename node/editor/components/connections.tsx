@@ -5,7 +5,7 @@ import { observer, inject } from 'mobx-react'
 import { Connection, Node, Connector, Vector } from '@editor/types'
 import Store from '@editor/store'
 import { colors, colorOfType } from '@editor/colors'
-import { type, expectedType, numIterators } from '@engine/render'
+import { deliveredType, expectedType, numIterators } from '@engine/render'
 import { transformer } from '@engine/util'
 
 import * as LA from '@editor/la'
@@ -58,12 +58,12 @@ class ConnectionPath extends React.Component<Props> {
 
   @computed get fromColor(): string {
     const node = this.store.translated.getNode(this.srcNode)
-    return colorOfType(type(node, this.store.context)).default
+    return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 
   @computed get toColor(): string {
     const node = this.store.translated.getNode(this.targetNode)
-    return colorOfType(type(node, this.store.context)).default
+    return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 
   @computed get numIterators(): number {
@@ -75,7 +75,7 @@ class ConnectionPath extends React.Component<Props> {
   @transformer
   colorOfNode(editorNode: Node): string {
     const node = this.store.translated.getNode(editorNode)
-    return colorOfType(type(node, this.store.context)).default
+    return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 
   @computed get offset(): Vector | null {

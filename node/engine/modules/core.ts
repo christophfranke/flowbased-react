@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType } from '@engine/render'
+import { value, deliveredType } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { inputs, firstInput } from '@engine/tree'
 
@@ -42,30 +42,30 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
       return input
         ? value(input.src.node, scope, input.src.key)
-        : createEmptyValue(type(node, scope.context), scope.context)
+        : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
     },
     type: {
       input: {
         type: () => Type.Unresolved.create(),
-        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
+        input: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context)
       },
       output: {
         output: (node: Engine.Node, context: Engine.Context) => intersectAll(
-          inputs(node).map(input => unmatchedType(input.node, context, input.key)),
+          inputs(node).map(input => deliveredType(input.node, input.key, context)),
           context
         )
       }
     }
   },
   MatchType: {
-    value: (node: Engine.Node, scope: Engine.Scope) => createEmptyValue(type(node, scope.context), scope.context),
+    value: (node: Engine.Node, scope: Engine.Scope) => createEmptyValue(deliveredType(node, 'output', scope.context), scope.context),
     type: {
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
+        input: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context)
       },
       output: {
         output: (node: Engine.Node, context: Engine.Context) => intersectAll(
-          inputs(node).map(input => unmatchedType(input.node, context, input.key)),
+          inputs(node).map(input => deliveredType(input.node, input.key, context)),
           context
         )
       }
@@ -83,10 +83,10 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       return (conditionInput && value(conditionInput.src.node, scope, conditionInput.src.key))
         ? (ifTrueInput
           ? value(ifTrueInput.src.node, scope, ifTrueInput.src.key)
-          : createEmptyValue(type(node, scope.context), scope.context))
+          : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context))
         : (ifFalseInput
           ? value(ifFalseInput.src.node, scope, ifFalseInput.src.key)
-          : createEmptyValue(type(node, scope.context), scope.context))
+          : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context))
     },
     type: {
       output: {
@@ -95,13 +95,13 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             .filter(ports => ports)
             .map(ports => ports[0])
             .filter(port => port)
-            .map(port => unmatchedType(port.src.node, context, port.src.key)),
+            .map(port => deliveredType(port.src.node, port.src.key, context)),
           context
         )
       },
       input: {
-        whenTrue: (node: Engine.Node, context: Engine.Context) => type(node, context),
-        whenFalse: (node: Engine.Node, context: Engine.Context) => type(node, context),
+        whenTrue: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context),
+        whenFalse: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context),
         condition: () => Type.Boolean.create()
       }
     }
@@ -117,7 +117,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         output: (node: Engine.Node, context: Engine.Context) => {
           const input = firstInput(node)
           return input
-            ? unmatchedType(input.node, context, input.key)
+            ? deliveredType(input.node, input.key, context)
             : Type.Unresolved.create()
         }
       },

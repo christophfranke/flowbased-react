@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType } from '@engine/render'
+import { value, deliveredType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -25,8 +25,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           .filter(src => src.node.params.key)
           .map(src => ({
             key: src.node.params.key.trim(),
-            type: unmatchedType(src.node, context, src.key).params.value
-              || context.modules.Core.Type.Mismatch.create(`Expected Pair, got ${unmatchedType(src.node, context, src.key).name}`)
+            type: deliveredType(src.node, src.key, context).params.value
+              || context.modules.Core.Type.Mismatch.create(`Expected Pair, got ${deliveredType(src.node, src.key, context).name}`)
           }))
           .filter(pair => pair.key)
           .reduce((obj, pair) => ({
@@ -46,13 +46,13 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       return inputs(node).length > 0
         ? value(inputs(node)[0].node, scope, inputs(node)[0].key)[node.params.key.trim()]
-        : createEmptyValue(type(node, scope.context), scope.context)
+        : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
     },
     type: {
       output: {
         output: (node:Engine. Node, context: Engine.Context) => {
           if (inputs(node).length > 0 && node.params.key) {
-            const inputType = unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
+            const inputType = deliveredType(inputs(node)[0].node, inputs(node)[0].key, context)
             if (inputType.name !== 'Unresolved') {
               return inputType.params[node.params.key.trim()]
                 || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
@@ -64,7 +64,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => node.params.key
-          ? Type.Object.create({ [node.params.key.trim()]: type(node, context) })
+          ? Type.Object.create({ [node.params.key.trim()]: deliveredType(node, 'output', context) })
           : Type.Object.create({})
       }
     }
@@ -74,23 +74,23 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       key: node.params.key.trim(),
       value: inputs(node).length > 0
         ? value(inputs(node)[0].node, scope, inputs(node)[0].key)
-        : createEmptyValue(type(node, scope.context).params.value, scope.context)
+        : createEmptyValue(deliveredType(node, 'output', scope.context).params.value, scope.context)
     }),
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
           Type.Pair.create(inputs(node).length > 0
-            ? unmatchedType(inputs(node)[0].node, context, inputs(node)[0].key)
+            ? deliveredType(inputs(node)[0].node, inputs(node)[0].key, context)
             : context.modules.Core.Type.Unresolved.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          const nodeType = type(node, context)
+          const nodeType = deliveredType(node, 'output', context)
           if (nodeType.name === 'Unresolved') {
             return nodeType
           }
 
-          return type(node, context).params.value
+          return deliveredType(node, 'output', context).params.value
         }
       }
     }

@@ -8,7 +8,7 @@ import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { colors, colorOfType } from '@editor/colors'
 import { describe } from '@shared/type-display'
-import { type, expectedType, unmatchedType } from '@engine/render'
+import { expectedType, deliveredType } from '@engine/render'
 import Store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
@@ -78,7 +78,7 @@ class ConnectorView extends React.Component<Props> {
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
-      return unmatchedType(node, this.store.context, this.props.connector.group.key)
+      return deliveredType(node, this.props.connector.group.key, this.store.context)
     }
 
     if (this.props.connector.group.function === 'input') {
@@ -92,7 +92,7 @@ class ConnectorView extends React.Component<Props> {
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
-      return unmatchedType(node, this.store.context, this.props.connector.group.key)
+      return deliveredType(node, this.props.connector.group.key, this.store.context)
     }
 
     if (this.props.connector.group.function === 'input') {
@@ -100,8 +100,9 @@ class ConnectorView extends React.Component<Props> {
         const connector = this.store.connector.connector(this.connections[0].src)
         if (connector) {
           const node = connector.group.ports.node        
-          return type(
+          return deliveredType(
             this.store.translated.getNode(node),
+            connector.group.key,
             this.store.context
            )
         }

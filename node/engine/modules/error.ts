@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType } from '@engine/render'
+import { value } from '@engine/render'
 import { createEmptyValue, intersectAll } from '@engine/type-functions'
 import { inputs } from '@engine/tree'
 

@@ -14,7 +14,7 @@ import {
   Vector
 } from '@editor/types'
 import Store from '@editor/store'
-import { type, unmatchedType, expectedType, numIterators, nodeDefinition } from '@engine/render'
+import { deliveredType, expectedType, numIterators, nodeDefinition } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
 import { transformer } from '@engine/util'
 import { flatFilteredSubForest, children } from '@engine/tree'
@@ -229,7 +229,7 @@ export default class ConnectorFunctions {
   }
 
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
-    const srcType = unmatchedType(this.store.translated.getNode(src.ports.node), this.store.context, src.key)
+    const srcType = deliveredType(this.store.translated.getNode(src.ports.node), src.key, this.store.context)
     const targetType = expectedType(
       this.store.translated.getNode(dest.ports.node),
       dest.key,

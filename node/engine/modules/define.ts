@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType } from '@engine/render'
+import { value, deliveredType } from '@engine/render'
 import { inputs, outputs } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
@@ -20,12 +20,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => intersectAll(
-          inputs(node).map(src => unmatchedType(src.node, context, src.key)),
+          inputs(node).map(src => deliveredType(src.node, src.key, context)),
           context
         )
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => type(node, context)
+        input: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context)
       }
     }
   },
@@ -36,12 +36,12 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       if (node.params.duplicate) {
         return input && input.length > 0
           ? input.map(input => value(input.src.node, scope.parent || scope, input.src.key))
-          : createEmptyValue(type(node, (scope.parent || scope).context), (scope.parent || scope).context)
+          : createEmptyValue(deliveredType(node, 'output', (scope.parent || scope).context), (scope.parent || scope).context)
       }
 
       return input && input.length > 0
         ? value(input[0].src.node, scope.parent || scope, input[0].src.key)
-        : createEmptyValue(type(node, (scope.parent || scope).context), (scope.parent || scope).context)
+        : createEmptyValue(deliveredType(node, 'output', (scope.parent || scope).context), (scope.parent || scope).context)
     },
     type: {
       output: {
@@ -63,7 +63,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         .find(other => other.id === Number(node.params.define))
 
       if (!define) {
-        return createEmptyValue(type(node, scope.context), scope.context)
+        return createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
       }
 
       const newScope = {
@@ -72,11 +72,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           ...scope.context,
           types: {
             ...scope.context.types,
-            [define.id]: type(node, scope.context),
+            [define.id]: deliveredType(node, 'output', scope.context),
             input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
               ...obj,
               [key]: intersectAll(
-                group.map(con => unmatchedType(con.src.node, scope.context, con.src.key)),
+                group.map(con => deliveredType(con.src.node, con.src.key, scope.context)),
                 scope.context
               )
             }), {})
@@ -101,7 +101,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
               input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
                 ...obj,
                 [key]: intersectAll(
-                  group.map(con => unmatchedType(con.src.node, context, con.src.key)),
+                  group.map(con => deliveredType(con.src.node, con.src.key, context)),
                   context
                 )
               }), {})
@@ -112,7 +112,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             .find(other => other.id === Number(node.params.define))
 
           return define
-            ? unmatchedType(define, newContext, 'output')
+            ? deliveredType(define, 'output', newContext)
             : context.modules.Core.Type.Mismatch.create(`Cannot find define node ${node.params.define}`)
         }
       }

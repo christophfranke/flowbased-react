@@ -5,7 +5,6 @@ import * as Editor from '@editor/types'
 import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
 import { flatten, transformer, unique } from '@engine/util'
 import { filteredSubForest } from '@engine/tree'
-import { type, unmatchedType } from '@engine/render'
 import { intersectAll } from '@engine/type-functions'
 import { module } from '@engine/module'
 

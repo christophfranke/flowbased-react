@@ -21,7 +21,7 @@ export const inputValue = computedFunction(function(node: Node, key: string, sco
     && value(node.connections.input[key][0].src.node, scope, node.connections.input[key][0].src.key)  
 })
 
-export const unmatchedType = computedFunction(function(node: Node, context: Context, key: string): ValueType {
+export const deliveredType = computedFunction(function(node: Node, key: string, context: Context): ValueType {
   if (context.types[node.id]) {
     return context.types[node.id]
   }
@@ -42,10 +42,6 @@ export const unmatchedType = computedFunction(function(node: Node, context: Cont
     newContext),
     newContext
   )
-})
-
-export const type = computedFunction(function(node: Node, context: Context, key: string = 'output'): ValueType {
-  return unmatchedType(node, context, key)
 })
 
 export const numIterators = computedFunction(function (node: Node): number {

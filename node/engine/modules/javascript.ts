@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, type, unmatchedType, inputValue } from '@engine/render'
+import { value, inputValue, deliveredType } from '@engine/render'
 import { inputs, outputs, firstInput } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -44,7 +44,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   TypeGuard: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const input = firstInput(node)
-      const typ = type(node, scope.context)
+      const typ = deliveredType(node, 'output', scope.context)
       if (input) {
         const val = value(input.node, scope, input.key)
         return testValue(val, typ, scope.context)
