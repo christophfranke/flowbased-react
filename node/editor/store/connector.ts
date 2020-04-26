@@ -14,7 +14,7 @@ import {
   Vector
 } from '@editor/types'
 import Store from '@editor/store'
-import { type, expectedType, numIterators, nodeDefinition } from '@engine/render'
+import { type, unmatchedType, expectedType, numIterators, nodeDefinition } from '@engine/render'
 import { canMatch } from '@engine/type-functions'
 import { transformer } from '@engine/util'
 import { flatFilteredSubForest, children } from '@engine/tree'
@@ -122,11 +122,18 @@ export default class ConnectorFunctions {
       ))
 
     ports.output.main = Object.keys(definition.type.output || {})
+      .filter(key => !this.connectorOptions(node, 'output', key).includes('side'))
       .map(key => this.createOutput(
         key,
         this.hasConnectorOption(node, 'output', key, 'hidden')
           ? 'hidden'
           : 'multiple',
+        ports))
+
+    ports.output.side = Object.keys(definition.type.output || {})
+      .filter(key => this.connectorOptions(node, 'output', key).includes('side'))
+      .map(key => this.createAction(
+        key,
         ports))
 
     return ports
@@ -203,8 +210,26 @@ export default class ConnectorFunctions {
     return group
   }
 
+  createAction = (key: string, ports: Ports): ConnectorGroup<'output', 'multiple'> => {
+    const group: ConnectorGroup<'output', 'multiple'> = observable({
+      key,
+      ports,
+      connectors: [],
+      mode: 'multiple',
+      name: key,
+      function: 'output',
+      direction: { x: 1, y: 0 },
+    })
+
+    group.connectors = [{
+      group
+    }]
+
+    return group
+  }
+
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
-    const srcType = type(this.store.translated.getNode(src.ports.node), this.store.context)
+    const srcType = unmatchedType(this.store.translated.getNode(src.ports.node), this.store.context, src.key)
     const targetType = expectedType(
       this.store.translated.getNode(dest.ports.node),
       dest.key,

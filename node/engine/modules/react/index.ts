@@ -13,10 +13,25 @@ export const name = 'React'
 export type Nodes = 'Tag' | 'Preview'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Tag: {
-    value: (node: Engine.Node, scope: Engine.Scope) => ObserverComponent(node, TagComponent, scope),
+    value: (node: Engine.Node, scope: Engine.Scope, key: string) => {
+      if (!scope.locals[node.id]) {
+        scope.locals[node.id] = {
+          component: ObserverComponent(node, TagComponent, scope),
+          events: {
+            click: {}
+          }
+        }
+      }
+
+      return key === 'output'
+        ? scope.locals[node.id].component
+        : scope.locals[node.id].events
+    },
     type: {
       output: {
         output: () => Type.Element.create(),
+        events: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Event.Type.Event.create()
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) =>
@@ -70,6 +85,9 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         classList: ['side'],
         style: ['side'],
         props: ['side']
+      },
+      output: {
+        events: ['side']
       }
     },
     create: () => ({

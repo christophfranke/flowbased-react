@@ -21,7 +21,8 @@ class ConnectorGroupView extends React.Component<Props> {
 
   render () {
     const style = {
-      display: this.props.vertical ? 'block' : 'flex'
+      display: this.props.vertical ? 'block' : 'flex',
+      justifyContent: this.props.group.direction.x > 0 ? 'flex-end' : 'flex-start'
     }
 
     return <div style={style}>

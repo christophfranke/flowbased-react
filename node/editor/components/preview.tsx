@@ -31,11 +31,6 @@ class Preview extends React.Component<Props> {
   translator = new Translator(this.store)
 
   componentDidMount() {
-    if (this.ref.current) {    
-      this.ref.current.addEventListener('error', e => {
-        // TODO: Do something useful with it
-      }, true)
-    }
     this.dispose = this.store.nodes
       .filter(node => graphStorage.context.modules[node.module]
         && graphStorage.editorModules[node.module].EditorNode[node.type].options

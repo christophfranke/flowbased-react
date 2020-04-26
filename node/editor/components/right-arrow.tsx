@@ -20,7 +20,7 @@ export default (props: Props) => {
     y: size / 2
   }
 
-  return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+  return <svg width={size / 1.5} height={size} viewBox={`0 0 ${size / 1.5} ${size}`}>
     <polygon points={`${u.x}, ${u.y} ${v.x}, ${v.y} ${w.x}, ${w.y}`} fill={props.fill} stroke={props.stroke}strokeWidth="2" />
   </svg>
 }

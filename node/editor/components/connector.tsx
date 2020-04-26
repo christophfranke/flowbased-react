@@ -8,7 +8,7 @@ import { isServer } from '@editor/util'
 import { rotate90, rotate270, scale } from '@editor/la'
 import { colors, colorOfType } from '@editor/colors'
 import { describe } from '@shared/type-display'
-import { type, expectedType } from '@engine/render'
+import { type, expectedType, unmatchedType } from '@engine/render'
 import Store from '@editor/store'
 
 import DownArrow from '@editor/components/down-arrow'
@@ -78,7 +78,7 @@ class ConnectorView extends React.Component<Props> {
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
-      return type(node, this.store.context)
+      return unmatchedType(node, this.store.context, this.props.connector.group.key)
     }
 
     if (this.props.connector.group.function === 'input') {
@@ -92,7 +92,7 @@ class ConnectorView extends React.Component<Props> {
     const editorNode = this.props.connector.group.ports.node
     const node = this.store.translated.getNode(editorNode)
     if (this.props.connector.group.function === 'output') {
-      return type(node, this.store.context)
+      return unmatchedType(node, this.store.context, this.props.connector.group.key)
     }
 
     if (this.props.connector.group.function === 'input') {
@@ -229,9 +229,12 @@ class ConnectorView extends React.Component<Props> {
   }
 
   render () {
+    const arrowDirection = [...this.props.connector.group.ports.input.main, ...this.props.connector.group.ports.output.main].includes(this.props.connector.group)
+      ? 'down' : 'right'
+
     const style: React.CSSProperties = {
       cursor: this.cursor,
-      width: `${CONNECTOR_SIZE}px`,
+      width: `${arrowDirection === 'down' ? CONNECTOR_SIZE : (CONNECTOR_SIZE / 1.5)}px`,
       height: `${CONNECTOR_SIZE}px`,
       borderRadius: '50%',
       position: 'relative',
@@ -287,7 +290,7 @@ class ConnectorView extends React.Component<Props> {
         display: 'none'
       }
 
-    const arrow = [...this.props.connector.group.ports.input.main, ...this.props.connector.group.ports.output.main].includes(this.props.connector.group)
+    const arrow = arrowDirection === 'down'
       ? <DownArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
       : <RightArrow fill={this.fillColor} stroke={this.borderValueColor.default} size={CONNECTOR_SIZE} />
 

@@ -7,7 +7,7 @@ import { unique } from '@engine/util'
 import * as Core from '@engine/modules/core'
 
 export function isGeneric(name: string): boolean {
-  return !['Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
+  return !['Event', 'Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
 }
 
 export function contains(type: ValueType, name: string): boolean {  

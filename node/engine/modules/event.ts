@@ -8,31 +8,28 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 export const Dependencies = ['Core']
 
 export const name = 'Event'
-export type Nodes = 'Watch'
+export type Nodes = 'Listen'
 export const Node: Engine.ModuleNodes<Nodes> = {
-  Watch: {
+  Listen: {
     value: (node: Engine.Node, current: Engine.Scope) =>
       null,
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => Type.Trigger.create(
-          firstInput(node)
-            ? unmatchedType(firstInput(node)!.node, context, firstInput(node)!.key)
-            : context.modules.Core.Type.Unresolved.create()
-        )
+        output: (node: Engine.Node, context: Engine.Context) => Type.Event.create()
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          const nodeType = type(node, context)
-          if (nodeType.name === 'Unresolved') {
-            return nodeType
-          }
+          return Type.Event.create()
+          // const nodeType = type(node, context)
+          // if (nodeType.name === 'Unresolved') {
+          //   return nodeType
+          // }
 
-          if (nodeType.name === 'Trigger') {
-            return nodeType.params.argument
-          }
+          // if (nodeType.name === 'Event') {
+          //   return nodeType.params.argument
+          // }
 
-          return context.modules.Core.Type.Mismatch.create(`Expected Trigger, got ${nodeType.name}`)
+          // return context.modules.Core.Type.Mismatch.create(`Expected Event, got ${nodeType.name}`)
         }
       }
     }
@@ -40,31 +37,34 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 }
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
-  Watch: {
-    name: 'Watch',
+  Listen: {
+    name: 'Listen',
     type: 'Trigger',
     documentation: {
-      explanation: 'Watches a value for changes',
+      explanation: 'Listens for events',
       input: {
-        input: 'the value to watch'
+        input: 'An event emitter to listen to'
       },
       output: {
-        output: 'the trigger carrying the new value'
+        output: 'A trigger to trigger side effects'
       }
     },
     ports: {
+      input: {
+        input: ['side']
+      },
       output: {
         output: ['side']
       }
     },
     create: () => ({
-      type: 'Watch',
+      type: 'Listen',
       params: [],
     })    
   }
 }
 
-export type Types = 'Trigger'
+export type Types = 'Trigger' | 'Event'
 export const Type: Engine.ModuleTypes<Types> = {
   Trigger: {
     create: (argument: Engine.ValueType) => ({
@@ -79,4 +79,14 @@ export const Type: Engine.ModuleTypes<Types> = {
     test: (value, type: Engine.ValueType, context: Engine.Context) =>
       Array.isArray(value) && value.every(value => testValue(value, type.params.items, context))
   },
-}
+  Event: {
+    create: () => ({
+      display: 'Event',
+      name: 'Event',
+      module: 'Event',
+      params: {}
+    }),
+    emptyValue: () => [],
+    test: (value, type: Engine.ValueType, context: Engine.Context) =>
+      Array.isArray(value) && value.every(value => testValue(value, type.params.items, context))
+  },}
