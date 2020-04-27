@@ -37,7 +37,7 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
   const definitions = nodeDefinition(node, context)
   return matchInto(
     definitions.type.output![key](node, newContext),
-    unionAll(outputs(node).map(
+    unionAll(outputs(node, key).map(
       target => expectedType(target.node, target.key, newContext)),
     newContext),
     newContext

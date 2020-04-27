@@ -2,7 +2,7 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, inputValue, deliveredType } from '@engine/render'
-import { inputs, outputs, firstInput } from '@engine/tree'
+import { inputs, firstInput } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 

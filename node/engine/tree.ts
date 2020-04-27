@@ -49,9 +49,15 @@ export const match = function(node: Node, flattener: Condition, deepener: Condit
   return children(node).map(child => match(child, flattener, deepener, newDepth)).find(result => result)
 }
 
-export const outputs = computedFunction(function(node: Node): Port[] {
+export const allOutputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.output)
     .map(group => group.map(connection => connection.target)))
+})
+
+export const outputs = computedFunction(function(node: Node, key): Port[] {
+  return node.connections.output[key]
+    ? node.connections.output[key].map(connection => connection.target)
+    : []
 })
 
 export const inputs = computedFunction(function(node: Node): Port[] {
