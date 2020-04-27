@@ -71,9 +71,8 @@ export const colors = {
       hover: 'white'
     },
     trigger: {
-      // default: 'rgb(136, 227, 70)',
-      default: 'rgb(91, 199, 64)',
-      highlight: 'rgb(119, 240, 89)',
+      default: 'rgb(180, 219, 118)',
+      highlight: 'rgb(207, 242, 150)',
       hover: 'white'
     },
     error: {
