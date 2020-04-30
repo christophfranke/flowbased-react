@@ -18,6 +18,7 @@ import * as Input from '@engine/modules/input'
 import * as Javascript from '@engine/modules/javascript'
 import * as ErrorModule from '@engine/modules/error'
 import * as EventModule from '@engine/modules/event'
+import * as StoreModule from '@engine/modules/store'
 
 
 const defaultModules = {
@@ -29,7 +30,8 @@ const defaultModules = {
   Input,
   Javascript,
   Error: ErrorModule,
-  Event: EventModule
+  Event: EventModule,
+  Store: StoreModule
 }
 
 

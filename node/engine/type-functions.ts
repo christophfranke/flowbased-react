@@ -88,6 +88,10 @@ export function union(src: ValueType, target: ValueType, context: Context): Valu
       return context.modules.Array.Type.Array.create(union(src.params.items, target.params.items, context))
     }
 
+    if (name === 'Trigger' && module === 'Event') {
+      return context.modules.Event.Type.Trigger.create(union(src.params.argument, target.params.argument, context))
+    }
+
     if (name === 'Pair' && module === 'Object') {
       return context.modules.Object.Type.Pair.create(union(src.params.value, target.params.value, context))
     }
@@ -135,6 +139,10 @@ export function intersect(src: ValueType, target: ValueType, context: Context): 
       return context.modules.Array.Type.Array.create(intersect(src.params.items, target.params.items, context))
     }
 
+    if (name === 'Trigger' && module === 'Event') {
+      return context.modules.Event.Type.Trigger.create(intersect(src.params.argument, target.params.argument, context))
+    }
+
     if (name === 'Pair' && module === 'Object') {
       return context.modules.Object.Type.Pair.create(intersect(src.params.value, target.params.value, context))
     }
@@ -173,6 +181,10 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
 
     if (name === 'Array' && module === 'Array') {
       return context.modules.Array.Type.Array.create(matchInto(src.params.items, target.params.items, context))
+    }
+
+    if (name === 'Trigger' && module === 'Event') {
+      return context.modules.Event.Type.Trigger.create(matchInto(src.params.argument, target.params.argument, context))
     }
 
     if (name === 'Pair' && module === 'Object') {

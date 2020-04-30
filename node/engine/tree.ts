@@ -69,3 +69,9 @@ export const firstInput = computedFunction(function(node: Node): Port | undefine
   return inputs(node)[0]
 })
 
+export const inputAt = computedFunction(function(node: Node, key: string): Port | undefined {
+  return node.connections.input[key]
+    && node.connections.input[key][0]
+    && node.connections.input[key][0].src
+})
+

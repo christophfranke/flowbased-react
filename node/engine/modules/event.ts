@@ -1,14 +1,14 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, deliveredType } from '@engine/render'
-import { inputs, firstInput, match } from '@engine/tree'
+import { value, deliveredType, inputValueAt, expectedType, inputTypeAt } from '@engine/render'
+import { inputs, firstInput, match, inputAt } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core']
 
 export const name = 'Event'
-export type Nodes = 'Listen'
+export type Nodes = 'Listen' | 'TriggerValue'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Listen: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
@@ -16,30 +16,55 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       if (input) {
         const emitter = value(input.node, scope, input.key)
         emitter.subscribe(node.params.event, (e) => {
-          console.log(node.params.event, 'got it', e)
+          scope.locals[node.id].subscribers.forEach(fn => fn(node.params.event))
         })
       }
 
-      return createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
+      if (!scope.locals[node.id]) {
+        scope.locals[node.id] = {
+          subscribers: []
+        }
+      }
+
+      return {
+        subscribe: (fn) => {
+          scope.locals[node.id].subscribers.push(fn)
+        }
+      }
     },
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
-          Type.Trigger.create(context.modules.Core.Type.Unresolved.create())
+          Type.Trigger.create(context.modules.Core.Type.Null.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
           return Type.Event.create()
-          // const nodeType = type(node, context)
-          // if (nodeType.name === 'Unresolved') {
-          //   return nodeType
-          // }
+        }
+      }
+    }
+  },
+  TriggerValue: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const triggerValue = inputValueAt(node, 'trigger', scope)
 
-          // if (nodeType.name === 'Event') {
-          //   return nodeType.params.argument
-          // }
-
-          // return context.modules.Core.Type.Mismatch.create(`Expected Event, got ${nodeType.name}`)
+      return {
+        subscribe: (fn) => triggerValue.subscribe(
+          () => fn(inputValueAt(node, 'value', scope))
+        )
+      }
+    },
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) =>
+          Type.Trigger.create(inputTypeAt(node, 'value', context))
+      },
+      input: {
+        trigger: (node: Engine.Node, context: Engine.Context) => {
+          return Type.Trigger.create(context.modules.Core.Type.Unresolved.create())
+        },
+        value: (node: Engine.Node, context: Engine.Context) => {
+          return context.modules.Core.Type.Unresolved.create()
         }
       }
     }
@@ -75,6 +100,31 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         value: 'click',
         type: 'text'
       }],
+    })    
+  },
+  TriggerValue: {
+    name: 'Trigger Value',
+    type: 'TriggerValue',
+    documentation: {
+      explanation: 'Listens for events',
+      input: {
+        input: 'An event emitter to listen to'
+      },
+      output: {
+        output: 'A trigger to trigger side effects'
+      }
+    },
+    ports: {
+      input: {
+        trigger: ['side']
+      },
+      output: {
+        output: ['side']
+      }
+    },
+    create: () => ({
+      type: 'TriggerValue',
+      params: [],
     })    
   }
 }

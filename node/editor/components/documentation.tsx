@@ -23,7 +23,7 @@ const replacementMap = {
         display: 'inline-block',
         backgroundColor: colors.background.editor,
         border: '1px solid rgba(255, 255, 255, 0.4)'
-      }}>{token}</pre>
+      }} key={Math.random()}>{token}</pre>
   }
 }
 

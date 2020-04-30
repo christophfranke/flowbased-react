@@ -1,14 +1,28 @@
 import React from 'react'
 import { Node, NodeIdentifier, NodeDefinition, ValueType, Scope, Context, Connection } from '@engine/types'
-import { outputs, children } from '@engine/tree'
+import { outputs, children, inputAt } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
-import { matchInto, unionAll } from '@engine/type-functions'
+import { matchInto, unionAll, createEmptyValue } from '@engine/type-functions'
 
 export const nodeDefinition = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition {
   return context.modules[node.module]
     ? context.modules[node.module].Node[node.type]
     : context.modules.Error.Node.ModuleNotFound
+})
+
+export const inputValueAt = computedFunction(function(node: Node, key: string, scope: Scope): any {
+  const input = inputAt(node, key)
+  return input
+    ? value(input.node, scope, input.key)
+    : createEmptyValue(expectedType(node, key, scope.context), scope.context)
+})
+
+export const inputTypeAt = computedFunction(function(node: Node, key: string, context: Context): ValueType {
+  const input = inputAt(node, key)
+  return input
+    ? deliveredType(input.node, input.key, context)
+    : context.modules.Core.Type.Unresolved.create()
 })
 
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
@@ -45,6 +59,8 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
 })
 
 export const numIterators = computedFunction(function (node: Node): number {
+  // TODO: Fix this function, must actually collect the iterators to not count
+  // unique iterators twice
   return Math.max(0, children(node).reduce(
     (sum, child) => numIterators(child) + sum,
     (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0)
