@@ -61,10 +61,12 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
 export const numIterators = computedFunction(function (node: Node): number {
   // TODO: Fix this function, must actually collect the iterators to not count
   // unique iterators twice
-  return Math.max(0, children(node).reduce(
-    (sum, child) => numIterators(child) + sum,
-    (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0)
-  ))
+  const max = children(node).reduce(
+    (max, child) => Math.max(numIterators(child), max),
+    0
+  )
+
+  return (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0) + max
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
