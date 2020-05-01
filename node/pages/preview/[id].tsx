@@ -31,15 +31,13 @@ class EditorLoad extends React.Component<Props> {
     }
   }
 
-  render() {
-    Object.entries(this.props.data).forEach(([id, data]) => {
-      if (!graphStorage.stores[id]) {
-        graphStorage.stores[id] = Store.createFromData(data)
-      }
-    })
+  constructor(props) {
+    super(props)
+    graphStorage.fillWithData(props.data)
+  }
 
-    const store = graphStorage.stores[this.props.id]
-    return <Preview store={store} />
+  render() {
+    return <Preview store={graphStorage.stores[this.props.id]} />
   }
 }
 

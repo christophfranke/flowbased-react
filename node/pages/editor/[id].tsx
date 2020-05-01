@@ -14,28 +14,48 @@ import loadDependencies from '@service/load-dependencies'
 
 import './editor.scss'
 
-const currentId = () => window.location.pathname.split('/')[2]
 
+interface Props {
+  id: string
+  data: any
+}
 
-@(withRouter as any)
 @observer
-class EditorLoad extends React.Component {
-  router = this.props['router']
- 
+class EditorLoad extends React.Component<Props> {
+  static async getInitialProps(ctx) {
+    const id = ctx.query.id
+    const data = await loadDependencies(id)
+
+    return {
+      id,
+      data
+    }
+  }
+
+  constructor(props) {
+    super(props)
+    graphStorage.fillWithData(props.data)
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      graphStorage.fillWithData(this.props.data) 
+    }
+  }
+
   @computed get store(): Store {
-    return graphStorage.stores[this.id]
+    return graphStorage.stores[this.props.id]
   }
 
   @observable loading = false
   @computed get graphName(): string {
-    return (graphStorage.stores[this.id] || { name: '' }).name
+    return (graphStorage.stores[this.props.id] || { name: '' }).name
   }
 
-  @observable id: string
   @observable documentBrowserKey = 1
 
   changeGraphName = (e) => {
-    graphStorage.stores[this.id].name = e.target.value
+    graphStorage.stores[this.props.id].name = e.target.value
   }
 
   clickDelete = async () => {
@@ -56,19 +76,19 @@ class EditorLoad extends React.Component {
   }
 
   async deleteGraph() {
-    if (this.id) {
-      const result = await fetch(`/api/documents/${this.id}`, {
+    if (this.props.id) {
+      const result = await fetch(`/api/documents/${this.props.id}`, {
         method: 'DELETE',
       })
 
-      delete graphStorage.stores[this.id]
+      delete graphStorage.stores[this.props.id]
       this.documentBrowserKey += 1
     }
   }
 
   async saveGraph() {
-    if (this.id) {
-      const result = await fetch(`/api/documents/${this.id}`, {
+    if (this.props.id) {
+      const result = await fetch(`/api/documents/${this.props.id}`, {
         method: 'POST',
         body: JSON.stringify({
           ...this.store.data,
@@ -76,29 +96,6 @@ class EditorLoad extends React.Component {
         })
       })
     }
-  }
-
-  async fetchData() {
-    if (this.id && !this.store) {
-      this.loading = true
-
-      const data = await loadDependencies(this.id)
-      console.log(data)
-      Object.entries(data).forEach(([id, storeData]) => {
-        if (!graphStorage.stores[id]) {
-          graphStorage.stores[id] = Store.createFromData(storeData)
-        }
-      })
-      
-      this.loading = false
-    }
-  }
-
-  componentDidMount() {
-    this.router.events.on('routeChangeComplete', (...params) => {
-      this.id = currentId()
-      this.fetchData()
-    })
   }
 
   render() {
@@ -128,11 +125,11 @@ class EditorLoad extends React.Component {
 
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-        {this.store && !this.loading && <EditorView key={this.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {this.store && !this.loading && <EditorView key={this.props.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h2 style={{ fontSize: '24px' }}>{this.loading ? 'Loading...' : 'No Graph'}</h2>
         </div>}
       </Viewport>
-      <DocumentBrowser selectedId={this.id} documentsKey={this.documentBrowserKey} />
+      <DocumentBrowser selectedId={this.props.id} documentsKey={this.documentBrowserKey} />
       <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
         <button disabled={this.loading || !this.store} onClick={this.clickSave} style={buttonStyles}>
@@ -141,7 +138,7 @@ class EditorLoad extends React.Component {
         <button disabled={this.loading || !this.store} onClick={this.clickDelete} style={buttonStyles}>
           Delete
         </button>
-        <a href={`/preview/${this.id}`} target="_blank" style={buttonStyles}>
+        <a href={`/preview/${this.props.id}`} target="_blank" style={buttonStyles}>
           Preview
         </a>
       </div>

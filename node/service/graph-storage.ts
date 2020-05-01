@@ -82,6 +82,12 @@ class GraphStorage {
       parent: null
     }
   }
+
+  fillWithData(data) {
+    Object.entries(data).forEach(([id, data]) => {
+      this.stores[id] = Store.createFromData(data)
+    })
+  }
 }
 
 export default new GraphStorage()
