@@ -7,10 +7,13 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongodb:/data/db
 
   node:
     build:
       context: ./node
+    restart: always
     volumes: 
       - /usr/src/app/.next
       - /usr/src/app/node_modules
@@ -20,4 +23,3 @@ services:
     environment:
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: example
-    command: npm start

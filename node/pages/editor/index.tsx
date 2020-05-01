@@ -8,6 +8,9 @@ import Viewport from '@editor/components/viewport'
 
 import Store from '@editor/store'
 
+import './editor.scss'
+
+
 @observer
 class EditorCreate extends React.Component {
   addDocument = async () => {    

@@ -6,6 +6,7 @@
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@zeit/next-sass": "^1.0.1",
     "autoprefixer": "^9.7.4",
     "babel-plugin-module-resolver": "^4.0.0",
     "isomorphic-fetch": "^2.2.1",
@@ -15,13 +16,11 @@
     "mongodb": "^3.5.5",
     "next": "^9.3.1",
     "next-connect": "^0.6.0",
+    "node-sass": "^4.14.0",
     "normalize-wheel": "^1.0.1",
-    "postcss-import": "^12.0.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "save-dev": "0.0.1-security",
-    "tailwindcss": "^1.2.0"
+    "react-dom": "^16.13.1"
   },
   "devDependencies": {
     "@types/node": "^13.9.2",

@@ -12,7 +12,10 @@ import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
 import loadDependencies from '@service/load-dependencies'
 
+import './editor.scss'
+
 const currentId = () => window.location.pathname.split('/')[2]
+
 
 @(withRouter as any)
 @observer

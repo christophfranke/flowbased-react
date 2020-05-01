@@ -214,7 +214,8 @@ class NodeView extends React.Component<Props> {
       fontSize: '18px',
       whiteSpace: 'nowrap',
       cursor: 'help',
-      display: 'inline',
+      display: 'block',
+      marginBottom: '6px',
       color: typeColor
     }
 
