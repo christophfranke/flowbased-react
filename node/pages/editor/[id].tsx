@@ -133,7 +133,7 @@ class EditorLoad extends React.Component<Props> {
 
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-        {this.store && !this.loading && <EditorView key={this.props.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {this.store && <EditorView key={this.props.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <h2 style={{ fontSize: '24px' }}>{this.loading ? 'Loading...' : 'No Graph'}</h2>
         </div>}
       </Viewport>
