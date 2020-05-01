@@ -57,6 +57,7 @@ export default class ConnectorFunctions {
     }
   }
 
+  @transformer
   areSame(one: ConnectorDescription, other: ConnectorDescription): boolean {
     return one.nodeId === other.nodeId
       && one.key === other.key
@@ -64,6 +65,7 @@ export default class ConnectorFunctions {
       && one.function === other.function
   }
 
+  @transformer
   connectorOptions(node: Node, fn: ConnectorFunction, key: string): ConnectorOption[] {
     const portConfig = this.store.editorDefinition(node).ports
     if (portConfig) {
@@ -76,6 +78,7 @@ export default class ConnectorFunctions {
     return []
   }
 
+  @transformer
   hasConnectorOption(node: Node, fn: ConnectorFunction, key: string, option: ConnectorOption): boolean {
     return this.connectorOptions(node, fn, key).includes(option)
   }
@@ -228,6 +231,7 @@ export default class ConnectorFunctions {
     return group
   }
 
+  @transformer
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
     const srcType = deliveredType(this.store.translated.getNode(src.ports.node), src.key, this.store.context)
     const targetType = expectedType(
@@ -239,10 +243,12 @@ export default class ConnectorFunctions {
     return canMatch(srcType, targetType, this.store.context)
   }
 
+  @transformer
   willProduceLoop(src?: Node, dest?: Node): boolean {
     return !!src && !!dest && this.store.getSubtree(src).includes(dest)
   }
 
+  @transformer
   iteratorsAreCompatatible(src: Node, dest: Node): boolean {
     if (numIterators(this.store.translated.getNode(src)) === 0
       || numIterators(this.store.translated.getNode(dest)) === 0) {
@@ -277,6 +283,7 @@ export default class ConnectorFunctions {
     return group.function === 'output'
   }
 
+  @transformer
   canConnect(pending: Connector, possiblyHot: Connector): boolean {
     const src = this.isSrc(pending.group) ? pending : possiblyHot
     const dest = this.isSrc(possiblyHot.group) ? pending : possiblyHot
@@ -288,6 +295,7 @@ export default class ConnectorFunctions {
       && this.iteratorsAreCompatatible(src.group.ports.node, dest.group.ports.node)
   }
 
+  @transformer
   state(connector: Connector): ConnectorState {
     if (this.store.pendingConnector) {
       if (this.areSame(this.description(this.store.pendingConnector), this.description(connector))) {

@@ -1,5 +1,4 @@
 import { computedFn } from 'mobx-utils'
-import { createTransformer } from 'mobx-utils'
 
 export const computedFunction = computedFn
 
@@ -10,7 +9,7 @@ export function transformer(target, key, descriptor) {
       this.$transformerId = this.$transformerId || Math.random()
       this.$transformed = this.$transformed || {}
       if (!this.$transformed[key]) {
-        this.$transformed[key] = createTransformer(fn.bind(this))
+        this.$transformed[key] = computedFn(fn.bind(this))
       }
       return this.$transformed[key](...args)
     }
