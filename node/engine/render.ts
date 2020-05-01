@@ -59,8 +59,6 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
 })
 
 export const numIterators = computedFunction(function (node: Node): number {
-  // TODO: Fix this function, must actually collect the iterators to not count
-  // unique iterators twice
   const max = children(node).reduce(
     (max, child) => Math.max(numIterators(child), max),
     0

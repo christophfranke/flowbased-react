@@ -21,19 +21,26 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         scope.locals[node.id] = {
           component,
           listeners,
-          events: {
-            subscribe: (name: string, fn) => {
-              if (name) {
-                listeners[`on${name.charAt(0).toUpperCase()}${name.slice(1)}`] = fn
-              }
-            }
-          }
         }
       }
 
-      return key === 'output'
-        ? scope.locals[node.id].component
-        : scope.locals[node.id].events
+      if (key === 'output') {
+        return scope.locals[node.id].component
+      }
+
+      return {
+        subscribe: (name: string, fn) => {
+          if (!scope.locals[node.id].listeners[name]){
+            scope.locals[node.id].listeners[name] = []
+          }
+
+          scope.locals[node.id].listeners[name].push(fn)
+
+          return () => {
+            scope.locals[node.id].listeners[name] = scope.locals[node.id].listeners[name].filter(ln => ln !== fn)
+          }
+        }
+      }
     },
     type: {
       output: {

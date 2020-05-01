@@ -2,7 +2,7 @@ import React from 'react'
 import { observer } from 'mobx-react'
 import { computed, observable } from 'mobx'
 import { Node, Scope, Port, Connection } from '@engine/types'
-import { RenderProps, NodeProps } from './types'
+import { RenderProps, NodeProps, TagLocals, Func } from './types'
 
 import { value, deliveredType } from '@engine/render'
 import { inputs } from '@engine/tree'
@@ -10,6 +10,10 @@ import { contains } from '@engine/type-functions'
 import { transformer } from '@engine/util'
 
 
+const combineFn = <A, B>(functions: Func<A, B>[]): Func<A, B[]> =>
+  (...args) => functions.map(fn => fn(...args))
+
+// TODO: Do we still need this?
 let currentRenderId = 0
 function getRenderKey(): number {
   currentRenderId += 1
@@ -60,8 +64,12 @@ const HOC = (Component, scope: Scope) => {
     }
 
     @computed get listeners() {
-      return scope.locals[this.props.node.id]
-        ? scope.locals[this.props.node.id].listeners
+      const locals = scope.locals[this.props.node.id] as TagLocals
+      return (locals)
+        ? Object.entries(locals.listeners).reduce((obj, [name, listeners]) => ({
+          ...obj,
+          [`on${name.charAt(0).toUpperCase()}${name.slice(1)}`]: combineFn(listeners)
+        }), {})
         : {}
     }
 
