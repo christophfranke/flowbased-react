@@ -22,6 +22,12 @@ export function load(path: string[], unserialize?: (any) => any): any {
   }
 }
 
+export function save(path: string[], object: any, key: string, serialize?: (any) => any): void {
+  const storageKey = path.join('.')
+  const value = serialize ? serialize(object[key]) : object[key]
+  window.localStorage.setItem(storageKey, JSON.stringify(value))
+}
+
 export function sync(path: string[], object: any, key: string, serialize?: (any) => any): void {
   if (isServer) {
     return

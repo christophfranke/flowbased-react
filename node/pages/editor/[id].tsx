@@ -3,7 +3,7 @@ import { observer, Provider } from 'mobx-react'
 import { observable, computed, autorun } from 'mobx'
 import fetch from 'isomorphic-fetch'
 
-import { sync } from '@shared/local-storage-sync'
+import { save } from '@shared/local-storage-sync'
 
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
@@ -45,10 +45,14 @@ class EditorLoad extends React.Component<Props> {
   }
 
   componentDidMount() {
-    sync(['editor', 'connections'], this.store, 'connections')
-    sync(['editor', 'nodes'], this.store, 'nodes')
-    sync(['editor', 'highZ'], this.store, 'currentHighZ')
-    sync(['editor', 'name'], this.store, 'name')
+    autorun(() => {    
+      if (this.store) {      
+        save(['editor', 'connections'], this.store, 'connections')
+        save(['editor', 'nodes'], this.store, 'nodes')
+        save(['editor', 'highZ'], this.store, 'currentHighZ')
+        save(['editor', 'name'], this.store, 'name')
+      }
+    })
   }
 
   @computed get store(): Store {
