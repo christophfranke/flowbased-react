@@ -12,6 +12,7 @@ export type Nodes = 'Listen' | 'TriggerValue'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Listen: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
+      // TODO: make a reasonable teardown/update 
       const input = firstInput(node)
       if (input) {
         const emitter = value(input.node, scope, input.key)
@@ -45,6 +46,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   TriggerValue: {
+    // TODO: make a reasonable teardown/update
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const triggerValue = inputValueAt(node, 'trigger', scope)
 

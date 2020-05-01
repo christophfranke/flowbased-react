@@ -14,6 +14,7 @@ export type Nodes = 'Variable'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Variable: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
+      // TODO: make a reasonable teardown/update
       if (!scope.locals[node.id]) {
         const initialValueConnection = node.connections.input.initialValue && node.connections.input.initialValue[0]
         const initialValue = initialValueConnection
