@@ -66,7 +66,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           return Type.Trigger.create(context.modules.Core.Type.Unresolved.create())
         },
         value: (node: Engine.Node, context: Engine.Context) => {
-          return context.modules.Core.Type.Unresolved.create()
+          const nodeType = deliveredType(node, 'output', context)
+          return nodeType.params.argument || context.modules.Core.Type.Unresolved.create()
         }
       }
     }
