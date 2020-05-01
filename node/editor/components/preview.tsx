@@ -46,9 +46,9 @@ class Preview extends React.Component<Props> {
     if (this.preview) {
       const root = this.translator.getNode(this.preview) 
            
-      return <div style={{ overflowY: 'auto', height: '100%' }}>
+      return <React.Fragment>
         {value(root, graphStorage.scope, 'output')}
-      </div>
+      </React.Fragment>
     }
 
     return <div ref={this.ref}>

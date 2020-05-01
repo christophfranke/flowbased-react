@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, inputValue, deliveredType } from '@engine/render'
+import { value, inputValueAt, deliveredType } from '@engine/render'
 import { inputs, firstInput } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -19,9 +19,9 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       } catch(e) {
         return undefined
       }
-      const x = inputValue(node, 'x', scope)
-      const y = inputValue(node, 'y', scope)
-      const z = inputValue(node, 'z', scope)
+      const x = inputValueAt(node, 'x', scope)
+      const y = inputValueAt(node, 'y', scope)
+      const z = inputValueAt(node, 'z', scope)
 
       let result = undefined
       try {

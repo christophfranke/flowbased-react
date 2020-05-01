@@ -29,13 +29,6 @@ export const value = computedFunction(function(node: Node, scope: Scope, key: st
   return nodeDefinition(node, scope.context).value(node, scope, key)
 })
 
-// TODO: remove this duplicate function
-export const inputValue = computedFunction(function(node: Node, key: string, scope: Scope): any {
-  return node.connections.input[key]
-    && node.connections.input[key][0]
-    && value(node.connections.input[key][0].src.node, scope, node.connections.input[key][0].src.key)  
-})
-
 export const deliveredType = computedFunction(function(node: Node, key: string, context: Context): ValueType {
   if (context.types[node.id]) {
     return context.types[node.id]
@@ -77,7 +70,7 @@ export const numIterators = computedFunction(function (node: Node): number {
   return iteratorsOfChildren(node)
 })
 
-export function expectedType(target: Node, key: string, context: Context): ValueType {
+export const expectedType = computedFunction(function(target: Node, key: string, context: Context): ValueType {
   const definitions = nodeDefinition(target, context)
   const input = definitions.type.input
 
@@ -86,4 +79,4 @@ export function expectedType(target: Node, key: string, context: Context): Value
   }
 
   return context.modules.Core.Type.Mismatch.create(`Connection target ${target.type}.id-${target.id} is missingn input key ${key}`)
-}
+})

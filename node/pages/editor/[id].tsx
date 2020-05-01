@@ -81,12 +81,15 @@ class EditorLoad extends React.Component {
   async fetchData() {
     if (this.id && !this.store) {
       this.loading = true
-      const result = await fetch(`/api/documents/${this.id}`)
-      const data = await result.json()
+
+      const data = await loadDependencies(this.id)
+      console.log(data)
+      Object.entries(data).forEach(([id, storeData]) => {
+        if (!graphStorage.stores[id]) {
+          graphStorage.stores[id] = Store.createFromData(storeData)
+        }
+      })
       
-      const store = Store.createFromData(data)
-      graphStorage.stores[this.id] = store
-      await loadDependencies(store)
       this.loading = false
     }
   }
