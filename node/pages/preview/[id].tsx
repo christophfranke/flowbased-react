@@ -14,55 +14,43 @@ import loadDependencies from '@service/load-dependencies'
 
 const currentId = () => window.location.pathname.split('/')[2]
 
+interface Props {
+  data: any
+  id: number
+}
+
 @(withRouter as any)
 @observer
-class EditorLoad extends React.Component {
-  @observable loading = true
-  
-  @computed get store(): Store | null {
-    return graphStorage.stores[this.id] || null
+class EditorLoad extends React.Component<Props> {
+  static async getInitialProps(ctx) {
+    const id = ctx.query.id
+    const data = await loadDependencies(id)
+
+    console.log(data)
+
+    return {
+      id,
+      data
+    }
   }
 
-  @observable savedId: null
-  @computed get id():string {
-    return typeof window !== 'undefined'
-      ? currentId()
-      : ''
-  }
+  // static async fetchStore(id: string) {
+  //   const result = await fetch(`/api/documents/${id}`)
+  //   const data = await result.json()      
+  //   graphStorage.stores[id] = Store.createFromData(data)
 
-  async fetchStore(id: string) {
-    const result = await fetch(`/api/documents/${id}`)
-    const data = await result.json()      
-    graphStorage.stores[id] = Store.createFromData(data)
-
-    return graphStorage.stores[id]
-  }
-
-  async fetchData() {
-    this.loading = true
-    const store = await this.fetchStore(this.id)
-    await loadDependencies(store)
-
-    this.loading = false
-  }
-
-  componentDidMount() {
-    this.fetchData()
-  }
+  //   return graphStorage.stores[id]
+  // }
 
   render() {
-    if (!this.loading && this.store) {
-      return <div>
-        <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
-          <Preview store={this.store}/>
-        </Viewport>
-      </div>
+    Object.entries(this.props.data).forEach(([id, data]) => {
+      if (!graphStorage.stores[id]) {
+        graphStorage.stores[id] = Store.createFromData(data)
+      }
+    })
 
-    }
-
-    return <div>
-      loading...
-    </div>
+    const store = graphStorage.stores[this.props.id]
+    return <Preview store={store} />
   }
 }
 
