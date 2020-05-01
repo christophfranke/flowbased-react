@@ -1,7 +1,11 @@
 import graphStorage from '@service/graph-storage'
 import Store from '@editor/store'
+import fetch from 'isomorphic-fetch'
 
-const base = 'http://localhost:3000'
+const isServer = typeof window === 'undefined'
+const base = isServer
+  ? 'http://localhost:3000'
+  : `${window.location.protocol}//${window.location.host}`
 
 async function fetchStore(id: string) {
   const result = await fetch(`${base}/api/documents/${id}`)
@@ -9,23 +13,10 @@ async function fetchStore(id: string) {
 }
 
 
-// export default async function(store) {
-//   await Promise.all<any>(store.nodes.map(node => {
-//     if (!graphStorage.modules[node.module]) {
-//       return fetchStore(node.module)
-//     }
-//     return Promise.resolve()
-//   }))  
-// }
-
 export default async function(id) {
   const data = {
     [id]: await fetchStore(id)
   }
-
-  console.log(data[id])
-
-  return data
 
   await Promise.all<any>(data[id].nodes.map(node => {
     if (!graphStorage.modules[node.module] && !data[node.module]) {

@@ -2,7 +2,6 @@ import React from 'react'
 import { observer, Provider } from 'mobx-react'
 import { observable, computed } from 'mobx'
 import Router, { withRouter } from 'next/router'
-import fetch from 'isomorphic-fetch'
 
 import Preview from '@editor/components/preview'
 import Viewport from '@editor/components/viewport'
@@ -26,21 +25,11 @@ class EditorLoad extends React.Component<Props> {
     const id = ctx.query.id
     const data = await loadDependencies(id)
 
-    console.log(data)
-
     return {
       id,
       data
     }
   }
-
-  // static async fetchStore(id: string) {
-  //   const result = await fetch(`/api/documents/${id}`)
-  //   const data = await result.json()      
-  //   graphStorage.stores[id] = Store.createFromData(data)
-
-  //   return graphStorage.stores[id]
-  // }
 
   render() {
     Object.entries(this.props.data).forEach(([id, data]) => {
