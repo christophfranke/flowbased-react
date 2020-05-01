@@ -69,13 +69,8 @@ class Translator {
   }
 
   @transformer
-  getEditorNode(id: number): Editor.Node {
-    const node = this.editor.nodes.find(node => node.id === id)
-    if (node) {
-      return node
-    }
-
-    throw new Error(`Cannot find editor node with id ${id}`)
+  getEditorNode(id: number): Editor.Node | undefined {
+    return this.editor.nodes.find(node => node.id === id)
   }
 
   @transformer
@@ -86,15 +81,18 @@ class Translator {
         ...obj,
         [key]: connections.filter(con => con.target.key === key)
           .sort((a, b) => a.target.slot - b.target.slot)
+          .filter(connection =>
+            this.getEditorNode(connection.src.nodeId) &&
+            this.getEditorNode(connection.target.nodeId))
           .map(connection => ({
             id: connection.id,
             src: {
               key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId))
+              node: this.getNode(this.getEditorNode(connection.src.nodeId)!)
             },
             target: {
               key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId))
+              node: this.getNode(this.getEditorNode(connection.target.nodeId)!)
             }
           }))
       }), {})
@@ -102,7 +100,12 @@ class Translator {
 
   @transformer
   getOutputs(editorNode: Editor.Node): { [key: string]: Connection[] } {
-    const connections = this.editor.connections.filter(connection => connection.src.nodeId === editorNode.id)
+    const connections = this.editor.connections
+      .filter(connection => connection.src.nodeId === editorNode.id)
+      .filter(connection =>
+        this.getEditorNode(connection.src.nodeId) &&
+        this.getEditorNode(connection.target.nodeId))
+
     return unique(connections.map(con => con.src.key))
       .reduce((obj, key) => ({
         ...obj,
@@ -112,11 +115,11 @@ class Translator {
             id: connection.id,
             src: {
               key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId))
+              node: this.getNode(this.getEditorNode(connection.src.nodeId)!)
             },
             target: {
               key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId))
+              node: this.getNode(this.getEditorNode(connection.target.nodeId)!)
             }
           }))
       }), {})

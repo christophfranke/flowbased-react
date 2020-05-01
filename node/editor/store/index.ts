@@ -1,6 +1,5 @@
 import { observable, computed, autorun, action } from 'mobx'
 import { Connection, Node, Connector, ConnectorState, Module, EditorDefinition, NodeIdentifier } from '@editor/types'
-import { sync, load } from '@shared/local-storage-sync'
 import Translator from '@engine/translator'
 import { Context } from '@engine/types'
 
@@ -48,28 +47,6 @@ class Store {
     this.node = new NodeFunctions(this)
 
     this.translated = new Translator(this)
-  }
-
-  static syncedInstance: Store
-  static createFromLocalStorage(): Store {
-    if (!Store.syncedInstance) {
-      const store = new Store()
-
-      store.nodes = load(['editor', 'nodes']) || []
-      store.connections = load(['editor', 'connections']) || []
-      store.currentHighZ = load(['editor', 'highZ']) || 1
-      store.name = load(['editor', 'name']) || ''
-
-      // autosave immediately
-      sync(['editor', 'connections'], store, 'connections')
-      sync(['editor', 'nodes'], store, 'nodes')
-      sync(['editor', 'highZ'], store, 'currentHighZ')
-      sync(['editor', 'name'], store, 'name')
-
-      Store.syncedInstance = store
-    }
-
-    return Store.syncedInstance
   }
 
   static createFromData(data) {

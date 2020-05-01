@@ -1,8 +1,9 @@
 import React from 'react'
 import { observer, Provider } from 'mobx-react'
-import { observable, computed } from 'mobx'
-import Router, { withRouter } from 'next/router'
+import { observable, computed, autorun } from 'mobx'
 import fetch from 'isomorphic-fetch'
+
+import { sync } from '@shared/local-storage-sync'
 
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
@@ -41,6 +42,13 @@ class EditorLoad extends React.Component<Props> {
     if (prevProps.id !== this.props.id) {
       graphStorage.fillWithData(this.props.data) 
     }
+  }
+
+  componentDidMount() {
+    sync(['editor', 'connections'], this.store, 'connections')
+    sync(['editor', 'nodes'], this.store, 'nodes')
+    sync(['editor', 'highZ'], this.store, 'currentHighZ')
+    sync(['editor', 'name'], this.store, 'name')
   }
 
   @computed get store(): Store {

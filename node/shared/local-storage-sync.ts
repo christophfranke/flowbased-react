@@ -31,5 +31,7 @@ export function sync(path: string[], object: any, key: string, serialize?: (any)
   autorun(() => {
     const value = serialize ? serialize(object[key]) : object[key]
     window.localStorage.setItem(storageKey, JSON.stringify(value))
+  }, {
+    delay: 0
   })
 }
