@@ -29,6 +29,7 @@ export const value = computedFunction(function(node: Node, scope: Scope, key: st
   return nodeDefinition(node, scope.context).value(node, scope, key)
 })
 
+// TODO: remove this duplicate function
 export const inputValue = computedFunction(function(node: Node, key: string, scope: Scope): any {
   return node.connections.input[key]
     && node.connections.input[key][0]
@@ -59,13 +60,21 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
 })
 
 export const numIterators = computedFunction(function (node: Node): number {
-  return 0
-  // const max = children(node).reduce(
-  //   (max, child) => Math.max(numIterators(child), max),
-  //   0
-  // )
+  const visited = {}
 
-  // return (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0) + max
+  const iteratorsOfChildren = (current: Node): number => {
+    visited[current.id] = true
+    const max = children(current)
+      .filter(child => !visited[child.id])
+      .reduce(
+        (max, child) => Math.max(iteratorsOfChildren(child), max),
+        0
+      )
+
+    return (current.type === 'Items' ? 1 : 0) + (current.type === 'Collect' ? -1 : 0) + max
+  }
+
+  return iteratorsOfChildren(node)
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {
