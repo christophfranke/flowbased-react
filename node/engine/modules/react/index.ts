@@ -102,7 +102,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
         props: ['side']
       },
       output: {
-        events: ['side']
+        events: ['side', 'allow-loops']
       }
     },
     create: () => ({

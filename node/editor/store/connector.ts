@@ -244,8 +244,26 @@ export default class ConnectorFunctions {
   }
 
   @transformer
-  willProduceLoop(src?: Node, dest?: Node): boolean {
-    return !!src && !!dest && this.store.getSubtree(src).includes(dest)
+  willProduceLoop(src: Node, dest: Node): boolean {
+    if (src === dest) {
+      return true
+    }
+
+    return this.store.connections.filter(con => con.src.nodeId === dest.id)
+      .filter(con => {
+        if (this.hasConnectorOption(dest, 'output', con.src.key, 'allow-loops')) {
+          return false
+        }
+
+        const other = this.store.getNodeById(con.target.nodeId)
+        if (!other || this.hasConnectorOption(other, 'input', con.target.key, 'allow-loops')) {
+          return false
+        }
+        
+        return true
+      })
+      .map(con => this.store.getNodeById(con.target.nodeId))
+      .some(other => this.willProduceLoop(src, other!))
   }
 
   @transformer
@@ -288,8 +306,7 @@ export default class ConnectorFunctions {
     const src = this.isSrc(pending.group) ? pending : possiblyHot
     const dest = this.isSrc(possiblyHot.group) ? pending : possiblyHot
 
-    return src !== dest
-      && !this.willProduceLoop(src.group.ports.node, dest.group.ports.node)
+    return !this.willProduceLoop(src.group.ports.node, dest.group.ports.node)
       && !(src.group.mode === 'multiple' && dest.group.mode === 'multiple')
       && this.valuesAreCompatible(src.group, dest.group)
       && this.iteratorsAreCompatatible(src.group.ports.node, dest.group.ports.node)

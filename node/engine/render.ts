@@ -59,12 +59,13 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
 })
 
 export const numIterators = computedFunction(function (node: Node): number {
-  const max = children(node).reduce(
-    (max, child) => Math.max(numIterators(child), max),
-    0
-  )
+  return 0
+  // const max = children(node).reduce(
+  //   (max, child) => Math.max(numIterators(child), max),
+  //   0
+  // )
 
-  return (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0) + max
+  // return (node.type === 'Items' ? 1 : 0) + (node.type === 'Collect' ? -1 : 0) + max
 })
 
 export function expectedType(target: Node, key: string, context: Context): ValueType {

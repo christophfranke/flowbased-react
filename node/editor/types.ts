@@ -34,7 +34,7 @@ export interface EditorDefinition<T = string> {
   create: () => RawNode<T>
 }
 
-export type ConnectorOption = 'side' | 'duplicate' | 'hidden'
+export type ConnectorOption = 'side' | 'duplicate' | 'hidden' | 'allow-loops'
 
 export type ValueType = Engine.ValueType
 export interface Rectangle {
