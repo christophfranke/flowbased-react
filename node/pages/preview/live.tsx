@@ -36,9 +36,6 @@ class LivePreview extends React.Component {
   }
 
   render() {
-    // console.log(this.sync && this.sync.selectedStoreId)
-    // console.log(Object.keys(graphStorage.stores))
-    // console.log(this.sync && this.sync.selectedStoreId && graphStorage.stores[this.sync.selectedStoreId])
     const nameOverlay = <div style={{ position: 'fixed', right: '1vw', top: '1vw', fontSize: '16px', color: 'white', padding: '5px 10px', backgroundColor: 'rgba(25, 25, 25, 0.6)', borderRadius: '8px', border: '1px solid white', pointerEvents: 'none' }}>
       {this.store ? this.store.name : ''}
     </div>
