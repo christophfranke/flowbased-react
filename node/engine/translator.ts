@@ -32,36 +32,36 @@ class Translator {
     this.editor = editor
   }
 
-  @observable modules: { [key: string]: Module } = {
-    Core,
-    React,
-    Array: ArrayModule,
-    Object: ObjectModule,
-    Define,
-    Input,
-    Javascript,
-    Error: ErrorModule
-  }
+  // @observable modules: { [key: string]: Module } = {
+  //   Core,
+  //   React,
+  //   Array: ArrayModule,
+  //   Object: ObjectModule,
+  //   Define,
+  //   Input,
+  //   Javascript,
+  //   Error: ErrorModule
+  // }
 
   @computed get export(): Module {
     return module(this.name, this.defines)
   }
 
-  @computed get context(): Context {
-    return {
-      modules: this.modules,
-      types: {},
-      defines: this.defines
-    }
-  }
+  // @computed get context(): Context {
+  //   return {
+  //     modules: this.modules,
+  //     types: {},
+  //     defines: this.defines
+  //   }
+  // }
 
-  @computed get scope(): Scope {
-    return {
-      locals: {},
-      context: this.context,
-      parent: null
-    }
-  }
+  // @computed get scope(): Scope {
+  //   return {
+  //     locals: {},
+  //     context: this.context,
+  //     parent: null
+  //   }
+  // }
 
   @computed get defines(): Node[] {
     return this.editor.nodes.filter(node => node.type === 'Define')

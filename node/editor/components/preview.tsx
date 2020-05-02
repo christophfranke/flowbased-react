@@ -19,16 +19,14 @@ interface Props {
 @observer
 class Preview extends React.Component<Props> {
   store = this.props.store
-
   ref = React.createRef<HTMLDivElement>()
-
   dispose: IReactionDisposer[] = []
+  translator = new Translator(this.store)
 
   @computed get preview(): Node | undefined {
     return this.store.nodes.find(node => node.type === 'Preview')
   }
 
-  translator = new Translator(this.store)
 
   componentDidMount() {
     this.dispose = this.store.nodes

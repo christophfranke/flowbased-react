@@ -15,16 +15,16 @@ handler.get(async (req, res) => {
       })
 
       if (doc) {
-        res.json(doc)
+        return res.json(doc)
       } else {
-        res.json({ ok: false, error: 'not found', status: 404 })
+        return res.json({ ok: false, error: 'not found', status: 404 })
       }
     } catch(e) {
       console.log(e)
-      res.json({ ok: false, error: "didn't work", status: 500 })
+      return res.json({ ok: false, error: "didn't work", status: 500 })
     }
   } catch(e) {
-    res.json({ ok: false, error: 'not found', status: 404 })
+    return res.json({ ok: false, error: 'not found', status: 404 })
   }
 })
 
@@ -34,10 +34,10 @@ handler.delete(async (req, res) => {
       _id: new ObjectID(req.query.id)
     })
 
-    res.json({ ok: true })
+    return res.json({ ok: true })
   } catch(e) {
     console.log(e)
-    res.json({ ok: false, error: "didn't work", status: 500 })
+    return res.json({ ok: false, error: "didn't work", status: 500 })
   }
 })
 
@@ -46,8 +46,7 @@ handler.post(async (req, res) => {
   try {
     data = JSON.parse(req.body)
   } catch(e) {
-    res.json({ ok: false, error: "no valid json", status: 500 })
-    return
+    return res.json({ ok: false, error: "no valid json", status: 500 })
   }
   try {
     await req.db.collection('documents').updateOne({
@@ -61,10 +60,10 @@ handler.post(async (req, res) => {
       }
     })
 
-    res.json({ ok: true })
+    return res.json({ ok: true })
   } catch(e) {
     console.log(e)
-    res.json({ ok: false, error: "didn't work", status: 500 })
+    return res.json({ ok: false, error: "didn't work", status: 500 })
   }
 })
 

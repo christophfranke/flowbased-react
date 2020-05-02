@@ -7,25 +7,44 @@ const base = isServer
   ? 'http://localhost:3000'
   : `${window.location.protocol}//${window.location.host}`
 
-async function fetchStore(id: string) {
-  const result = await fetch(`${base}/api/documents/${id}`)
-  return await result.json()      
-}
 
+const fetchPromises = {}
+const fetchJson = {}
+async function cachedFetchStore(id: string) {
+  const url = `${base}/api/documents/${id}`
+  if (!fetchPromises[url]) {
+    fetchPromises[url] = fetch(url)
+    if (fetchJson[url]) {
+      delete fetchJson[url]
+    }
+  }
+
+  const result = await fetchPromises[url]
+  delete fetchPromises[url]
+  if (!fetchJson[url]) {
+    // make sure you only do this once,
+    // because dumb stream api cannot do it again
+    fetchJson[url] = await result.json()
+  }
+
+  return fetchJson[url]
+}
 
 export default async function(id) {
   const data = {
-    [id]: await fetchStore(id)
+    [id]: await cachedFetchStore(id)
   }
 
-  await Promise.all<any>(data[id].nodes.map(node => {
+  const resolveNodes = nextId => Promise.all<any>(data[nextId].nodes.map(node => {
     if (!graphStorage.modules[node.module] && !data[node.module]) {
-      return fetchStore(node.module).then(result => {
+      return cachedFetchStore(node.module).then(result => {
         data[node.module] = result
+        return resolveNodes(node.module)
       })
     }
     return Promise.resolve()
   }))
 
+  await resolveNodes(id)
   return data
 }
