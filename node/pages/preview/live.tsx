@@ -30,12 +30,11 @@ class LivePreview extends React.Component {
 
   componentDidMount() {
     this.updateStore()
-    window.addEventListener('storage', this.updateStore)
+    // window.addEventListener('storage', this.updateStore)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('storage', this.updateStore)
-
+    // window.removeEventListener('storage', this.updateStore)
   }
 
   render() {

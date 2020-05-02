@@ -9,7 +9,7 @@ export default class StorageEditor {
 
   constructor() {
     this.load()
-    window.addEventListener('storage', this.load)
+    // window.addEventListener('storage', this.load)
   }
 
   load = () => {

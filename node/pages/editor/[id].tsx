@@ -12,6 +12,7 @@ import DocumentBrowser from '@components/document-browser'
 import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
 import loadDependencies from '@service/load-dependencies'
+import LocalStorageSync from '@service/local-storage-sync'
 
 import './editor.scss'
 
@@ -51,32 +52,41 @@ class EditorLoad extends React.Component<Props> {
 
   disposers: IReactionDisposer[] = []
   componentDidMount() {
-    this.disposers = [
-      autorun(() => {
-        if (this.store) {
-          save(['editor', 'connections'], this.store, 'connections')
-        }
-      }),
-      autorun(() => {
-        if (this.store) {
-          save(['editor', 'nodes'], this.store, 'nodes')
-        }
-      }),
-      autorun(() => {
-        if (this.store) {
-          save(['editor', 'currentHighZ'], this.store, 'currentHighZ')
-        }
-      }),
-      autorun(() => {
-        if (this.store) {
-          save(['editor', 'name'], this.store, 'name')
-        }
-      })
-    ]
+    const sync = new LocalStorageSync()
+    sync.enableSending()
+    sync.enableReceiving()
+
+    // const sync = new LocalStorageSync()
+    // requestAnimationFrame(() => {
+    //   console.log('setting item', this.props.id)
+    //   window.localStorage.setItem('id', this.props.id)
+    // })
+    // this.disposers = [
+    //   autorun(() => {
+    //     if (this.store) {
+    //       save(['editor', 'connections'], this.store, 'connections')
+    //     }
+    //   }),
+    //   autorun(() => {
+    //     if (this.store) {
+    //       save(['editor', 'nodes'], this.store, 'nodes')
+    //     }
+    //   }),
+    //   autorun(() => {
+    //     if (this.store) {
+    //       save(['editor', 'currentHighZ'], this.store, 'currentHighZ')
+    //     }
+    //   }),
+    //   autorun(() => {
+    //     if (this.store) {
+    //       save(['editor', 'name'], this.store, 'name')
+    //     }
+    //   })
+    // ]
   }
 
   componentWillUnmount() {
-    this.disposers.forEach(disposer => disposer())
+    // this.disposers.forEach(disposer => disposer())
   }
 
   @computed get store(): Store | undefined {
