@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable } from 'mobx'
+import { observable, action } from 'mobx'
 import { observer } from 'mobx-react'
 
 import Store from '@editor/store'
@@ -16,11 +16,16 @@ import loadDependencies from '@service/load-dependencies'
 class LivePreview extends React.Component {
   @observable store: Store = new Store()
 
+  @action
   updateStore = () => {
-    this.store.nodes = load(['editor', 'nodes']) || []
-    this.store.connections = load(['editor', 'connections']) || []
-    this.store.currentHighZ = load(['editor', 'currentHighZ']) || 1
-    this.store.name = load(['editor', 'name']) || ''    
+    const data = {
+      nodes: load(['editor', 'nodes']) || [],
+      connections: load(['editor', 'connections']) || [],
+      currentHighZ: load(['editor', 'currentHighZ']) || 1,
+      name: load(['editor', 'name']) || ''
+    }
+
+    this.store.fillWithData(data)
   }
 
   componentDidMount() {

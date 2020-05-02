@@ -260,7 +260,7 @@ class NodeView extends React.Component<Props> {
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params', textAlign: 'center' }}>
-            <div style={nameStyle} onClick={this.showHelp}>{definition.name}</div>
+            <div style={nameStyle} onClick={this.showHelp}>{definition.name} {node.id}</div>
             {this.isDocumentationVisible && <Documentation nodeType={this.props.node.type} nodeModule={this.props.node.module} style={documentationStyle} />}
             <div style={{ display: 'grid', gridTemplate: '"label input" auto / auto auto', gridGap: '4px 8px', alignItems: 'center', textAlign: 'left' }}>
               {this.params.map(param => {

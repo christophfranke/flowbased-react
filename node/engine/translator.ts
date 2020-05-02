@@ -74,7 +74,12 @@ class Translator {
   }
 
   @transformer
-  getInputs(editorNode: Editor.Node): { [key: string]: Connection[] } {
+  getInputs(editorNodeId: number): { [key: string]: Connection[] } {
+    const editorNode = this.getEditorNode(editorNodeId)
+    if (!editorNode) {
+      return {}
+    }
+
     const connections = this.editor.connections.filter(connection => connection.target.nodeId === editorNode.id)
     return unique(connections.map(con => con.target.key))
       .reduce((obj, key) => ({
@@ -99,7 +104,12 @@ class Translator {
   }
 
   @transformer
-  getOutputs(editorNode: Editor.Node): { [key: string]: Connection[] } {
+  getOutputs(editorNodeId: number): { [key: string]: Connection[] } {
+    const editorNode = this.getEditorNode(editorNodeId)
+    if (!editorNode) {
+      return {}
+    }
+
     const connections = this.editor.connections
       .filter(connection => connection.src.nodeId === editorNode.id)
       .filter(connection =>
@@ -126,18 +136,21 @@ class Translator {
   }
 
   @transformer
-  getParams(editorNode: Editor.Node): { [key: string]: any } {
-    return editorNode.params.reduce((obj, param) => ({
-      ...obj,
-      [param.key]: param.value
-    }), {})
+  getParams(editorNodeId: number): { [key: string]: any } {
+    const editorNode = this.getEditorNode(editorNodeId)
+    return editorNode
+      ? editorNode.params.reduce((obj, param) => ({
+          ...obj,
+          [param.key]: param.value
+        }), {})
+      : {}
   }
 
   @transformer
   getNode(editorNode: Editor.Node): Node {
-    const getInputs = () => this.getInputs(editorNode)
-    const getOutputs = () => this.getOutputs(editorNode)
-    const getParams = () => this.getParams(editorNode)
+    const getInputs = () => this.getInputs(editorNode.id)
+    const getOutputs = () => this.getOutputs(editorNode.id)
+    const getParams = () => this.getParams(editorNode.id)
 
     return {
       id: editorNode.id,
