@@ -28,7 +28,8 @@ class Store {
     return {
       nodes: this.nodes,
       connections: this.connections,
-      currentHighZ: this.currentHighZ
+      currentHighZ: this.currentHighZ,
+      name: this.name
     }
   }
 
@@ -51,12 +52,16 @@ class Store {
 
   static createFromData(data) {
     const store = new Store()
-    store.nodes = data.nodes || []
-    store.connections = data.connections || []
-    store.currentHighZ = data.currentHighZ || 1
-    store.name = data.name || ''
+    store.fillWithData(data)
 
     return store
+  }
+
+  fillWithData(data) {
+    this.nodes = data.nodes || []
+    this.connections = data.connections || []
+    this.currentHighZ = data.currentHighZ || 1
+    this.name = data.name || ''    
   }
 
   uid(): number {
@@ -129,6 +134,7 @@ class Store {
         this.connector.connector(connection.src)!.group.ports.node !== node &&
         this.connector.connector(connection.target) &&
         this.connector.connector(connection.target)!.group.ports.node !== node)
+    // TODO: Fix this
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
     //   this.pendingConnector = null
     // }

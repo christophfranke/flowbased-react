@@ -85,7 +85,11 @@ class GraphStorage {
 
   fillWithData(data) {
     Object.entries(data).forEach(([id, data]) => {
-      this.stores[id] = Store.createFromData(data)
+      if (!this.stores[id]) {
+        this.stores[id] = Store.createFromData(data)
+      } else {
+        this.stores[id].fillWithData(data)
+      }
     })
   }
 }

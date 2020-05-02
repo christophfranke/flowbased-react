@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer, Provider } from 'mobx-react'
-import { observable, computed, autorun } from 'mobx'
+import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import fetch from 'isomorphic-fetch'
 
 import { save } from '@shared/local-storage-sync'
@@ -15,6 +15,7 @@ import loadDependencies from '@service/load-dependencies'
 
 import './editor.scss'
 
+const isServer = typeof window === 'undefined'
 
 interface Props {
   id: string
@@ -25,7 +26,9 @@ interface Props {
 class EditorLoad extends React.Component<Props> {
   static async getInitialProps(ctx) {
     const id = ctx.query.id
-    const data = await loadDependencies(id)
+    const data = isServer 
+      ? await loadDependencies(id)
+      : {}
 
     return {
       id,
@@ -38,53 +41,73 @@ class EditorLoad extends React.Component<Props> {
     graphStorage.fillWithData(props.data)
   }
 
-  componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
-      graphStorage.fillWithData(this.props.data) 
+      await this.saveGraph(prevProps.id)
+      const data = await loadDependencies(this.props.id)
+      graphStorage.fillWithData(data)
     }
   }
 
+  disposers: IReactionDisposer[] = []
   componentDidMount() {
-    autorun(() => {    
-      if (this.store) {      
-        save(['editor', 'connections'], this.store, 'connections')
-        save(['editor', 'nodes'], this.store, 'nodes')
-        save(['editor', 'highZ'], this.store, 'currentHighZ')
-        save(['editor', 'name'], this.store, 'name')
-      }
-    })
+    this.disposers = [
+      autorun(() => {
+        if (this.store) {
+          save(['editor', 'connections'], this.store, 'connections')
+        }
+      }),
+      autorun(() => {
+        if (this.store) {
+          save(['editor', 'nodes'], this.store, 'nodes')
+        }
+      }),
+      autorun(() => {
+        if (this.store) {
+          save(['editor', 'currentHighZ'], this.store, 'currentHighZ')
+        }
+      }),
+      autorun(() => {
+        if (this.store) {
+          save(['editor', 'name'], this.store, 'name')
+        }
+      })
+    ]
   }
 
-  @computed get store(): Store {
+  componentWillUnmount() {
+    this.disposers.forEach(disposer => disposer())
+  }
+
+  @computed get store(): Store | undefined {
     return graphStorage.stores[this.props.id]
   }
 
-  @observable loading = false
   @computed get graphName(): string {
-    return (graphStorage.stores[this.props.id] || { name: '' }).name
+    const result = (this.store || { name: '' }).name
+    return result
   }
 
   @observable documentBrowserKey = 1
 
   changeGraphName = (e) => {
-    graphStorage.stores[this.props.id].name = e.target.value
+    if (this.store) {
+      this.store.name = e.target.value
+    }
   }
 
   clickDelete = async () => {
-    if (!this.loading) {    
-      this.loading = true
-      await this.deleteGraph()
-      this.loading = false
-    }
+    await this.deleteGraph()
   }
 
   clickSave = async () => {
-    if (!this.loading) {    
-      this.loading = true
-      await this.saveGraph()
-      this.loading = false
-      this.documentBrowserKey += 1
-    }
+    await this.saveGraph(this.props.id)
+    this.documentBrowserKey += 1
+  }
+
+  blurGraphname = async () => {
+    await this.saveGraph(this.props.id)
+    this.documentBrowserKey += 1
   }
 
   async deleteGraph() {
@@ -98,14 +121,12 @@ class EditorLoad extends React.Component<Props> {
     }
   }
 
-  async saveGraph() {
-    if (this.props.id) {
-      const result = await fetch(`/api/documents/${this.props.id}`, {
+  async saveGraph(id: string) {
+    const store = graphStorage.stores[id]
+    if (store) {
+      await fetch(`/api/documents/${id}`, {
         method: 'POST',
-        body: JSON.stringify({
-          ...this.store.data,
-          name: this.graphName
-        })
+        body: JSON.stringify(store.data)
       })
     }
   }
@@ -118,8 +139,8 @@ class EditorLoad extends React.Component<Props> {
       padding: '8px 15px',
       borderRadius: '8px',
       marginBottom: '8px',
-      cursor: this.loading ? 'progress' : 'pointer',
-      opacity: this.loading ? 0.5 : 1
+      cursor: 'pointer',
+      opacity: 1
     }
 
     const graphNameStyle: React.CSSProperties = {
@@ -138,20 +159,23 @@ class EditorLoad extends React.Component<Props> {
     return <div>
       <Viewport dimensions={{ x: 0, y: 0, width: 100, height: 100 }}>
         {this.store && <EditorView key={this.props.id} store={this.store} /> || <div style={{ color: 'white', backgroundColor: 'rgb(25, 25, 25)', width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '24px' }}>{this.loading ? 'Loading...' : 'No Graph'}</h2>
+          <h2 style={{ fontSize: '24px' }}>Loading...</h2>
         </div>}
       </Viewport>
       <DocumentBrowser selectedId={this.props.id} documentsKey={this.documentBrowserKey} />
-      <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} />
+      <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} onBlur={this.blurGraphname} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
-        <button disabled={this.loading || !this.store} onClick={this.clickSave} style={buttonStyles}>
-          Save
+        <button disabled={!this.store} onClick={this.clickSave} style={buttonStyles}>
+          Save Graph
         </button>
-        <button disabled={this.loading || !this.store} onClick={this.clickDelete} style={buttonStyles}>
-          Delete
+        <button disabled={!this.store} onClick={this.clickDelete} style={buttonStyles}>
+          Delete Graph
         </button>
+        <a href="/preview/live" target="_blank" style={buttonStyles}>
+          Live Preview
+        </a>
         <a href={`/preview/${this.props.id}`} target="_blank" style={buttonStyles}>
-          Preview
+          View as Page
         </a>
       </div>
     </div>
