@@ -1,5 +1,5 @@
 import React from 'react'
-import { observable, action } from 'mobx'
+import { observable, action, computed } from 'mobx'
 import { observer } from 'mobx-react'
 
 import Store from '@editor/store'
@@ -10,34 +10,35 @@ import Preview from '@editor/components/preview'
 
 import graphStorage from '@service/graph-storage'
 import loadDependencies from '@service/load-dependencies'
+import LocalStorageSync from '@service/local-storage-sync'
 
 
 @observer
 class LivePreview extends React.Component {
-  @observable store: Store = new Store()
+  @observable sync: LocalStorageSync
+  @computed get id(): string {
+    return this.sync && this.sync.selectedStoreId || ''
+  }
 
-  @action
-  updateStore = () => {
-    const data = {
-      nodes: load(['editor', 'nodes']) || [],
-      connections: load(['editor', 'connections']) || [],
-      currentHighZ: load(['editor', 'currentHighZ']) || 1,
-      name: load(['editor', 'name']) || ''
-    }
-
-    this.store.fillWithData(data)
+  @computed get store(): Store | undefined {
+    return this.id 
+      ? graphStorage.stores[this.id]
+      : undefined
   }
 
   componentDidMount() {
-    this.updateStore()
-    // window.addEventListener('storage', this.updateStore)
+    this.sync = new LocalStorageSync()
+    this.sync.enableReceiving()
   }
 
   componentWillUnmount() {
-    // window.removeEventListener('storage', this.updateStore)
+    this.sync.disableReceiving()
   }
 
   render() {
+    // console.log(this.sync && this.sync.selectedStoreId)
+    // console.log(Object.keys(graphStorage.stores))
+    // console.log(this.sync && this.sync.selectedStoreId && graphStorage.stores[this.sync.selectedStoreId])
     const nameOverlay = <div style={{ position: 'fixed', right: '1vw', top: '1vw', fontSize: '16px', color: 'white', padding: '5px 10px', backgroundColor: 'rgba(25, 25, 25, 0.6)', borderRadius: '8px', border: '1px solid white', pointerEvents: 'none' }}>
       {this.store ? this.store.name : ''}
     </div>
@@ -45,7 +46,7 @@ class LivePreview extends React.Component {
     return <React.Fragment>
       {nameOverlay}
       {this.store
-        ? <Preview store={this.store} />
+        ? <Preview key={this.id} store={this.store} />
         : <div>Initializing live preview...</div>}
     </React.Fragment>
   }

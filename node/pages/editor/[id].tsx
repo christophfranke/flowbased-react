@@ -25,6 +25,7 @@ interface Props {
 
 @observer
 class EditorLoad extends React.Component<Props> {
+  sync: LocalStorageSync
   static async getInitialProps(ctx) {
     const id = ctx.query.id
     const data = isServer 
@@ -44,6 +45,7 @@ class EditorLoad extends React.Component<Props> {
 
   async componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
+      this.sync.setStoreId(this.props.id)
       await this.saveGraph(prevProps.id)
       const data = await loadDependencies(this.props.id)
       graphStorage.fillWithData(data)
@@ -52,41 +54,15 @@ class EditorLoad extends React.Component<Props> {
 
   disposers: IReactionDisposer[] = []
   componentDidMount() {
-    const sync = new LocalStorageSync()
-    sync.enableSending()
-    sync.enableReceiving()
-
-    // const sync = new LocalStorageSync()
-    // requestAnimationFrame(() => {
-    //   console.log('setting item', this.props.id)
-    //   window.localStorage.setItem('id', this.props.id)
-    // })
-    // this.disposers = [
-    //   autorun(() => {
-    //     if (this.store) {
-    //       save(['editor', 'connections'], this.store, 'connections')
-    //     }
-    //   }),
-    //   autorun(() => {
-    //     if (this.store) {
-    //       save(['editor', 'nodes'], this.store, 'nodes')
-    //     }
-    //   }),
-    //   autorun(() => {
-    //     if (this.store) {
-    //       save(['editor', 'currentHighZ'], this.store, 'currentHighZ')
-    //     }
-    //   }),
-    //   autorun(() => {
-    //     if (this.store) {
-    //       save(['editor', 'name'], this.store, 'name')
-    //     }
-    //   })
-    // ]
+    this.sync = new LocalStorageSync()
+    this.sync.enableSending()
+    this.sync.enableReceiving()
+    this.sync.setStoreId(this.props.id)
   }
 
   componentWillUnmount() {
-    // this.disposers.forEach(disposer => disposer())
+    this.sync.disableSending()
+    this.sync.disableReceiving()
   }
 
   @computed get store(): Store | undefined {
