@@ -3,8 +3,6 @@ import { observer, Provider } from 'mobx-react'
 import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import fetch from 'isomorphic-fetch'
 
-import { save } from '@shared/local-storage-sync'
-
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
 import DocumentBrowser from '@components/document-browser'

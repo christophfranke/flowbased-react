@@ -4,8 +4,6 @@ import { observer } from 'mobx-react'
 
 import Store from '@editor/store'
 
-import { load } from '@shared/local-storage-sync'
-
 import Preview from '@editor/components/preview'
 
 import graphStorage from '@service/graph-storage'
