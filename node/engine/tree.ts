@@ -75,3 +75,9 @@ export const inputAt = computedFunction(function(node: Node, key: string): Port 
     && node.connections.input[key][0].src
 })
 
+export const inputsAt = computedFunction(function(node: Node, key: string): Port[] {
+  return node.connections.input[key]
+    ? node.connections.input[key].map(con => con.src)
+    : []
+})
+

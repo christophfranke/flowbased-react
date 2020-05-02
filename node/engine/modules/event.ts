@@ -1,6 +1,8 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
+import { autorun, observable, runInAction } from 'mobx'
+
 import { value, deliveredType, inputValueAt, expectedType, inputTypeAt } from '@engine/render'
 import { inputs, firstInput, match, inputAt } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
@@ -8,30 +10,53 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 export const Dependencies = ['Core']
 
 export const name = 'Event'
-export type Nodes = 'Listen' | 'TriggerValue'
+export type Nodes = 'Listener' | 'TriggerValue'
 export const Node: Engine.ModuleNodes<Nodes> = {
-  Listen: {
+  Listener: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       // TODO: make a reasonable teardown/update 
-      const input = firstInput(node)
-      if (input) {
-        const emitter = value(input.node, scope, input.key)
-        emitter.subscribe(node.params.event, (e) => {
-          scope.locals[node.id].subscribers.forEach(fn => fn(node.params.event))
-        })
-      }
-
       if (!scope.locals[node.id]) {
-        scope.locals[node.id] = {
-          subscribers: []
-        }
+        scope.locals[node.id] = observable({
+          listeners: [],
+          unsubscribe: null,
+          output: createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
+        })
+
+        autorun(() => {
+          const input = firstInput(node)
+          if (input) {
+            // gather data
+            const emitter = value(input.node, scope, input.key)
+            const eventName = node.params.event
+
+            // update output
+            runInAction(() => {
+              if (scope.locals[node.id].unsubscribe) {
+                scope.locals[node.id].unsubscribe()
+              }
+
+              scope.locals[node.id].unsubscribe = emitter.subscribe(
+                eventName,
+                (e) => {
+                  scope.locals[node.id].listeners.forEach(fn => fn(eventName))          
+                }
+              )
+
+              scope.locals[node.id].output = {
+                subscribe: (fn) => {
+                  scope.locals[node.id].listeners.push(fn)
+                  return () => {
+                    scope.locals[node.id].listeners = scope.locals[node.id].listeners
+                      .filter(sub => sub !== fn)
+                  }
+                }
+              }
+            }) // action end
+          }
+        }) // autorun end
       }
 
-      return {
-        subscribe: (fn) => {
-          scope.locals[node.id].subscribers.push(fn)
-        }
-      }
+      return scope.locals[node.id].output
     },
     type: {
       output: {
@@ -46,7 +71,6 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   TriggerValue: {
-    // TODO: make a reasonable teardown/update
     value: (node: Engine.Node, scope: Engine.Scope) => {
       const triggerValue = inputValueAt(node, 'trigger', scope)
 
@@ -75,8 +99,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 }
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
-  Listen: {
-    name: 'Listen',
+  Listener: {
+    name: 'Listener',
     type: 'Trigger',
     documentation: {
       explanation: 'Listens for events',
@@ -96,7 +120,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       }
     },
     create: () => ({
-      type: 'Listen',
+      type: 'Listener',
       params: [{
         name: 'Event',
         key: 'event',
@@ -144,9 +168,11 @@ export const Type: Engine.ModuleTypes<Types> = {
         argument
       }
     }),
-    emptyValue: () => [],
+    emptyValue: () => ({
+      subscribe: () => () => null
+    }),
     test: (value, type: Engine.ValueType, context: Engine.Context) =>
-      Array.isArray(value) && value.every(value => testValue(value, type.params.items, context))
+      value && value.subscribe && typeof value.subscribe === 'function'
   },
   Event: {
     create: () => ({
@@ -155,7 +181,9 @@ export const Type: Engine.ModuleTypes<Types> = {
       module: 'Event',
       params: {}
     }),
-    emptyValue: () => [],
+    emptyValue: () => ({
+      subscribe: () => () => null
+    }),
     test: (value, type: Engine.ValueType, context: Engine.Context) =>
-      Array.isArray(value) && value.every(value => testValue(value, type.params.items, context))
+      value && value.subscribe && typeof value.subscribe === 'function'
   },}

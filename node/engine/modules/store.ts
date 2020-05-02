@@ -1,10 +1,10 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { observable } from 'mobx'
+import { observable, autorun, runInAction } from 'mobx'
 
-import { value, deliveredType } from '@engine/render'
-import { inputs, firstInput, match } from '@engine/tree'
+import { value, deliveredType, inputValueAt, inputValuesAt } from '@engine/render'
+import { inputs, match } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core', 'Event']
@@ -14,24 +14,25 @@ export type Nodes = 'Variable'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Variable: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
-      // TODO: make a reasonable teardown/update
       if (!scope.locals[node.id]) {
-        const initialValueConnection = node.connections.input.initialValue && node.connections.input.initialValue[0]
-        const initialValue = initialValueConnection
-          ? value(initialValueConnection.src.node, scope, initialValueConnection.src.key)
-          : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
-
         scope.locals[node.id] = observable({
-          value: initialValue
+          value: inputValueAt(node, 'initialValue', scope),
+          unsubscribe: []
         })
 
-        const inputs = node.connections.input.set
-        if (inputs) {
-          const triggers = inputs.map(input => value(input.src.node, scope, input.src.key))
-          triggers.forEach(trigger => trigger.subscribe(argument => {
-            scope.locals[node.id].value = argument
-          }))
-        }
+        autorun(() => {
+          const triggers = inputValuesAt(node, 'set', scope)
+          const initialValue = inputValueAt(node, 'initialValue', scope)
+          
+          runInAction(() => {
+            scope.locals[node.id].value = initialValue
+            scope.locals[node.id].unsubscribe.forEach(fn => fn())
+            scope.locals[node.id].unsubscribe = triggers
+              .map(trigger => trigger.subscribe(argument => {
+                scope.locals[node.id].value = argument
+              }))
+          })
+        })
       }
 
       return scope.locals[node.id].value

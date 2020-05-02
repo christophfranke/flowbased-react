@@ -35,7 +35,6 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           }
 
           scope.locals[node.id].listeners[name].push(fn)
-
           return () => {
             scope.locals[node.id].listeners[name] = scope.locals[node.id].listeners[name].filter(ln => ln !== fn)
           }

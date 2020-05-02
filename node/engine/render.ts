@@ -1,6 +1,6 @@
 import React from 'react'
 import { Node, NodeIdentifier, NodeDefinition, ValueType, Scope, Context, Connection } from '@engine/types'
-import { outputs, children, inputAt } from '@engine/tree'
+import { outputs, children, inputAt, inputsAt } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
 import { matchInto, unionAll, createEmptyValue } from '@engine/type-functions'
@@ -16,6 +16,10 @@ export const inputValueAt = computedFunction(function(node: Node, key: string, s
   return input
     ? value(input.node, scope, input.key)
     : createEmptyValue(expectedType(node, key, scope.context), scope.context)
+})
+
+export const inputValuesAt = computedFunction(function(node: Node, key: string, scope: Scope): any {
+  return inputsAt(node, key).map(input => value(input.node, scope, input.key))
 })
 
 export const inputTypeAt = computedFunction(function(node: Node, key: string, context: Context): ValueType {
