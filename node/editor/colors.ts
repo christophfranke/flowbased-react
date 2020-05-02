@@ -66,8 +66,8 @@ export const colors = {
       hover: 'white'
     },
     complex: {
-      default: 'rgb(14, 136, 201)',
-      highlight: 'rgb(42, 174, 245)',
+      default: 'rgb(70, 136, 227)',
+      highlight: 'rgb(89, 158, 255)',
       hover: 'white'
     },
     trigger: {
