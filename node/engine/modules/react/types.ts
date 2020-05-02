@@ -15,7 +15,6 @@ export interface RenderProps {
 }
 
 export interface NodeProps {
-  key: number
   node: Node
 }
 

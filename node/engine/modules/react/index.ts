@@ -61,8 +61,16 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   Preview: {
-    value: (node: Engine.Node, scope: Engine.Scope) =>
-      ObserverComponent(node, PreviewComponent, scope),
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      if (!scope.locals[node.id]) {
+        scope.locals[node.id] = {
+          listeners: {},
+          component: ObserverComponent(node, PreviewComponent, scope)
+        }
+      }
+
+      return scope.locals[node.id].component
+    },
     type: {
       output: {
         output: () => Type.Element.create(),

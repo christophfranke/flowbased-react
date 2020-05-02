@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { computed, observable } from 'mobx'
+import { computed, observable, autorun } from 'mobx'
 import { Node, Scope, Port, Connection } from '@engine/types'
 import { RenderProps, NodeProps, TagLocals, Func } from './types'
 
@@ -13,17 +13,10 @@ import { transformer } from '@engine/util'
 const combineFn = <A, B>(functions: Func<A, B>[]): Func<A, B[]> =>
   (...args) => functions.map(fn => fn(...args))
 
-// TODO: Do we still need this?
-let currentRenderId = 0
-function getRenderKey(): number {
-  currentRenderId += 1
-  return currentRenderId
-}
 
-
-const HOC = (Component, scope: Scope) => {
+const HOC = (Component, scope: Scope, node: Node) => {
   @observer
-  class RenderComponent extends React.Component<NodeProps> {
+  class RenderComponent extends React.Component {
     @transformer
     getChild(input: Port) {
       const result = value(input.node, scope, input.key)
@@ -39,32 +32,28 @@ const HOC = (Component, scope: Scope) => {
     }
 
     @computed get children() {
-      return this.props.node.connections.input.input
-        ? this.props.node.connections.input.input
+      return node.connections.input.input
+        ? node.connections.input.input
           .map(input => this.getChild(input.src))
         : []
     }
 
     @computed get properties() {
-      return Object.keys(this.props.node.connections.input)
+      return Object.keys(node.connections.input)
         .filter(key => key !== 'input')
         .reduce((obj, key) => ({
           ...obj,
-          [key]: this.props.node.connections.input[key].length > 0
+          [key]: node.connections.input[key].length > 0
             ? value(
-              this.props.node.connections.input[key][0].src.node,
+              node.connections.input[key][0].src.node,
               scope,
-              this.props.node.connections.input[key][0].src.key)
+              node.connections.input[key][0].src.key)
             : null
         }), {})
     }
 
-    @computed get params() {
-      return this.props.node.params
-    }
-
     @computed get listeners() {
-      const locals = scope.locals[this.props.node.id] as TagLocals
+      const locals = scope.locals[node.id] as TagLocals
       return (locals)
         ? Object.entries(locals.listeners).reduce((obj, [name, listeners]) => ({
           ...obj,
@@ -75,7 +64,7 @@ const HOC = (Component, scope: Scope) => {
 
 
     render() {
-      return <Component params={this.params} properties={this.properties} listeners={this.listeners}>
+      return <Component params={node.params} properties={this.properties} listeners={this.listeners}>
         {this.children}
       </Component>
     }
@@ -85,5 +74,5 @@ const HOC = (Component, scope: Scope) => {
 }
 
 export default function(node: Node, Component: React.ComponentType<RenderProps>, scope: Scope): any {
-  return React.createElement(HOC(Component, scope), { node, key: getRenderKey() })
+  return React.createElement(HOC(Component, scope, node), { key: Math.random() })
 }
