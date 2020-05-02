@@ -1,4 +1,4 @@
-import { observable, computed, autorun, action } from 'mobx'
+import { observable, computed, autorun, action, reaction, runInAction } from 'mobx'
 import { Connection, Node, Connector, ConnectorState, Module, EditorDefinition, NodeIdentifier } from '@editor/types'
 import Translator from '@engine/translator'
 import { Context } from '@engine/types'
@@ -23,13 +23,15 @@ class Store {
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentHighZ = 1
+  @observable version = -1
 
   get data() {
     return {
       nodes: this.nodes,
       connections: this.connections,
       currentHighZ: this.currentHighZ,
-      name: this.name
+      name: this.name,
+      version: this.version
     }
   }
 
@@ -48,6 +50,29 @@ class Store {
     this.node = new NodeFunctions(this)
 
     this.translated = new Translator(this)
+
+    // bump version on changes
+    reaction(() => {
+      return {
+        nodes: this.nodes.map(node => ({
+          ...node,
+          params: node.params.map(param => ({
+            ...param
+          }))
+        })),
+        connections: this.connections.map(connection => ({
+          ...connection
+        })),
+        currentHighZ: this.currentHighZ,
+        name: this.name
+      }
+    },
+    () => {
+      this.version += 1
+      console.log('new version', this.version)
+    }, {
+      delay: 50
+    })
   }
 
   static createFromData(data) {
@@ -72,10 +97,16 @@ class Store {
     // })
     // const validIds = data.nodes.map(node => node.id)
     // this.nodes = this.nodes.filter(node => validIds.includes(node.id))
-    this.nodes = data.nodes || []
-    this.connections = data.connections || []
-    this.currentHighZ = data.currentHighZ || 1
-    this.name = data.name || ''    
+    runInAction(() => {    
+      if (data.version > this.version) {
+        console.log('filled with', data.version)
+        this.nodes = data.nodes || []
+        this.connections = data.connections || []
+        this.currentHighZ = data.currentHighZ || 1
+        this.name = data.name || ''   
+        this.version = data.version - 1 || 0
+      }
+    })
   }
 
   uid(): number {

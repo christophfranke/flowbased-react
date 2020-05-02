@@ -173,11 +173,19 @@ class NodeView extends React.Component<Props> {
   @action
   updatePosition = () => {
     if (this.nodeRef.current) {
-      this.props.node.boundingBox = {
+      const newBoundingBox = {
         x: this.props.node.position.x,
         y: this.props.node.position.y,
         width: this.nodeRef.current.offsetWidth,
         height: this.nodeRef.current.offsetHeight
+      }
+      if (!this.props.node.boundingBox ||
+          this.props.node.boundingBox.x !== newBoundingBox.x ||
+          this.props.node.boundingBox.y !== newBoundingBox.y ||
+          this.props.node.boundingBox.width !== newBoundingBox.width ||
+          this.props.node.boundingBox.height !== newBoundingBox.height
+        ) {
+        this.props.node.boundingBox = newBoundingBox
       }
     }
   }

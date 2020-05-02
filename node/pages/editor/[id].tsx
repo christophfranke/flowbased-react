@@ -26,27 +26,27 @@ class EditorLoad extends React.Component<Props> {
   sync: LocalStorageSync
   static async getInitialProps(ctx) {
     const id = ctx.query.id
-    const data = isServer 
-      ? await loadDependencies(id)
-      : {}
+    // const data = isServer 
+    //   ? await loadDependencies(id)
+    //   : {}
 
     return {
       id,
-      data
+      // data
     }
   }
 
   constructor(props) {
     super(props)
-    graphStorage.fillWithData(props.data)
+    // graphStorage.fillWithData(props.data)
   }
 
   async componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.sync.setStoreId(this.props.id)
-      await this.saveGraph(prevProps.id)
-      const data = await loadDependencies(this.props.id)
-      graphStorage.fillWithData(data)
+      // await this.saveGraph(prevProps.id)
+      // const data = await loadDependencies(this.props.id)
+      // graphStorage.fillWithData(data)
     }
   }
 
@@ -149,9 +149,6 @@ class EditorLoad extends React.Component<Props> {
       <DocumentBrowser selectedId={this.props.id} documentsKey={this.documentBrowserKey} />
       <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} onBlur={this.blurGraphname} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
-        <button disabled={!this.store} onClick={this.clickSave} style={buttonStyles}>
-          Save Graph
-        </button>
         <button disabled={!this.store} onClick={this.clickDelete} style={buttonStyles}>
           Delete Graph
         </button>

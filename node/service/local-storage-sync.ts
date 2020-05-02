@@ -1,4 +1,4 @@
-import { observable, runInAction, autorun, IReactionDisposer } from 'mobx'
+import { observable, runInAction, reaction, IReactionDisposer } from 'mobx'
 import graphStorage from '@service/graph-storage'
 import Store from '@editor/store'
 
@@ -8,16 +8,15 @@ class LocalStorageSync {
   version = 0
 
   enableSending() {
-    this.disposer = autorun(() => {
-      this.version += 1
-      // console.log('sending', this.version)
+    this.disposer = reaction(() => {
+      return Object.values(graphStorage.stores).map(store => store.version)
+    },
+    () => {
       Object.entries(graphStorage.stores).forEach(([id, store]) => {
-        window.localStorage.setItem(id, JSON.stringify({
-          data: store.data,
-          version: this.version
-        }))
+        window.localStorage.setItem(id, JSON.stringify(store.data))
       })
     }, {
+      // autosave once per 100ms
       delay: 100
     })
   }
@@ -35,22 +34,15 @@ class LocalStorageSync {
     }
 
     try {    
-      const msg = JSON.parse(value)
-      if (msg.version > this.version) {
-        // console.log('receiving', msg.version)
-        this.version = msg.version - 2 // for some reason this triggers two autoruns
+      const data = JSON.parse(value)
+      runInAction(() => {
+        if (!graphStorage.stores[key]) {
+          graphStorage.stores[key] = new Store()
+        }
 
-        runInAction(() => {
-          if (!graphStorage.stores[key]) {
-            graphStorage.stores[key] = new Store()
-          }
-
-          const store = graphStorage.stores[key]
-          const data = msg.data
-
-          store.fillWithData(data)
-        })
-      }
+        const store = graphStorage.stores[key]
+        store.fillWithData(data)
+      })
     } catch(e) {
       // anything can happen
     }
