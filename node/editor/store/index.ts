@@ -72,7 +72,6 @@ class Store {
     // })
     // const validIds = data.nodes.map(node => node.id)
     // this.nodes = this.nodes.filter(node => validIds.includes(node.id))
-    console.log('fill with data', data.nodes)
     this.nodes = data.nodes || []
     this.connections = data.connections || []
     this.currentHighZ = data.currentHighZ || 1

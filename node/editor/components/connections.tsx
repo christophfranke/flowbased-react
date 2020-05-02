@@ -57,24 +57,24 @@ class ConnectionPath extends React.Component<Props> {
 
 
   @computed get fromColor(): string {
-    const node = this.store.translated.getNode(this.srcNode)
+    const node = this.store.translated.getNode(this.srcNode.id)
     return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 
   @computed get toColor(): string {
-    const node = this.store.translated.getNode(this.targetNode)
+    const node = this.store.translated.getNode(this.targetNode.id)
     return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 
   @computed get numIterators(): number {
     return this.srcNode
-      ? numIterators(this.store.translated.getNode(this.srcNode))
+      ? numIterators(this.store.translated.getNode(this.srcNode.id))
       : 0
   }
 
   @transformer
   colorOfNode(editorNode: Node): string {
-    const node = this.store.translated.getNode(editorNode)
+    const node = this.store.translated.getNode(editorNode.id)
     return colorOfType(deliveredType(node, 'output', this.store.context)).default
   }
 

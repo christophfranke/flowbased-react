@@ -233,9 +233,9 @@ export default class ConnectorFunctions {
 
   @transformer
   valuesAreCompatible(src: ConnectorGroup<'output'>, dest: ConnectorGroup<'input'>): boolean {
-    const srcType = deliveredType(this.store.translated.getNode(src.ports.node), src.key, this.store.context)
+    const srcType = deliveredType(this.store.translated.getNode(src.ports.node.id), src.key, this.store.context)
     const targetType = expectedType(
-      this.store.translated.getNode(dest.ports.node),
+      this.store.translated.getNode(dest.ports.node.id),
       dest.key,
       this.store.context
     )
@@ -268,12 +268,12 @@ export default class ConnectorFunctions {
 
   @transformer
   iteratorsAreCompatatible(src: Node, dest: Node): boolean {
-    if (numIterators(this.store.translated.getNode(src)) === 0
-      || numIterators(this.store.translated.getNode(dest)) === 0) {
+    if (numIterators(this.store.translated.getNode(src.id)) === 0
+      || numIterators(this.store.translated.getNode(dest.id)) === 0) {
       return true
     }
 
-    const destNode = this.store.translated.getNode(dest)
+    const destNode = this.store.translated.getNode(dest.id)
     const dependingChildrenIterator = node => children(node)
       .map(child => flatFilteredSubForest(child, candidate => candidate.type === 'Items'))
       .filter(forest => forest.length > 0)
@@ -288,7 +288,7 @@ export default class ConnectorFunctions {
 
     const dependingIterator = node => flatFilteredSubForest(node, candidate => candidate.type === 'Items')
       .find(tree => tree.node)!.node
-    const dependingSrc = dependingIterator(this.store.translated.getNode(src))
+    const dependingSrc = dependingIterator(this.store.translated.getNode(src.id))
     if (dependingSrc && dependingDest.id === dependingSrc.id) {
       return true
     }

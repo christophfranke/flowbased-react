@@ -65,7 +65,7 @@ class Translator {
 
   @computed get defines(): Node[] {
     return this.editor.nodes.filter(node => node.type === 'Define')
-      .map(node => this.getNode(node))
+      .map(node => this.getNode(node.id))
   }
 
   @transformer
@@ -93,11 +93,11 @@ class Translator {
             id: connection.id,
             src: {
               key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId)!)
+              node: this.getNode(this.getEditorNode(connection.src.nodeId)!.id)
             },
             target: {
               key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId)!)
+              node: this.getNode(this.getEditorNode(connection.target.nodeId)!.id)
             }
           }))
       }), {})
@@ -125,11 +125,11 @@ class Translator {
             id: connection.id,
             src: {
               key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId)!)
+              node: this.getNode(this.getEditorNode(connection.src.nodeId)!.id)
             },
             target: {
               key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId)!)
+              node: this.getNode(this.getEditorNode(connection.target.nodeId)!.id)
             }
           }))
       }), {})
@@ -147,7 +147,21 @@ class Translator {
   }
 
   @transformer
-  getNode(editorNode: Editor.Node): Node {
+  getNode(editorNodeId: number): Node {
+    const editorNode = this.getEditorNode(editorNodeId)
+    if (!editorNode) {
+      return {
+        id: editorNodeId,
+        type: 'NodeNotFound',
+        module: 'Error',
+        params: {},
+        connections: {
+          input: {},
+          output: {}
+        }
+      }
+    }
+
     const getInputs = () => this.getInputs(editorNode.id)
     const getOutputs = () => this.getOutputs(editorNode.id)
     const getParams = () => this.getParams(editorNode.id)

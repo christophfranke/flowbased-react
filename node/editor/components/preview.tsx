@@ -35,7 +35,7 @@ class Preview extends React.Component<Props> {
       .filter(node => graphStorage.context.modules[node.module]
         && graphStorage.editorModules[node.module].EditorNode[node.type].options
         && graphStorage.editorModules[node.module].EditorNode[node.type].options!.includes('side-effect'))
-      .map(node => autorun(() => value(this.translator.getNode(node), graphStorage.scope, 'output')))
+      .map(node => autorun(() => value(this.translator.getNode(node.id), graphStorage.scope, 'output')))
   }
 
   componentWillUnmount() {
@@ -44,7 +44,7 @@ class Preview extends React.Component<Props> {
 
   render() {
     if (this.preview) {
-      const root = this.translator.getNode(this.preview) 
+      const root = this.translator.getNode(this.preview.id)
            
       return <React.Fragment>
         {value(root, graphStorage.scope, 'output')}

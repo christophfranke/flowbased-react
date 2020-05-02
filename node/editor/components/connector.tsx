@@ -76,7 +76,7 @@ class ConnectorView extends React.Component<Props> {
 
   @computed get expectedType(): ValueType {
     const editorNode = this.props.connector.group.ports.node
-    const node = this.store.translated.getNode(editorNode)
+    const node = this.store.translated.getNode(editorNode.id)
     if (this.props.connector.group.function === 'output') {
       return deliveredType(node, this.props.connector.group.key, this.store.context)
     }
@@ -90,7 +90,7 @@ class ConnectorView extends React.Component<Props> {
 
   @computed get type(): ValueType {
     const editorNode = this.props.connector.group.ports.node
-    const node = this.store.translated.getNode(editorNode)
+    const node = this.store.translated.getNode(editorNode.id)
     if (this.props.connector.group.function === 'output') {
       return deliveredType(node, this.props.connector.group.key, this.store.context)
     }
@@ -101,7 +101,7 @@ class ConnectorView extends React.Component<Props> {
         if (connector) {
           const node = connector.group.ports.node        
           return deliveredType(
-            this.store.translated.getNode(node),
+            this.store.translated.getNode(node.id),
             connector.group.key,
             this.store.context
            )
