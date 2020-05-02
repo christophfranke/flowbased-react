@@ -39,9 +39,16 @@ class LivePreview extends React.Component {
   }
 
   render() {
-    return this.store
-      ? <Preview store={this.store} />
-      : <div>Initializing live preview...</div>
+    const nameOverlay = <div style={{ position: 'fixed', right: '1vw', top: '1vw', fontSize: '16px', color: 'white', padding: '5px 10px', backgroundColor: 'rgba(25, 25, 25, 0.6)', borderRadius: '8px', border: '1px solid white', pointerEvents: 'none' }}>
+      {this.store ? this.store.name : ''}
+    </div>
+
+    return <React.Fragment>
+      {nameOverlay}
+      {this.store
+        ? <Preview store={this.store} />
+        : <div>Initializing live preview...</div>}
+    </React.Fragment>
   }
 }
 

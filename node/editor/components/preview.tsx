@@ -43,20 +43,15 @@ class Preview extends React.Component<Props> {
   }
 
   render() {
-    const nameOverlay = <div style={{ position: 'fixed', right: '1vw', top: '1vw', fontSize: '16px', color: 'white', padding: '5px 10px', backgroundColor: 'rgba(25, 25, 25, 0.6)', borderRadius: '8px', border: '1px solid white', pointerEvents: 'none' }}>
-      {this.store.name}
-    </div>
     if (this.preview) {
       const root = this.translator.getNode(this.preview.id)
            
       return <React.Fragment>
-        {nameOverlay}
         {value(root, graphStorage.scope, 'output')}
       </React.Fragment>
     }
 
     return <div ref={this.ref}>
-      {nameOverlay}
       Create a Preview node to see a preview
     </div>
   }
