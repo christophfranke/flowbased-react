@@ -1,0 +1,25 @@
+@import 'styles/default.scss';
+
+body {
+  font-family: 'Noto Sans', sans serif;
+  background-color: rgba(35, 35, 35, 1);
+}
+
+button {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 30px 60px;
+  border-radius: 8px;
+  border: 1px solid white;
+  cursor: pointer;
+  font-size: 35px;
+  background-color: transparent;
+  color: white;
+
+  &:hover {
+    background-color: white;
+    color: black;
+  }
+}

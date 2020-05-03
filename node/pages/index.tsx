@@ -2,12 +2,12 @@ import React from 'react'
 import fetch from 'isomorphic-fetch'
 import Link from 'next/link'
 
+import './index.scss'
 
 const Home = () => {
-  const buttonClasses = "p-5 my-3 mx-10 border border-black"
-  return <div className="text-center flex justify-center flex-col content-center w-screen h-screen">
+  return <div>
     <Link href="/editor">
-      <a className={buttonClasses}>Start Editor</a>
+      <button>Start Editor</button>
     </Link>
   </div>
 }
