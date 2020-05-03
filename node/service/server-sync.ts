@@ -1,6 +1,7 @@
 import { observable, reaction, IReactionDisposer, runInAction } from 'mobx'
 import graphStorage from '@service/graph-storage'
 import Store from '@editor/store'
+import fetch from 'isomorphic-fetch'
 
 const isServer = typeof window === 'undefined'
 const base = isServer
@@ -73,7 +74,7 @@ class ServerSync {
   }
 
   async delete(id: string) {
-    const result = await fetch(`/api/documents/${id}`, {
+    const result = await fetch(`${base}/api/documents/${id}`, {
       method: 'DELETE',
     })
   }
