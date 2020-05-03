@@ -43,6 +43,7 @@ class EditorLoad extends React.Component<Props> {
   async componentDidUpdate(prevProps) {
     if (prevProps.id !== this.props.id) {
       this.localStorageSync.setStoreId(this.props.id)
+      await this.serverSync.load(this.props.id)
     }
   }
 
@@ -54,6 +55,8 @@ class EditorLoad extends React.Component<Props> {
 
     this.serverSync = new ServerSync()
     this.serverSync.enableSaving()
+
+    this.serverSync.load(this.props.id)
   }
 
   componentWillUnmount() {

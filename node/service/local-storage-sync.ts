@@ -16,7 +16,7 @@ class LocalStorageSync {
         window.localStorage.setItem(id, JSON.stringify(store.data))
       })
     }, {
-      // autosave once per 100ms
+      // autosave maximum once per 100ms
       delay: 100
     })
   }
@@ -44,7 +44,7 @@ class LocalStorageSync {
         store.fillWithData(data)
       })
     } catch(e) {
-      // anything can happen
+      // do not care about malformed storage keys
     }
   }
 

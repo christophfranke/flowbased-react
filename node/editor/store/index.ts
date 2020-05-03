@@ -99,12 +99,12 @@ class Store {
     // this.nodes = this.nodes.filter(node => validIds.includes(node.id))
     runInAction(() => {    
       if (data.version > this.version) {
-        console.log('filled with', data.version)
+        console.log('filled with', this.name, data.version)
         this.nodes = data.nodes || []
         this.connections = data.connections || []
         this.currentHighZ = data.currentHighZ || 1
         this.name = data.name || ''   
-        this.version = data.version - 1 || 0
+        this.version = data.version - 1 || -1
       }
     })
   }
