@@ -118,8 +118,8 @@ class ConnectionPath extends React.Component<Props> {
 
     if (this.diff) {
       const distance = LA.distance(this.diff)
-      const middle1 = LA.scale(distance / 2, this.srcDirection)
-      const middle2 = LA.madd(this.diff, distance / 2, this.targetDirection)
+      const middle1 = LA.scale(0.6 * distance, this.srcDirection)
+      const middle2 = LA.madd(this.diff, 0.6 * distance, this.targetDirection)
 
       const v2 = middle1
       const v3 = middle2
