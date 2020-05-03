@@ -264,7 +264,7 @@ class NodeView extends React.Component<Props> {
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gridArea: 'actions' }}>
             {this.ports.output.side.map(group => <ConnectorGroup key={group.key} group={group} />)}
           </div>
-          <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseOver={this.handleCloseMouseOver} onMouseOut={this.handleCloseMouseOut}>
+          <svg onClick={this.handleDelete} style={closeStyle} width="24" height="24" viewBox="0 0 24 24" onMouseEnter={this.handleCloseMouseOver} onMouseLeave={this.handleCloseMouseOut}>
             <use xlinkHref="/icons/close.svg#close" />
           </svg>
           <div style={{ gridArea: 'params', textAlign: 'center' }}>
