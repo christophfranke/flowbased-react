@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer, Provider } from 'mobx-react'
-import { observable, computed, autorun, IReactionDisposer } from 'mobx'
+import { observable, computed } from 'mobx'
 import fetch from 'isomorphic-fetch'
 
 import EditorView from '@editor/components/view'
@@ -11,6 +11,7 @@ import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
 import loadDependencies from '@service/load-dependencies'
 import LocalStorageSync from '@service/local-storage-sync'
+import ServerSync from '@service/server-sync'
 
 import './editor.scss'
 
@@ -23,56 +24,43 @@ interface Props {
 
 @observer
 class EditorLoad extends React.Component<Props> {
-  sync: LocalStorageSync
   static async getInitialProps(ctx) {
-    const id = ctx.query.id
-    // const data = isServer 
-    //   ? await loadDependencies(id)
-    //   : {}
-
     return {
-      id,
-      // data
+      id: ctx.query.id
     }
   }
 
-  constructor(props) {
-    super(props)
-    // graphStorage.fillWithData(props.data)
-  }
-
-  async componentDidUpdate(prevProps) {
-    if (prevProps.id !== this.props.id) {
-      this.sync.setStoreId(this.props.id)
-      // await this.saveGraph(prevProps.id)
-      // const data = await loadDependencies(this.props.id)
-      // graphStorage.fillWithData(data)
-    }
-  }
-
-  disposers: IReactionDisposer[] = []
-  componentDidMount() {
-    this.sync = new LocalStorageSync()
-    this.sync.enableSending()
-    this.sync.enableReceiving()
-    this.sync.setStoreId(this.props.id)
-  }
-
-  componentWillUnmount() {
-    this.sync.disableSending()
-    this.sync.disableReceiving()
-  }
-
+  localStorageSync: LocalStorageSync
+  serverSync: ServerSync
   @computed get store(): Store | undefined {
     return graphStorage.stores[this.props.id]
   }
 
   @computed get graphName(): string {
-    const result = (this.store || { name: '' }).name
-    return result
+    return (this.store || { name: '' }).name
   }
 
-  @observable documentBrowserKey = 1
+  async componentDidUpdate(prevProps) {
+    if (prevProps.id !== this.props.id) {
+      this.localStorageSync.setStoreId(this.props.id)
+    }
+  }
+
+  componentDidMount() {
+    this.localStorageSync = new LocalStorageSync()
+    this.localStorageSync.enableSending()
+    this.localStorageSync.enableReceiving()
+    this.localStorageSync.setStoreId(this.props.id)
+
+    this.serverSync = new ServerSync()
+    this.serverSync.enableSaving()
+  }
+
+  componentWillUnmount() {
+    this.localStorageSync.disableSending()
+    this.localStorageSync.disableReceiving()
+    this.serverSync.disableSaving()
+  }
 
   changeGraphName = (e) => {
     if (this.store) {
@@ -84,16 +72,6 @@ class EditorLoad extends React.Component<Props> {
     await this.deleteGraph()
   }
 
-  clickSave = async () => {
-    await this.saveGraph(this.props.id)
-    this.documentBrowserKey += 1
-  }
-
-  blurGraphname = async () => {
-    await this.saveGraph(this.props.id)
-    this.documentBrowserKey += 1
-  }
-
   async deleteGraph() {
     if (this.props.id) {
       const result = await fetch(`/api/documents/${this.props.id}`, {
@@ -101,17 +79,6 @@ class EditorLoad extends React.Component<Props> {
       })
 
       delete graphStorage.stores[this.props.id]
-      this.documentBrowserKey += 1
-    }
-  }
-
-  async saveGraph(id: string) {
-    const store = graphStorage.stores[id]
-    if (store) {
-      await fetch(`/api/documents/${id}`, {
-        method: 'POST',
-        body: JSON.stringify(store.data)
-      })
     }
   }
 
@@ -146,8 +113,8 @@ class EditorLoad extends React.Component<Props> {
           <h2 style={{ fontSize: '24px' }}>Loading...</h2>
         </div>}
       </Viewport>
-      <DocumentBrowser selectedId={this.props.id} documentsKey={this.documentBrowserKey} />
-      <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} onBlur={this.blurGraphname} />
+      <DocumentBrowser selectedId={this.props.id} />
+      <input value={this.graphName} style={graphNameStyle} onChange={this.changeGraphName} />
       <div style={{ position: 'fixed', top: '1vw', right: '1vw', display: 'flex', flexDirection: 'column' }}>
         <button disabled={!this.store} onClick={this.clickDelete} style={buttonStyles}>
           Delete Graph

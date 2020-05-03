@@ -6,18 +6,25 @@ class ServerSync {
   disposer: IReactionDisposer
 
   enableSaving() {
+    console.log('enabled saving')
     this.disposer = reaction(() => {
       return Object.values(graphStorage.stores).map(store => store.version)
     },
     () => {
-      console.log('should save to server now')
+      return Promise.all(Object.entries(graphStorage.stores).map(([id, store]) => {
+        console.log('saving', store.name, store.version)
+        return fetch(`/api/documents/${id}`, {
+          method: 'POST',
+          body: JSON.stringify(store.data)
+        })
+      }))
     }, {
-      // autosave once per minute
-      delay: 60000
+      // autosave once per second
+      delay: 1000
     })
   }
 
-  disableSending() {
+  disableSaving() {
     if (this.disposer) {
       this.disposer()
     }

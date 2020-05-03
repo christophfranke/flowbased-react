@@ -13,7 +13,6 @@ import graphStorage from '@service/graph-storage'
 
 interface Props {
   selectedId: string
-  documentsKey: number
 }
 
 @observer
@@ -39,10 +38,7 @@ class EditorLoad extends React.Component<Props> {
   }
 
   componentDidMount() {
-    autorun(() => {
-      const id = this.props.documentsKey
-      this.fetchData()
-    })
+    this.fetchData()
   }
 
   render() {
