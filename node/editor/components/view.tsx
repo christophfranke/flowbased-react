@@ -291,8 +291,6 @@ class EditorView extends React.Component<Props> {
         el.select()
         document.execCommand('copy')
         document.body.removeChild(el)
-
-        console.log('copied', obj)
       }, 0)
     } else {
       this.timeoutId = null
@@ -332,15 +330,14 @@ class EditorView extends React.Component<Props> {
           })
         }
       }
-
-      console.log('pasted', data)
     } catch(e) {
       // ignore invalid clipboard content
     }
   }
 
   handleCut = e => {
-    console.log('cut', e)
+    this.handleCopy(e)
+    this.store.deleteNodes(this.store.selectedNodes)
   }
 
   componentDidMount() {
