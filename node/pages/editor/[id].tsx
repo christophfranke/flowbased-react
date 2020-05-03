@@ -9,7 +9,6 @@ import DocumentBrowser from '@components/document-browser'
 
 import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
-import loadDependencies from '@service/load-dependencies'
 import LocalStorageSync from '@service/local-storage-sync'
 import ServerSync from '@service/server-sync'
 

@@ -7,7 +7,6 @@ import Store from '@editor/store'
 import Preview from '@editor/components/preview'
 
 import graphStorage from '@service/graph-storage'
-import loadDependencies from '@service/load-dependencies'
 import LocalStorageSync from '@service/local-storage-sync'
 
 

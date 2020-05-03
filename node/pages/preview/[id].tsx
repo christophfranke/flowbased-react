@@ -4,7 +4,7 @@ import { observer } from 'mobx-react'
 import Preview from '@editor/components/preview'
 
 import graphStorage from '@service/graph-storage'
-import loadDependencies from '@service/load-dependencies'
+import ServerSync from '@service/server-sync'
 
 
 interface Props {
@@ -16,11 +16,13 @@ interface Props {
 class PagePreview extends React.Component<Props> {
   static async getInitialProps(ctx) {
     const id = ctx.query.id
-    const data = await loadDependencies(id)
+
+    const serverSync = new ServerSync()
+    await serverSync.load(id)
 
     return {
       id,
-      data
+      data: graphStorage.data
     }
   }
 

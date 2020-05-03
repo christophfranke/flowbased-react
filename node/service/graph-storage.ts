@@ -53,6 +53,13 @@ class GraphStorage {
     defines: []
   }
 
+  @computed get data() {
+    return Object.entries(this.stores).reduce((obj, [id, store]) => ({
+      ...obj,
+      [id]: store.data
+    }), {})
+  }
+
   @computed get editorModules(): { [key: string]: Editor.Module } {
     return Object.entries(this.stores).reduce((obj, [key, store]) => ({
       ...obj,
@@ -83,13 +90,13 @@ class GraphStorage {
     }
   }
 
-  fillWithData(data) {
-    Object.entries(data).forEach(([id, data]) => {
+  fillWithData(storesData) {
+    Object.entries(storesData).forEach(([id, data]) => {
       if (!this.stores[id]) {
-        this.stores[id] = Store.createFromData(data)
-      } else {
-        this.stores[id].fillWithData(data)
+        this.stores[id] = new Store()
       }
+
+      this.stores[id].fillWithData(data)
     })
   }
 }
