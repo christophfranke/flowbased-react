@@ -12,7 +12,7 @@ import Store from '@editor/store'
 import graphStorage from '@service/graph-storage'
 
 interface Props {
-  selectedId: string
+  selectedId: string | null
 }
 
 @observer

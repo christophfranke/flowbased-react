@@ -7,7 +7,7 @@ import './index.scss'
 const Home = () => {
   return <div>
     <Link href="/editor">
-      <button>Start Editor</button>
+      <button className="start-button">Start Editor</button>
     </Link>
   </div>
 }
