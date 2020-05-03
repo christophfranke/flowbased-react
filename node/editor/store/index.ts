@@ -83,20 +83,6 @@ class Store {
   }
 
   fillWithData(data) {
-    // does not seem to be necessary to do this slow kind of patch here
-    // data.nodes.forEach(newNode => {
-    //   const original = this.getNodeById(newNode.id)
-    //   if (original) {
-    //     original.module = newNode.module
-    //     original.type = newNode.type
-    //     original.position = newNode.position
-    //     original.zIndex = newNode.zIndex
-    //   } else {
-    //     this.nodes.push(newNode)
-    //   }
-    // })
-    // const validIds = data.nodes.map(node => node.id)
-    // this.nodes = this.nodes.filter(node => validIds.includes(node.id))
     runInAction(() => {    
       if (data.version > this.version) {
         console.log('filled with', this.name, data.version)

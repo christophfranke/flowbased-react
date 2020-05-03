@@ -32,6 +32,13 @@ class EditorLoad extends React.Component<Props> {
     this.fetchData()
   }
 
+  name(document): string {
+    return (graphStorage.stores[document._id]
+        && graphStorage.stores[document._id].name)
+      || document.name
+      || 'Unnamed'
+  }
+
   async fetchData() {
     const result = await fetch('/api/documents')
     graphStorage.documents = await result.json()
@@ -62,7 +69,7 @@ class EditorLoad extends React.Component<Props> {
       <div style={{ padding: '10px 0 0 10px' }}>
         {graphStorage.documents.map(document =>
           <Link key={document._id} href='/editor/[id]' as={`/editor/${document._id}`}>
-            <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{document.name || 'Unnamed'}</div>
+            <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{this.name(document)}</div>
           </Link>)}
         <div style={{ ...linkStyle, marginTop: '8px' }} onClick={this.addDocument}>Create new Graph</div>
       </div>
