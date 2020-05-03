@@ -69,6 +69,7 @@ export default class NodeFunctions {
           this.store.context)
 
         return Object.keys(definition.type.output || {})
+          .filter(key => !this.store.connector.hasConnectorOption(node, 'output', key, 'hidden'))
           .some(key => canMatch(
             deliveredType(translated, key, this.store.context),
             pendingType,
@@ -83,6 +84,7 @@ export default class NodeFunctions {
           this.store.context)
 
         return Object.keys(definition.type.input || {})
+          .filter(key => !this.store.connector.hasConnectorOption(node, 'input', key, 'hidden'))
           .some(key => canMatch(
             pendingType,
             expectedType(translated, key, this.store.context),
