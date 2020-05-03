@@ -34,7 +34,7 @@ class Tag extends React.Component<RenderProps> {
     const TagName = sanitize(props.params['tag'])
     const tagProps = {
       ...(props.properties.props || {}),
-      style: transformStyles(props.properties.style),
+      style: transformStyles(props.properties.style || {}),
       ...(this.props.listeners || {})
     }
     if (props.properties.classList) {
