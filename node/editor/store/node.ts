@@ -1,6 +1,8 @@
 import { computed, observable } from 'mobx'
 import { Node, Vector, EditorDefinition } from '@editor/types'
 
+import { expectedType, deliveredType, nodeDefinition } from '@engine/render'
+import { canMatch } from '@engine/type-functions'
 import { flatten } from '@engine/util'
 import Store from '@editor/store'
 
@@ -33,6 +35,7 @@ export default class NodeFunctions {
             moduleName: definitions.name,
             create: position => this.createNode(position, module, type)
           }))))
+          .filter(item => this.canConnectPending(item))
 
     return list.sort((a, b) => {
       if (a.module === b.module) {
@@ -40,6 +43,54 @@ export default class NodeFunctions {
       }
       return a.module < b.module ? -1 : 1
     })
+  }
+
+  canConnectPending(nodeListItem: NodeListItem): boolean {
+    const node = this.createNodeData({ x: 0, y: 0 }, nodeListItem.module, nodeListItem.type)
+    const translated = {
+      ...node,
+      params: node.params.reduce((obj, param) => ({
+        ...obj,
+        [param.key]: param.value
+      }), {}),
+      connections: {
+        input: {},
+        output: {}
+      }
+    }
+
+    if (this.store.pendingConnector) {
+      const definition = nodeDefinition(node, this.store.context)
+
+      if (this.store.pendingConnector.group.function === 'input') {
+        const pendingType = expectedType(
+          this.store.translated.getNode(this.store.pendingConnector.group.ports.node.id),
+          this.store.pendingConnector.group.key,
+          this.store.context)
+
+        return Object.keys(definition.type.output || {})
+          .some(key => canMatch(
+            deliveredType(translated, key, this.store.context),
+            pendingType,
+            this.store.context
+          ))
+      }
+
+      if (this.store.pendingConnector.group.function === 'output') {
+        const pendingType = deliveredType(
+          this.store.translated.getNode(this.store.pendingConnector.group.ports.node.id),
+          this.store.pendingConnector.group.key,
+          this.store.context)
+
+        return Object.keys(definition.type.input || {})
+          .some(key => canMatch(
+            pendingType,
+            expectedType(translated, key, this.store.context),
+            this.store.context
+          ))
+      }
+    }
+    return true
   }
 
   createNodeData(position: Vector, module: string, name: string): Node {
