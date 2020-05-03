@@ -1,4 +1,4 @@
-import { computed } from 'mobx'
+import { computed, observable } from 'mobx'
 import { Node, Vector, EditorDefinition } from '@editor/types'
 
 import { flatten } from '@engine/util'
@@ -43,16 +43,16 @@ export default class NodeFunctions {
   }
 
 
-  createNode(position: Vector, module: string, name: string) {
+  createNode(position: Vector, module: string, name: string): Node {
     const editorDefinition = this.store.editorDefinition({ type: name, module })
 
-    const node: Node = {
+    const node: Node = observable({
       ...editorDefinition.create(),
       module,
       zIndex: 1,
       id: this.store.uid(),
       position
-    }
+    })
 
     if (editorDefinition.options && editorDefinition.options.includes('singleton')) {
       const singletonNodes = this.store.nodes.filter(node => node.type === name)
@@ -60,5 +60,7 @@ export default class NodeFunctions {
     }
 
     this.store.nodes.push(node)
+
+    return node
   }
 }

@@ -13,7 +13,7 @@ class ServerSync {
   disposer: IReactionDisposer
 
   enableSaving() {
-    console.log('enabled saving')
+    // console.log('enabled autosave')
     this.disposer = reaction(() => {
       return Object.values(graphStorage.stores).map(store => store.version)
     },
@@ -21,7 +21,7 @@ class ServerSync {
       return Promise.all(Object.entries(graphStorage.stores)
         .filter(([id, store]) => store.version > 0)
         .map(([id, store]) => {
-          console.log('saving', store.name, store.version)
+          // console.log('saving', store.name, store.version)
           return fetch(`/api/documents/${id}`, {
             method: 'POST',
             body: JSON.stringify(store.data)
@@ -43,7 +43,7 @@ class ServerSync {
   async fetchOnce(id: string) {
     if (!this.fetched[id]) {
       this.fetched[id] = true
-      console.log('fetching', id)
+      // console.log('fetching', id)
 
       const url = `${base}/api/documents/${id}`
       const result = await fetch(url)

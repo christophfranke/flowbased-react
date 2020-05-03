@@ -69,7 +69,7 @@ class Store {
     },
     () => {
       this.version += 1
-      console.log('new version', this.version)
+      // console.log('new version', this.version)
     }, {
       delay: 50
     })
@@ -85,7 +85,7 @@ class Store {
   fillWithData(data) {
     runInAction(() => {    
       if (data.version > this.version) {
-        console.log('filled with data', data.name, data.version)
+        // console.log('filled with data', data.name, data.version)
         this.nodes = data.nodes || []
         this.connections = data.connections || []
         this.currentHighZ = data.currentHighZ || 1
@@ -97,6 +97,38 @@ class Store {
 
   uid(): number {
     return Math.random()
+  }
+
+  @action
+  copyNode(oldNode: Node): Node {
+    const newNode = this.node.createNode(oldNode.position, oldNode.module, oldNode.type)
+    newNode.params.forEach((newParam, index) => {
+      const originalParam = oldNode.params.find(oldParam => oldParam.key === newParam.key)
+      if (originalParam) {
+        newNode.params[index].value = originalParam.value
+      }
+    })
+
+    return newNode
+  }
+
+  @action
+  copyConnection(connection: Connection, srcId: number, targetId: number) {
+    const newConnection: Connection = observable({
+      id: this.uid(),
+      src: {
+        ...connection.src
+      },
+      target: {
+        ...connection.target
+      }
+    })
+
+    newConnection.src.nodeId = srcId
+    newConnection.target.nodeId = targetId
+
+    this.connections.push(newConnection)
+    return newConnection
   }
 
   @transformer

@@ -21,6 +21,9 @@ import TextlistInput from '@editor/components/input/textlist'
 import TextpairsInput from '@editor/components/input/textpairs'
 
 
+const TREE_SELECT_MODIFIER = 'Control'
+const COPY_MODIFIER = 'Alt'
+
 interface Props {
   node: Node
 }
@@ -41,8 +44,7 @@ class NodeView extends React.Component<Props> {
     return this.props.node.params
   }
 
-  offset: Vector
-  relativePositions: {
+  dragOffsets: {
     [id: number]: Vector
   }
 
@@ -86,7 +88,7 @@ class NodeView extends React.Component<Props> {
   @action
   handleSelection() {
     const keys = this.props['keys']
-    const relevantNodes = keys.Control
+    const relevantNodes = keys[TREE_SELECT_MODIFIER]
       ? this.store.getSubtree(this.props.node)
       : [this.props.node]
 
@@ -114,22 +116,44 @@ class NodeView extends React.Component<Props> {
 
   @action
   startDrag(position: Vector) {
-    this.offset = LA.subtract(position, this.props.node.position)
-    this.relativePositions = this.store.selectedNodes
-      .filter(node => node !== this.props.node)
+    if (this.props['keys'][COPY_MODIFIER]) {
+      // copy nodes and keep track of their original
+      const copiedNodeMap = this.store.selectedNodes
+        .reduce((obj, oldNode) => ({
+          ...obj,
+          [oldNode.id]: this.store.copyNode(oldNode)
+        }), {})
+
+      // copy connections
+      const selectedIds = this.store.selectedNodes.map(node => node.id)
+      this.store.connections
+        .filter(connection => selectedIds.includes(connection.src.nodeId)
+          && selectedIds.includes(connection.target.nodeId))
+        .forEach(connection => {
+          this.store.copyConnection(
+            connection,
+            copiedNodeMap[connection.src.nodeId].id,
+            copiedNodeMap[connection.target.nodeId].id
+          )
+        })
+
+      // select new nodes
+      this.store.selectNodes(Object.values(copiedNodeMap))
+    }
+
+    this.dragOffsets = this.store.selectedNodes
       .reduce((obj, node) => ({
         ...obj,
-        [node.id]: LA.subtract(node.position, this.props.node.position)
+        [node.id]: LA.subtract(position, node.position)
       }), {})
   }
 
   @action
   moveDrag(position: Vector) {
-    this.props.node.position = LA.subtract(position, this.offset)
-    Object.entries(this.relativePositions).forEach(([id, position]) => {
+    Object.entries(this.dragOffsets).forEach(([id, offset]) => {
       const node = this.store.getNodeById(Number(id))
       if (node) {
-        node.position = LA.add(position, this.props.node.position)
+        node.position = LA.subtract(position, offset)
       }
     })
   }
