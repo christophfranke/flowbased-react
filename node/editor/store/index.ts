@@ -85,7 +85,7 @@ class Store {
   fillWithData(data) {
     runInAction(() => {    
       if (data.version > this.version) {
-        console.log('filled with', this.name, data.version)
+        console.log('filled with data', data.name, data.version)
         this.nodes = data.nodes || []
         this.connections = data.connections || []
         this.currentHighZ = data.currentHighZ || 1
