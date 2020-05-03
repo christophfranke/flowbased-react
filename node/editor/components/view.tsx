@@ -279,6 +279,70 @@ class EditorView extends React.Component<Props> {
     }
   }
 
+  timeoutId: any
+  copyObject(e, obj) {
+    if (!this.timeoutId) {
+      this.timeoutId = setTimeout(() => {
+        const el = document.createElement('textarea')
+
+        el.value = JSON.stringify(obj)
+
+        document.body.appendChild(el)
+        el.select()
+        document.execCommand('copy')
+        document.body.removeChild(el)
+
+        console.log('copied', obj)
+      }, 0)
+    } else {
+      this.timeoutId = null
+    }
+  }
+
+  handleCopy = e => {
+    const selectedIds = this.store.selectedNodes.map(node => node.id)
+    const connections = this.store.connections
+        .filter(connection => selectedIds.includes(connection.src.nodeId)
+          && selectedIds.includes(connection.target.nodeId))
+
+    this.copyObject(e, {
+      nodes: this.store.selectedNodes,
+      connections
+    })
+  }
+
+  handlePaste = e => {
+    const content = e.clipboardData.getData('text')
+    try {
+      const data = JSON.parse(content)
+      if (data.nodes) {
+        const copiedNodeMap = data.nodes
+          .reduce((obj, oldNode) => ({
+            ...obj,
+            [oldNode.id]: this.store.copyNode(oldNode)
+          }), {})
+
+        if (data.connections) {
+          data.connections.forEach(connection => {
+            this.store.copyConnection(
+              connection,
+              copiedNodeMap[connection.src.nodeId].id,
+              copiedNodeMap[connection.target.nodeId].id
+            )
+          })
+        }
+      }
+
+      console.log('pasted', data)
+    } catch(e) {
+      // ignore invalid clipboard content
+    }
+  }
+
+  handleCut = e => {
+    console.log('cut', e)
+  }
+
   componentDidMount() {
     this.updateDimensions()
     window.addEventListener('contextmenu', this.preventDefault)
@@ -287,6 +351,9 @@ class EditorView extends React.Component<Props> {
     window.addEventListener('keydown', this.handleKeydown)
     window.addEventListener('keyup', this.handleKeyup)
     window.addEventListener('keypress', this.handleKeypress)
+    window.addEventListener('copy', this.handleCopy)
+    window.addEventListener('paste', this.handlePaste)
+    window.addEventListener('cut', this.handleCut)
     this.dispose = autorun(this.selectWithRectangle)
   }
 
@@ -297,6 +364,9 @@ class EditorView extends React.Component<Props> {
     window.removeEventListener('keydown', this.handleKeydown)
     window.removeEventListener('keyup', this.handleKeyup)
     window.removeEventListener('keypress', this.handleKeypress)
+    window.removeEventListener('copy', this.handleCopy)
+    window.removeEventListener('paste', this.handlePaste)
+    window.removeEventListener('cut', this.handleCut)
     this.dispose()
   }
 

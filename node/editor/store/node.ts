@@ -42,18 +42,22 @@ export default class NodeFunctions {
     })
   }
 
-
-  createNode(position: Vector, module: string, name: string): Node {
+  createNodeData(position: Vector, module: string, name: string): Node {
     const editorDefinition = this.store.editorDefinition({ type: name, module })
 
-    const node: Node = observable({
+    return {
       ...editorDefinition.create(),
       module,
       zIndex: 1,
       id: this.store.uid(),
       position
-    })
+    }
+  }
 
+  createNode(position: Vector, module: string, name: string): Node {
+    const node = observable(this.createNodeData(position, module, name))
+
+    const editorDefinition = this.store.editorDefinition({ type: name, module })
     if (editorDefinition.options && editorDefinition.options.includes('singleton')) {
       const singletonNodes = this.store.nodes.filter(node => node.type === name)
       this.store.deleteNodes(singletonNodes)
