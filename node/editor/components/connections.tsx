@@ -118,8 +118,12 @@ class ConnectionPath extends React.Component<Props> {
 
     if (this.diff) {
       const distance = LA.distance(this.diff)
-      const middle1 = LA.scale(0.6 * distance, this.srcDirection)
-      const middle2 = LA.madd(this.diff, 0.6 * distance, this.targetDirection)
+      const controlPointFactor = {
+        [BEZIER_STYLE]: Math.min(0.6 * distance, 300),
+        [LINE_STYLE]: 40
+      }[CONNECTION_STYLE]
+      const middle1 = LA.scale(controlPointFactor, this.srcDirection)
+      const middle2 = LA.madd(this.diff, controlPointFactor, this.targetDirection)
 
       const v2 = middle1
       const v3 = middle2
@@ -129,7 +133,7 @@ class ConnectionPath extends React.Component<Props> {
       this.currentDiff = this.diff
       this.currentD = {
         [BEZIER_STYLE]: `M0 0 C${v2.x} ${v2.y} ${v3.x} ${v3.y} ${v4.x} ${v4.y}`,
-        [LINE_STYLE]: `M0 0 L${v4.x} ${v4.y}`
+        [LINE_STYLE]: `M0 0 L${v2.x} ${v2.y} L${v3.x} ${v3.y} L${v4.x} ${v4.y}`
       }[CONNECTION_STYLE]
 
       return this.currentD
