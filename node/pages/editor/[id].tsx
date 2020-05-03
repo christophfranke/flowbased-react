@@ -2,6 +2,7 @@ import React from 'react'
 import { observer, Provider } from 'mobx-react'
 import { observable, computed } from 'mobx'
 import fetch from 'isomorphic-fetch'
+import Router from 'next/router'
 
 import EditorView from '@editor/components/view'
 import Viewport from '@editor/components/viewport'
@@ -75,13 +76,10 @@ class EditorLoad extends React.Component<Props> {
   }
 
   async deleteGraph() {
-    if (this.props.id) {
-      const result = await fetch(`/api/documents/${this.props.id}`, {
-        method: 'DELETE',
-      })
-
-      delete graphStorage.stores[this.props.id]
-    }
+    this.localStorageSync.delete(this.props.id)
+    this.serverSync.delete(this.props.id)
+    delete graphStorage.stores[this.props.id]
+    Router.push('/editor')
   }
 
   render() {

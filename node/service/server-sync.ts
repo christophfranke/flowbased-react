@@ -70,19 +70,12 @@ class ServerSync {
   async load(id: string) {
     this.fetched = {}
     await this.fetchOnce(id)
+  }
 
-    // const resolveNodes = nextId => Promise.all<any>(data[nextId].nodes.map(node => {
-    //   if (!graphStorage.modules[node.module] && !data[node.module]) {
-    //     return cachedFetchStore(node.module).then(result => {
-    //       data[node.module] = result
-    //       return resolveNodes(node.module)
-    //     })
-    //   }
-    //   return Promise.resolve()
-    // }))
-
-    // await resolveNodes(id)
-    // return data    
+  async delete(id: string) {
+    const result = await fetch(`/api/documents/${id}`, {
+      method: 'DELETE',
+    })
   }
 }
 

@@ -67,6 +67,10 @@ class LocalStorageSync {
   setStoreId(id: string) {
     window.localStorage.setItem('selectedStoreId', id)
   }
+
+  delete(id: string) {
+    window.localStorage.removeItem(id);
+  }
 }
 
 
