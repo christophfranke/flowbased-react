@@ -20,6 +20,13 @@ const sanitize = tag => {
 }
 const isValid = tag => !!tag
 
+const transformStyleKey = key => key.toLowerCase().replace(/-[a-z]/g, match => match[1].toUpperCase())
+const transformStyles = styles =>
+  Object.entries(styles).reduce((obj, [key, value]) => ({
+    ...obj,
+    [transformStyleKey(key)]: value
+  }), {})
+
 @observer
 class Tag extends React.Component<RenderProps> {
   render() {
@@ -27,7 +34,7 @@ class Tag extends React.Component<RenderProps> {
     const TagName = sanitize(props.params['tag'])
     const tagProps = {
       ...(props.properties.props || {}),
-      style: props.properties.style,
+      style: transformStyles(props.properties.style),
       ...(this.props.listeners || {})
     }
     if (props.properties.classList) {
