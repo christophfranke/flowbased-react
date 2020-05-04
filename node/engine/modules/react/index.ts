@@ -45,7 +45,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       output: {
         output: () => Type.Element.create(),
         events: (node: Engine.Node, context: Engine.Context) =>
-          context.modules.Event.Type.Event.create()
+          context.modules.Event.Type.EventEmitter.create()
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) =>

@@ -18,13 +18,14 @@ export function colorOfType(type: ValueType): ColorMap {
     Pair: 'primitive',
     Array: 'complex',
     Object: 'complex',
+    EventData: 'complex',
     Unresolved: 'unresolved',
     Element: 'render',
     Null: 'unknown',
     Unknown: 'unknown',
     Mismatch: 'error',
     Trigger: 'trigger',
-    Event: 'trigger'
+    EventEmitter: 'trigger'
   }[type.name]
 
   if (!key) {

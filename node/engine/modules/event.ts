@@ -10,7 +10,7 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 export const Dependencies = ['Core']
 
 export const name = 'Event'
-export type Nodes = 'Listener' | 'TriggerValue'
+export type Nodes = 'Listener' | 'TriggerValue' | 'ChangeArgument' | 'UseArgument'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Listener: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
@@ -38,7 +38,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
               scope.locals[node.id].unsubscribe = emitter.subscribe(
                 eventName,
                 (e) => {
-                  scope.locals[node.id].listeners.forEach(fn => fn(eventName))          
+                  scope.locals[node.id].listeners.forEach(fn => fn(e))          
                 }
               )
 
@@ -61,11 +61,11 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
-          Type.Trigger.create(context.modules.Core.Type.Null.create())
+          Type.Trigger.create(Type.EventData.create())
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          return Type.Event.create()
+          return Type.EventEmitter.create()
         }
       }
     }
@@ -92,6 +92,84 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         value: (node: Engine.Node, context: Engine.Context) => {
           const nodeType = deliveredType(node, 'output', context)
           return nodeType.params.argument || context.modules.Core.Type.Unresolved.create()
+        }
+      }
+    }
+  },
+  ChangeArgument: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      return scope.locals.ChangeArgument
+        ? scope.locals.ChangeArgument
+        : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
+    },
+    type: {
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => {
+          return Type.Trigger.create(deliveredType(node, 'output', context))
+        }
+      },
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => {
+          const inputType = inputTypeAt(node, 'input', context)
+          if (inputType.name === 'Unresolved') {
+            return inputType
+          }
+
+          if (inputType.name !== 'Trigger') {
+            return context.modules.Core.Type.Mismatch.create(`Expected type Trigger, got ${inputType.name}`)
+          }
+
+          return inputType.params.argument
+        }
+      }
+    }
+  },
+  UseArgument: {    
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const changeArgumentNode = match(node,
+        candidate => candidate.type === 'ChangeArgument',
+        candidate => candidate.type === 'UseArgument')
+
+      if (changeArgumentNode) {
+        const triggerValue = inputValueAt(changeArgumentNode, 'input', scope)
+
+        return {
+          subscribe: (fn) => triggerValue.subscribe(
+            (e) => {
+              const newScope = {
+                ...scope,
+                locals: {
+                  ...scope.locals,
+                  ChangeArgument: e
+                }
+              }
+
+              return fn(inputValueAt(node, 'input', newScope))
+            }
+          )
+        }
+      }
+
+      return createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
+    },
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => {
+          return Type.Trigger.create(inputTypeAt(node, 'input', context))
+        }
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) => {
+          const outputType = deliveredType(node, 'output', context)
+          if (outputType.name === 'Unresolved') {
+            return outputType
+          }
+
+          if (outputType.name !== 'Trigger') {
+            return context.modules.Core.Type.Mismatch.create(`Expected type Trigger, got ${outputType.name}`)
+          }
+
+          return outputType.params.argument
         }
       }
     }
@@ -155,10 +233,42 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'TriggerValue',
       params: [],
     })    
+  },
+  ChangeArgument: {
+    name: 'Change Argument',
+    type: 'ChangeArgument',
+    documentation: {
+      explanation: ''
+    },
+    ports: {
+      input: {
+        input: ['side']
+      }
+    },
+    create: () => ({
+      type: 'ChangeArgument',
+      params: []
+    })
+  },
+  UseArgument: {
+    name: 'Use Argument',
+    type: 'UseArgument',
+    documentation: {
+      explanation: ''
+    },
+    ports: {
+      output: {
+        output: ['side']
+      }
+    },
+    create: () => ({
+      type: 'UseArgument',
+      params: []
+    })
   }
 }
 
-export type Types = 'Trigger' | 'Event'
+export type Types = 'Trigger' | 'EventData' | 'EventEmitter'
 export const Type: Engine.ModuleTypes<Types> = {
   Trigger: {
     create: (argument: Engine.ValueType) => ({
@@ -175,10 +285,10 @@ export const Type: Engine.ModuleTypes<Types> = {
     test: (value, type: Engine.ValueType, context: Engine.Context) =>
       value && value.subscribe && typeof value.subscribe === 'function'
   },
-  Event: {
+  EventEmitter: {
     create: () => ({
-      display: 'Event',
-      name: 'Event',
+      display: 'EventEmitter',
+      name: 'EventEmitter',
       module: 'Event',
       params: {}
     }),
@@ -187,4 +297,18 @@ export const Type: Engine.ModuleTypes<Types> = {
     }),
     test: (value, type: Engine.ValueType, context: Engine.Context) =>
       value && value.subscribe && typeof value.subscribe === 'function'
-  },}
+  },
+  EventData: {
+    create: () => ({
+      display: 'EventData',
+      name: 'EventData',
+      module: 'Event',
+      params: {}
+    }),
+    emptyValue: () => ({}),
+    test: (value, type: Engine.ValueType, context: Engine.Context) => {
+      console.warn('Testing for EventData type is not implemented yet and will always return true')
+      return true
+    }
+  }
+}

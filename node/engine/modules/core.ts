@@ -1,3 +1,5 @@
+import { toJS } from 'mobx'
+
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
@@ -109,7 +111,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Log: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       inputs(node).forEach(port => {
-        console.log('Log:', value(port.node, scope, port.key))
+        console.log('Log:', toJS(value(port.node, scope, port.key)))
       })
     },
     type: {    
