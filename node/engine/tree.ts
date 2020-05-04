@@ -16,27 +16,48 @@ export function children(node: Node): Node[] {
 
 type Condition = (node: Node) => boolean
 export function filteredSubForest(root: Node, condition: Condition): NodeForest {
-  if (condition(root)) {
-    return [{
-      node: root,
-      children: flatten(children(root).map(child => filteredSubForest(child, condition)))
-    }]
+  const visited = {}
+
+  const recursion = root => {
+    visited[root.id] = true
+    if (condition(root)) {
+      return [{
+        node: root,
+        children: flatten(children(root)
+          .filter(child => !visited[child.id])
+          .map(child => recursion(child)))
+      }]
+    }
+
+    return flatten(children(root)
+      .filter(child => !visited[child.id])
+      .map(child => recursion(child)))
   }
 
-  return flatten(children(root).map(child => filteredSubForest(child, condition)))
+  return recursion(root)
 }
 
 // same as filteredSubForest, but does not recurse
 // into children of nodes the satisfy the condition
 export function flatFilteredSubForest(root: Node, condition: Condition): NodeForest {
-  if (condition(root)) {
-    return [{
-      node: root,
-      children: []
-    }]
+  const visited = {}
+
+  const recursion = root => {
+    visited[root.id] = true
+    if (condition(root)) {
+      return [{
+        node: root,
+        children: []
+      }]
+    }
+
+    return flatten(
+      children(root)
+        .filter(child => !visited[child.id])
+        .map(child => recursion(child)))
   }
 
-  return flatten(children(root).map(child => filteredSubForest(child, condition)))
+  return recursion(root)
 }
 
 export const match = function(node: Node, flattener: Condition, deepener: Condition, depth = 0): Node | undefined {

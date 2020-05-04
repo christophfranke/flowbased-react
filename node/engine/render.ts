@@ -56,6 +56,8 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
   )
 })
 
+const increasingIterators = ['Items', 'ChangeArgument']
+const decreasingIterators = ['Collect', 'UseArgument']
 export const numIterators = computedFunction(function (node: Node): number {
   const visited = {}
 
@@ -68,7 +70,7 @@ export const numIterators = computedFunction(function (node: Node): number {
         0
       )
 
-    return (current.type === 'Items' ? 1 : 0) + (current.type === 'Collect' ? -1 : 0) + max
+    return (increasingIterators.includes(current.type) ? 1 : 0) + (decreasingIterators.includes(current.type) ? -1 : 0) + max
   }
 
   return iteratorsOfChildren(node)
