@@ -66,30 +66,35 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         return createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
       }
 
-      const newScope = {
-        ...scope,
-        context: {
-          ...scope.context,
-          types: {
-            ...scope.context.types,
-            [define.id]: deliveredType(node, 'output', scope.context),
-            input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
-              ...obj,
-              [key]: intersectAll(
-                group.map(con => deliveredType(con.src.node, con.src.key, scope.context)),
-                scope.context
-              )
-            }), {})
+      if (!scope.locals[node.id]) {      
+        scope.locals[node.id] = {
+          scope: {
+            ...scope,
+            context: {
+              ...scope.context,
+              types: {
+                ...scope.context.types,
+                [define.id]: deliveredType(node, 'output', scope.context),
+                input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
+                  ...obj,
+                  [key]: intersectAll(
+                    group.map(con => deliveredType(con.src.node, con.src.key, scope.context)),
+                    scope.context
+                  )
+                }), {})
+              }
+            },
+            parent: scope,
+            locals: {
+              ...scope.locals,
+              input: node.connections.input
+            }
           }
-        },
-        parent: scope,
-        locals: {
-          ...scope.locals,
-          input: node.connections.input
         }
       }
 
-      return value(define, newScope, 'output')
+
+      return value(define, scope.locals[node.id].scope, 'output')
     },
     type: {
       output: {
