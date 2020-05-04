@@ -133,12 +133,13 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     name: 'Trigger Value',
     type: 'TriggerValue',
     documentation: {
-      explanation: 'Listens for events',
+      explanation: 'Takes a trigger and sets its value. Whenever the trigger is triggered, the value input will be evaluated and transmitted with the trigger.',
       input: {
-        input: 'An event emitter to listen to'
+        value: 'The value that will be transmitted.',
+        trigger: 'A trigger that pushes this trigger. Its value will be discarded.'
       },
       output: {
-        output: 'A trigger to trigger side effects'
+        output: 'The new transformed trigger with the new value.'
       }
     },
     ports: {
