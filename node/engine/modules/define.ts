@@ -2,7 +2,7 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, deliveredType, inputValueAt, inputTypeAt } from '@engine/render'
-import { inputs } from '@engine/tree'
+import { inputs, findChild } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core', 'Array']
@@ -72,7 +72,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     }
   },
   Proxy: {
-    value: (node: Engine.Node, scope: Engine.Scope) => {
+    value: (node: Engine.Node, scope: Engine.Scope, key: string) => {
       const define = scope.context.defines
         .find(other => other.id === Number(node.params.define))
 
@@ -107,8 +107,14 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         }
       }
 
+      if (key === 'output') {
+        return value(define, scope.locals[node.id].scope, 'output')
+      }
 
-      return value(define, scope.locals[node.id].scope, 'output')
+      const output = findChild(define, candidate => candidate.type === 'Output' && candidate.params.name === key)
+      if (output) {
+        return value(output, scope.locals[node.id].scope, 'output')
+      }
     },
     type: {
       output: {

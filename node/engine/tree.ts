@@ -60,6 +60,15 @@ export function flatFilteredSubForest(root: Node, condition: Condition): NodeFor
   return recursion(root)
 }
 
+export function findChild(root: Node, condition: Condition): Node | null {
+  const forest = flatFilteredSubForest(root, condition)
+  if (forest.length > 0) {
+    return forest[0].node
+  }
+
+  return null
+}
+
 export const match = function(node: Node, flattener: Condition, deepener: Condition, depth = 0): Node | undefined {
   const newDepth = depth + (flattener(node) ? -1 : 0) + (deepener(node) ? 1 : 0)
 

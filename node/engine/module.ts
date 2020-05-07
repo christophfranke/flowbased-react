@@ -44,8 +44,8 @@ export function module(name: string, defines: Node[]): Module {
     Node: defines.reduce((obj: ModuleNodes<string>, define: Node): ModuleNodes<string> => ({
       ...obj,
       [`define-${define.id}`]: {
-        value: (node: Node, scope: Scope) => {
-          return scope.context.modules.Define.Node.Proxy.value(node, scope, 'output')
+        value: (node: Node, scope: Scope, key: string) => {
+          return scope.context.modules.Define.Node.Proxy.value(node, scope, key)
         },
         type: {
           get output() {
