@@ -10,7 +10,7 @@ export function isGeneric(name: string): boolean {
   return !['Output', 'EventEmitter', 'EventData', 'Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
 }
 
-export function contains(type: ValueType, name: string): boolean {  
+export function contains(type: ValueType, name: string): boolean {
   if (type.name === name) {
     return true
   }

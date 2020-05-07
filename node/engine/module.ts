@@ -54,7 +54,7 @@ export function module(name: string, defines: Node[]): Module {
             return forest.reduce((obj, output) => ({
               ...obj,
               [output.node.params.name]: (node: Node, context: Context) => {
-                return context.modules.Core.Type.Unresolved.create()
+                return deliveredType(output.node, 'output', context)
               }
             }), {
               output: (node: Node, context: Context) => {
