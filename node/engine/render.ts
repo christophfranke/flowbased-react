@@ -7,7 +7,9 @@ import { matchInto, unionAll, createEmptyValue } from '@engine/type-functions'
 
 export const nodeDefinition = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition {
   return context.modules[node.module]
-    ? context.modules[node.module].Node[node.type]
+    ? (context.modules[node.module].Node[node.type]
+      ? context.modules[node.module].Node[node.type]
+      : context.modules.Error.Node.NodeNotFound)
     : context.modules.Error.Node.ModuleNotFound
 })
 
@@ -27,6 +29,10 @@ export const inputTypeAt = computedFunction(function(node: Node, key: string, co
   return input
     ? deliveredType(input.node, input.key, context)
     : context.modules.Core.Type.Unresolved.create()
+})
+
+export const inputTypesAt = computedFunction(function(node: Node, key: string, context: Context): any {
+  return inputsAt(node, key).map(input => deliveredType(input.node, input.key, context))
 })
 
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {

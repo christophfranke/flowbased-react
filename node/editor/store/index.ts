@@ -137,6 +137,10 @@ class Store {
       console.warn('cannot find module', node.module, 'in', this.modules)
       return this.modules.Error.EditorNode.ModuleNotFound
     }
+    if (!this.modules[node.module].EditorNode[node.type]) {
+      return this.modules.Error.EditorNode.NodeNotFound
+    }
+
     return this.modules[node.module].EditorNode[node.type]
   }
 

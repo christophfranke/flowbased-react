@@ -3,7 +3,7 @@ import * as Editor from '@editor/types'
 
 import { observable, autorun, runInAction } from 'mobx'
 
-import { value, deliveredType, inputValueAt, inputValuesAt } from '@engine/render'
+import { value, deliveredType, inputValueAt, inputValuesAt, inputTypeAt, inputTypesAt } from '@engine/render'
 import { inputs, match } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -40,14 +40,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          const setConnection = node.connections.input.set && node.connections.input.set[0]
-          const initialConnection = node.connections.input.initialValue && node.connections.input.initialValue[0]
-          const setType = setConnection
-            ? deliveredType(setConnection.src.node, setConnection.src.key, context)
-            : context.modules.Core.Type.Unresolved.create()
-          const initialType = initialConnection
-            ? deliveredType(initialConnection.src.node, initialConnection.src.key, context)
-            : context.modules.Core.Type.Unresolved.create()
+          const setType = intersectAll(inputTypesAt(node, 'set', context), context)
+          const initialType = inputTypeAt(node, 'initialValue', context)
 
           return intersectAll(
             [initialType, setType.name === 'Unresolved'
