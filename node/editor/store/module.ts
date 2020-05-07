@@ -26,6 +26,14 @@ export function module(name: string, defines: Engine.Node[]): Editor.Module {
                   (input.node.params.side ? ['side'] : [])
                   .concat(input.node.params.duplicate ? ['duplicate'] : [])
               }), {})
+            },
+            get output() {
+              const forest = filteredSubForest(define, candidate => candidate.type === 'Output')
+              return forest.reduce((obj, output) => ({
+                ...obj,
+                [output.node.params.name]:
+                  (output.node.params.side ? ['side'] : [])
+              }), {})
             }
           },
           create: () => ({

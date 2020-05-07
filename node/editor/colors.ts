@@ -22,6 +22,7 @@ export function colorOfType(type: ValueType): ColorMap {
     Unresolved: 'unresolved',
     Element: 'render',
     Null: 'unknown',
+    Output: 'unknown',
     Unknown: 'unknown',
     Mismatch: 'error',
     Trigger: 'trigger',

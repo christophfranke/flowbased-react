@@ -2,11 +2,11 @@ import { Node, Port } from '@engine/types'
 import { computedFunction } from '@engine/util'
 import { unique, flatten } from '@engine/util'
 
-interface NodeTree {
+export interface NodeTree {
   node: Node,
   children: NodeTree[]
 }
-type NodeForest = NodeTree[]
+export type NodeForest = NodeTree[]
 
 export function children(node: Node): Node[] {
   return unique(

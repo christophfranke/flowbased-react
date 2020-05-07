@@ -1,31 +1,28 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, deliveredType } from '@engine/render'
+import { value, deliveredType, inputValueAt, inputTypeAt } from '@engine/render'
 import { inputs } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
 
 export const Dependencies = ['Core', 'Array']
 
 export const name = 'Define'
-export type Nodes = 'Define' | 'Proxy' | 'Input'
+export type Nodes = 'Define' | 'Proxy' | 'Input' | 'Output'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Define: {
-    value: (node: Engine.Node, scope: Engine.Scope) => {
-      const input = inputs(node)[0]
-      return input
-        ? value(input.node, scope, input.key)
-        : createEmptyValue(scope.context.modules.Core.Type.Unresolved.create(), scope.context)
-    },
+    value: (node: Engine.Node, scope: Engine.Scope) =>
+      inputValueAt(node, 'input', scope),
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => intersectAll(
-          inputs(node).map(src => deliveredType(src.node, src.key, context)),
-          context
-        )
+        output: (node: Engine.Node, context: Engine.Context) => 
+          inputTypeAt(node, 'input', context)
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => deliveredType(node, 'output', context)
+        input: (node: Engine.Node, context: Engine.Context) =>
+          deliveredType(node, 'output', context),
+        outputs: (node: Engine.Node, context: Engine.Context) =>
+          Type.Output.create(context.modules.Core.Type.Unresolved.create())
       }
     }
   },
@@ -54,6 +51,23 @@ export const Node: Engine.ModuleNodes<Nodes> = {
             ? context.modules.Array.Type.Array.create(inputType)
             : inputType
         }
+      }
+    }
+  },
+  Output: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      return inputValueAt(node, 'input', scope)
+    },
+    type: {
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Core.Type.Unresolved.create()
+      },
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) =>
+          inputTypeAt(node, 'input', context),
+        define: (node: Engine.Node, context: Engine.Context) =>
+          Type.Output.create(inputTypeAt(node, 'input', context))
       }
     }
   },
@@ -125,7 +139,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   }
 }
 
-export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
+export const EditorNode: Editor.ModuleNodes<'Define' | 'Input' | 'Output'> = {
   Define: {
     name: 'Define',
     type: 'Define',
@@ -141,6 +155,9 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
     ports: {
       output: {
         output: ['hidden']
+      },
+      input: {
+        outputs: ['side', 'duplicate']
       }
     },
     create: () => ({
@@ -186,8 +203,55 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input'> = {
         type: 'checkbox'
       }],
     })
+  },
+  Output: {
+    name: 'Output',
+    type: 'Output',
+    ports: {
+      output: {
+        output: ['hidden']
+      }
+    },
+    documentation: {
+      explanation: 'Defines an output to a node type defined using the *Define* node.',
+      input: {
+        input: 'This value will be send to the output.'
+      },
+      params: {
+        name: 'The name of the output. Warning: If you change this, any connections to this output may be dangling and eventually lost.',
+        side: 'Wether the input will appear on the side or at the top of the node.',
+      }
+    },
+    create: () => ({
+      type: 'Output',
+      params: [{
+        name: 'Name',
+        key: 'name',
+        value: 'side',
+        type: 'text'
+      }, {
+        name: 'Side',
+        key: 'side',
+        value: false,
+        type: 'checkbox'
+      }],
+    })
   }
 }
 
-export type Types = never
-export const Type: Engine.ModuleTypes<Types> = {}
+export type Types = 'Output'
+export const Type: Engine.ModuleTypes<Types> = {
+  Output: {
+    create: (value: Engine.ValueType) => ({
+      display: 'Output <{value}>',
+      name: 'Output',
+      module: 'Define',
+      params: {
+        // TODO: Fix types
+        // value
+      }
+    }),
+    emptyValue: () => undefined,
+    test: value => true
+  },
+}

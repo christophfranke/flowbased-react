@@ -13,10 +13,11 @@ export interface Module {
 export interface NodeDefinition {
   type: {
     input?: {
-      [key: string]: TypeResolver,
+      [key: string]: TypeResolver
     },
-    output?: {
-      [key: string]: TypeResolver,
+    output: {
+      output: TypeResolver
+      [key: string]: TypeResolver
     },
   },
   context?: ContextResolver
