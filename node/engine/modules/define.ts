@@ -173,6 +173,11 @@ export const EditorNode: Editor.ModuleNodes<'Define' | 'Input' | 'Output'> = {
         key: 'name',
         value: '',
         type: 'text'
+      }, {
+        name: 'Side Output',
+        key: 'side',
+        value: false,
+        type: 'checkbox'
       }],
     })    
   },

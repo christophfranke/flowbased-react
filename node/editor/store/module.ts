@@ -33,7 +33,9 @@ export function module(name: string, defines: Engine.Node[]): Editor.Module {
                 ...obj,
                 [output.node.params.name]:
                   (output.node.params.side ? ['side'] : [])
-              }), {})
+              }), {
+                output: define.params.side ? ['side'] : []
+              })
             }
           },
           create: () => ({
