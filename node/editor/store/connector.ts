@@ -275,7 +275,7 @@ export default class ConnectorFunctions {
 
     const destNode = this.store.translated.getNode(dest.id)
     const dependingChildrenIterator = node => children(node)
-      .map(child => flatFilteredSubForest(child, candidate => candidate.type === 'Items'))
+      .map(child => flatFilteredSubForest(child, candidate => ['Items', 'ChangeArgument'].includes(candidate.type)))
       .filter(forest => forest.length > 0)
       .map(forest => forest.find(tree => tree.node))
       .map(tree => tree && tree.node)
@@ -286,7 +286,7 @@ export default class ConnectorFunctions {
       return true
     }
 
-    const dependingIterator = node => flatFilteredSubForest(node, candidate => candidate.type === 'Items')
+    const dependingIterator = node => flatFilteredSubForest(node, candidate => ['Items', 'ChangeArgument'].includes(candidate.type))
       .find(tree => tree.node)!.node
     const dependingSrc = dependingIterator(this.store.translated.getNode(src.id))
     if (dependingSrc && dependingDest.id === dependingSrc.id) {

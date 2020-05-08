@@ -259,6 +259,9 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
     ports: {
       output: {
         output: ['side']
+      },
+      input: {
+        input: ['allow-loops']
       }
     },
     create: () => ({
