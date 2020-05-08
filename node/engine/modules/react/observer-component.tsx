@@ -17,6 +17,48 @@ const combineFn = <A, B>(functions: Func<A, B>[]): Func<A, B[]> =>
 const HOC = (Component, scope: Scope, node: Node) => {
   @observer
   class RenderComponent extends React.Component {
+    @observable children
+    @observable properties
+    @observable listeners
+
+    constructor(props) {
+      super(props)
+
+      // children
+      autorun(() => {
+        this.children = node.connections.input.input
+          ? node.connections.input.input
+            .map(input => this.getChild(input.src))
+          : []
+      })
+
+      // properties
+      autorun(() => {
+        this.properties = Object.keys(node.connections.input)
+          .filter(key => key !== 'input')
+          .reduce((obj, key) => ({
+            ...obj,
+            [key]: node.connections.input[key].length > 0
+              ? value(
+                node.connections.input[key][0].src.node,
+                scope,
+                node.connections.input[key][0].src.key)
+              : null
+          }), {})
+      })
+
+      // listeners
+      autorun(() => {
+        const locals = scope.locals[node.id] as TagLocals
+        this.listeners = locals
+          ? Object.entries(locals.listeners).reduce((obj, [name, listeners]) => ({
+            ...obj,
+            [`on${name.charAt(0).toUpperCase()}${name.slice(1)}`]: combineFn(listeners)
+          }), {})
+          : {}        
+      })
+    }
+
     @transformer
     getChild(input: Port) {
       const result = value(input.node, scope, input.key)
@@ -29,37 +71,6 @@ const HOC = (Component, scope: Scope, node: Node) => {
       }
 
       return result
-    }
-
-    @computed get children() {
-      return node.connections.input.input
-        ? node.connections.input.input
-          .map(input => this.getChild(input.src))
-        : []
-    }
-
-    @computed get properties() {
-      return Object.keys(node.connections.input)
-        .filter(key => key !== 'input')
-        .reduce((obj, key) => ({
-          ...obj,
-          [key]: node.connections.input[key].length > 0
-            ? value(
-              node.connections.input[key][0].src.node,
-              scope,
-              node.connections.input[key][0].src.key)
-            : null
-        }), {})
-    }
-
-    @computed get listeners() {
-      const locals = scope.locals[node.id] as TagLocals
-      return (locals)
-        ? Object.entries(locals.listeners).reduce((obj, [name, listeners]) => ({
-          ...obj,
-          [`on${name.charAt(0).toUpperCase()}${name.slice(1)}`]: combineFn(listeners)
-        }), {})
-        : {}
     }
 
 

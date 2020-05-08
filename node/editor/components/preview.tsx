@@ -2,7 +2,8 @@ import React from 'react'
 import { observable, computed, autorun, IReactionDisposer } from 'mobx'
 import { observer, inject } from 'mobx-react'
 
-import { Node, Connection } from '@editor/types'
+import * as Editor from '@editor/types'
+import * as Engine from '@engine/types'
 import Translator from '@engine/translator'
 
 import { value } from '@engine/render'
@@ -11,8 +12,8 @@ import graphStorage from '@service/graph-storage'
 interface Props {
   store: {
     name: string
-    nodes: Node[]
-    connections: Connection[]
+    nodes: Editor.Node[]
+    connections: Editor.Connection[]
   }
 }
 
@@ -22,8 +23,15 @@ class Preview extends React.Component<Props> {
   ref = React.createRef<HTMLDivElement>()
   dispose: IReactionDisposer[] = []
   translator = new Translator(this.store)
+  @observable value: any
 
-  @computed get preview(): Node | undefined {
+  @computed get root(): Engine.Node | undefined {
+    return this.preview
+      ? this.translator.getNode(this.preview.id)
+      : undefined
+  }
+
+  @computed get preview(): Editor.Node | undefined {
     return this.store.nodes.find(node => node.type === 'Preview')
   }
 
@@ -34,6 +42,12 @@ class Preview extends React.Component<Props> {
         && graphStorage.editorModules[node.module].EditorNode[node.type].options
         && graphStorage.editorModules[node.module].EditorNode[node.type].options!.includes('side-effect'))
       .map(node => autorun(() => value(this.translator.getNode(node.id), graphStorage.scope, 'output')))
+
+    autorun(() => {
+      this.value = this.root
+        ? value(this.root, graphStorage.scope, 'output')
+        : null
+    })
   }
 
   componentWillUnmount() {
@@ -42,10 +56,8 @@ class Preview extends React.Component<Props> {
 
   render() {
     if (this.preview) {
-      const root = this.translator.getNode(this.preview.id)
-           
       return <React.Fragment>
-        {value(root, graphStorage.scope, 'output')}
+        {this.value}
       </React.Fragment>
     }
 
