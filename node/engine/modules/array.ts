@@ -1,7 +1,9 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, deliveredType } from '@engine/render'
+import { autorun, observable, runInAction } from 'mobx'
+
+import { value, deliveredType, inputValueAt } from '@engine/render'
 import { inputs, firstInput, match } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
 
@@ -65,26 +67,38 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   },
   Collect: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
-      const itemsNode = match(node,
+      const items = match(node,
         candidate => candidate.type === 'Items',
         candidate => candidate.type === 'Collect')
 
-      if (itemsNode) {
-        const itemsInput = firstInput(itemsNode)
-        const array = itemsInput
-          ? value(itemsInput.node, scope, itemsInput.key)
-          : []
+      if (items) {
+        if (!scope.locals[items.id]) {
+          scope.locals[items.id] = observable({
+            scopes: []
+          })
 
-        const scopes = array.map(item => ({
-          ...scope,
-          parent: scope,
-          locals: {
-            ...scope.locals,
-            item
-          }
-        }))
+          autorun(() => {
+            const array = inputValueAt(items, 'input', scope)
 
-        return scopes.map(childScope => value(firstInput(node)!.node, childScope, firstInput(node)!.key))
+            runInAction(() => {
+              scope.locals[items.id].scopes = array.map(item => ({
+                context: scope.context,
+                get parent() {
+                  return scope
+                },
+                get locals() {
+                  return {
+                    ...scope.locals,
+                    item
+                  }
+                }
+              }))
+            })
+          })
+        }
+
+        return scope.locals[items.id].scopes
+          .map(childScope => inputValueAt(node, 'input', childScope))
       }
 
       return []
