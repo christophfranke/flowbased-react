@@ -69,11 +69,11 @@ export function findChild(root: Node, condition: Condition): Node | null {
   return null
 }
 
-export const match = function(root: Node, flattener: Condition, deepener: Condition, initialDepth = 0): Node | undefined {
+export const match = computedFunction(function(root: Node, flattener: Condition, deepener: Condition): Node | undefined {
   const visited = {}
 
   const recursion = (node, depth) => {
-    visited[root.id] = true
+    visited[node.id] = true
     const newDepth = depth + (flattener(node) ? -1 : 0) + (deepener(node) ? 1 : 0)
 
     if (newDepth === 0) {
@@ -85,8 +85,8 @@ export const match = function(root: Node, flattener: Condition, deepener: Condit
       .map(child => recursion(child, newDepth)).find(result => result)
   }
 
-  return recursion(root, initialDepth)
-}
+  return recursion(root, 0)
+})
 
 export const allOutputs = computedFunction(function(node: Node): Port[] {
   return flatten(Object.values(node.connections.output)
