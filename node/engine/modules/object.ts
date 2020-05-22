@@ -2,8 +2,9 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
 import { value, deliveredType } from '@engine/render'
+import { unique } from '@engine/util'
 import { inputs } from '@engine/tree'
-import { intersectAll, createEmptyValue, testValue } from '@engine/type-functions'
+import { intersectAll, createEmptyValue, testValue, union } from '@engine/type-functions'
 
 
 export const Dependencies = ['Core']
@@ -188,6 +189,27 @@ export const Type: Engine.ModuleTypes<Types> = {
     test: (value, type: Engine.ValueType, context: Engine.Context) => {
       return !Array.isArray(value) && typeof value === 'object'
         && Object.entries(type.params).every(([key, param]) => testValue(value[key], param, context))
+    },
+    combine: {
+      union: (src: Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
+        const srcParams = Object.keys(src.params)
+        const targetParams = Object.keys(target.params)
+        const keys = unique(srcParams.concat(targetParams))
+
+        const params = keys.map(key => ({
+          key,
+          type: union(
+            src.params[key] || context.modules.Core.Type.Unresolved.create(),
+            target.params[key] || context.modules.Core.Type.Unresolved.create(),
+            context
+          )
+        })).reduce((obj, { key, type }) => ({
+          ...obj,
+          [key]: type
+        }), {})
+
+        return context.modules.Object.Type.Object.create(params)        
+      }
     }
   },
   Pair: {

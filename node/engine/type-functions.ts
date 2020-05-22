@@ -1,13 +1,13 @@
 import React from 'react'
 import { ValueType, Context } from '@engine/types'
 
-import { expectedType } from '@engine/render'
+import { expectedType, typeDefinition } from '@engine/render'
 import { unique } from '@engine/util'
 
 import * as Core from '@engine/modules/core'
 
 export function isGeneric(name: string): boolean {
-  return !['Output', 'EventEmitter', 'EventData', 'Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
+  return !['EventEmitter', 'EventData', 'Mismatch', 'String', 'Number', 'Boolean', 'Unresolved', 'Element', 'Null', 'Unknown'].includes(name)
 }
 
 export function contains(type: ValueType, name: string): boolean {
@@ -71,55 +71,63 @@ function matchBasic(src: ValueType, target: ValueType, context: Context): ValueT
   return null
 }
 
-export function unionAll(types: ValueType[], context: Context): ValueType {
-  return types.reduce((result, type) => union(type, result, context), context.modules.Core.Type.Unresolved.create())
-}
-export function union(src: ValueType, target: ValueType, context: Context): ValueType {
-  const basicMatch = matchBasic(src, target, context)
-  if (basicMatch) {
-    return basicMatch
+export function combine(src: ValueType, target: ValueType, context: Context, method: string): ValueType {
+  if (!src) {
+    console.warn('no src type')
+  }
+  if (!target) {
+    console.warn('no target type')
+  }
+
+  if (!src || !target) {
+    console.warn('returned Unresolved')
+    return context.modules.Core.Type.Unresolved.create()
+  }
+
+  if (src.name === 'Mismatch' && target.name === 'Mismatch') {
+    const msg = src.params.msg.display === target.params.msg.display
+      ? src.params.msg.display
+      : `${src.params.msg.display} and ${target.params.msg.display}`
+    return Core.Type.Mismatch.create(msg)
+  }
+
+  if (src.name === 'Unresolved') {
+    return target
+  }
+  if (target.name === 'Unresolved') {
+    return src
+  }
+
+  if (src.name === 'Mismatch') {
+    return src
+  }
+  if (target.name === 'Mismatch') {
+    return target
   }
 
   if (src.name === target.name && src.module === target.module) {
-    const name = src.name
-    const module = src.module
-
-    if (name === 'Array' && module === 'Array') {
-      return context.modules.Array.Type.Array.create(union(src.params.items, target.params.items, context))
+    const definition = typeDefinition(src, context)
+    if (definition.combine && definition.combine[method]) {
+      return definition.combine[method](src, target, context)
     }
 
-    if (name === 'Trigger' && module === 'Event') {
-      return context.modules.Event.Type.Trigger.create(union(src.params.argument, target.params.argument, context))
-    }
+    const newType = definition.create()
+    Object.keys(src.params).forEach(param => {
+      newType.params[param] = combine(src.params[param], target.params[param], context, method)
+    })
 
-    if (name === 'Pair' && module === 'Object') {
-      return context.modules.Object.Type.Pair.create(union(src.params.value, target.params.value, context))
-    }
-
-    if (name === 'Object' && module === 'Object') {
-      const srcParams = Object.keys(src.params)
-      const targetParams = Object.keys(target.params)
-      const keys = unique(srcParams.concat(targetParams))
-
-      const params = keys.map(key => ({
-        key,
-        type: union(
-          src.params[key] || context.modules.Core.Type.Unresolved.create(),
-          target.params[key] || context.modules.Core.Type.Unresolved.create(),
-          context
-        )
-      })).reduce((obj, { key, type }) => ({
-        ...obj,
-        [key]: type
-      }), {})
-
-      return context.modules.Object.Type.Object.create(params)
-    }
-
-    throw new Error(`Unknown generic type ${name}`)
+    return newType
   }
 
   return context.modules.Core.Type.Mismatch.create(`${src.name} is not ${target.name}`)
+}
+
+export function unionAll(types: ValueType[], context: Context): ValueType {
+  return types.reduce((result, type) => union(type, result, context), context.modules.Core.Type.Unresolved.create())
+}
+
+export function union(src: ValueType, target: ValueType, context: Context): ValueType {
+  return combine(src, target, context, 'union')
 }
 
 export function intersectAll(types: ValueType[], context: Context): ValueType {
@@ -145,6 +153,10 @@ export function intersect(src: ValueType, target: ValueType, context: Context): 
 
     if (name === 'Pair' && module === 'Object') {
       return context.modules.Object.Type.Pair.create(intersect(src.params.value, target.params.value, context))
+    }
+
+    if (name === 'Output' && module === 'Define') {
+      return context.modules.Define.Type.Output.create(intersect(src.params.value, target.params.value, context))
     }
 
     if (name === 'Object' && module === 'Object') {
@@ -189,6 +201,10 @@ export function matchInto(src: ValueType, target: ValueType, context: Context): 
 
     if (name === 'Pair' && module === 'Object') {
       return context.modules.Object.Type.Pair.create(matchInto(src.params.value, target.params.value, context))
+    }
+
+    if (name === 'Output' && module === 'Define') {
+      return context.modules.Define.Type.Output.create(matchInto(src.params.value, target.params.value, context))
     }
 
     if (name === 'Object' && module === 'Object') {

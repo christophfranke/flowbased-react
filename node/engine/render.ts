@@ -1,5 +1,5 @@
 import React from 'react'
-import { Node, NodeIdentifier, NodeDefinition, ValueType, Scope, Context, Connection } from '@engine/types'
+import { Node, NodeIdentifier, NodeDefinition, ValueType, ValueTypeDefinition, Scope, Context, Connection } from '@engine/types'
 import { outputs, children, inputAt, inputsAt } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
@@ -11,6 +11,14 @@ export const nodeDefinition = computedFunction(function(node: NodeIdentifier, co
       ? context.modules[node.module].Node[node.type]
       : context.modules.Error.Node.NodeNotFound)
     : context.modules.Error.Node.ModuleNotFound
+})
+
+export const typeDefinition = computedFunction(function(type: ValueType, context: Context): ValueTypeDefinition<any> {
+  return context.modules[type.module]
+    ? (context.modules[type.module].Type[type.name])
+      ? context.modules[type.module].Type[type.name]
+      : context.modules.Core.Type.Unknown
+    : context.modules.Core.Type.Unknown
 })
 
 export const inputValueAt = computedFunction(function(node: Node, key: string, scope: Scope): any {
@@ -90,5 +98,5 @@ export const expectedType = computedFunction(function(target: Node, key: string,
     return definitions.type.input![key](target, context)
   }
 
-  return context.modules.Core.Type.Mismatch.create(`Connection target ${target.type}.id-${target.id} is missingn input key ${key}`)
+  return context.modules.Core.Type.Mismatch.create(`Connection target ${target.type}.id-${target.id} is missing input key ${key}`)
 })

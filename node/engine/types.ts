@@ -36,6 +36,11 @@ export interface ValueTypeDefinition<name> {
   create: (...args) => ValueTypeTemplate<name>
   emptyValue: (type: ValueType, context: Context) => any
   test: (value: any, type: ValueType, context: Context) => boolean
+  combine?: {  
+    union?: (src: ValueType, target: ValueType, context: Context) => ValueType
+    intersect?: (src: ValueType, target: ValueType, context: Context) => ValueType
+    matchInto?: (src: ValueType, target: ValueType, context: Context) => ValueType
+  }
 }
 
 export type ValueType = ValueTypeTemplate<any>

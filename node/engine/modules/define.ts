@@ -258,8 +258,7 @@ export const Type: Engine.ModuleTypes<Types> = {
       name: 'Output',
       module: 'Define',
       params: {
-        // TODO: Fix types
-        // value
+        value
       }
     }),
     emptyValue: () => undefined,
