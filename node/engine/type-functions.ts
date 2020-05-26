@@ -29,10 +29,10 @@ export function canMatch(src: ValueType, target: ValueType, context: Context): b
 
 export function combine(src: ValueType, target: ValueType, context: Context, method: string): ValueType {
   if (!src) {
-    console.warn('no src type')
+    console.warn('no src type. This is a bug in the type engine or a text programmed module.')
   }
   if (!target) {
-    console.warn('no target type')
+    console.warn('no target type. This is a bug in the type engine or a text programmed module.')
   }
 
   if (!src || !target) {
