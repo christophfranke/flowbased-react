@@ -4,7 +4,7 @@ import * as Editor from '@editor/types'
 import { value, deliveredType } from '@engine/render'
 import { unique } from '@engine/util'
 import { inputs } from '@engine/tree'
-import { intersectAll, createEmptyValue, testValue, union } from '@engine/type-functions'
+import { intersectAll, createEmptyValue, testValue, union, intersect, matchInto } from '@engine/type-functions'
 
 
 export const Dependencies = ['Core']
@@ -209,8 +209,42 @@ export const Type: Engine.ModuleTypes<Types> = {
         }), {})
 
         return context.modules.Object.Type.Object.create(params)        
+      },
+      intersect: (src: Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
+        const srcParams = Object.keys(src.params)
+        const targetParams = Object.keys(target.params)
+        const keys = srcParams.filter(key => targetParams.includes(key))
+
+        const params = keys.map(key => ({
+          key,
+          type: intersect(src.params[key], target.params[key], context)
+        })).reduce((obj, { key, type }) => ({
+          ...obj,
+          [key]: type
+        }), {})
+
+        return context.modules.Object.Type.Object.create(params)      
+      },
+      matchInto: (src:Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
+        const srcParams = Object.keys(src.params)
+        const targetParams = Object.keys(target.params)
+        const keys = unique(srcParams.concat(targetParams))
+
+        const params = keys.map(key => ({
+          key,
+          type: matchInto(
+            src.params[key] || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${key}`),
+            target.params[key] || context.modules.Core.Type.Unresolved.create(),
+            context
+          )
+        })).reduce((obj, { key, type }) => ({
+          ...obj,
+          [key]: type
+        }), {})
+
+        return context.modules.Object.Type.Object.create(params)        
       }
-    }
+    },
   },
   Pair: {
     create: (value: Engine.ValueType) => ({
