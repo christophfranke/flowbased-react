@@ -4,8 +4,16 @@ import * as Editor from '@editor/types'
 import { value, deliveredType, inputValueAt, inputValuesAt, inputTypesAt, inputTypeAt } from '@engine/render'
 import { unique } from '@engine/util'
 import { inputs } from '@engine/tree'
-import { intersectAll, createEmptyValue, testValue, union, intersect, matchInto } from '@engine/type-functions'
+import { intersectAll, unionAll, createEmptyValue, testValue, union, intersect, matchInto } from '@engine/type-functions'
 
+const isOptional = key => !!key.match(/\?$/)
+const makeOptional = key => isOptional(key)
+  ? key
+  : `${key}?`
+const makeMandatory = key => isOptional(key)
+  ? key.substring(0, key.length - 1)
+  : key
+const sanitizeKey = key => key.trim().replace(/\?$/, '')
 
 export const Dependencies = ['Core']
 
@@ -21,30 +29,34 @@ export const Node: Engine.ModuleNodes<Nodes> = {
         }), {}),
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(
-          inputTypesAt(node, 'input', context)
-          .reduce((obj, inputType) => ({
-            ...obj,
-            ...(inputType.name === 'Object'
-              ? inputType.params
-              : {})
-          }), {}))
+        output: (node: Engine.Node, context: Engine.Context) => 
+          unionAll(inputTypesAt(node, 'input', context), context)
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => Type.Object.create({})
+        input: (node: Engine.Node, context: Engine.Context) => {
+          const outputType = deliveredType(node, 'output', context)
+          return Type.Object.create(
+            Object.entries(outputType.params)
+              .filter(([key, type]) => type.name !== 'Mismatch')
+              .reduce((obj, [key, type]) => ({
+                ...obj,
+                [makeOptional(key)]: type
+              }), {})
+          )
+        }
       }
     }
   },
   Key: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
       return inputs(node).length > 0
-        ? value(inputs(node)[0].node, scope, inputs(node)[0].key)[node.params.key.trim()]
+        ? inputValueAt(node, 'input', scope)[sanitizeKey(node.params.key)]
         : createEmptyValue(deliveredType(node, 'output', scope.context), scope.context)
     },
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          if (!node.params.key.trim()) {
+          if (!sanitizeKey(node.params.key)) {
             return context.modules.Core.Type.Null.create()
           }
           const inputType = inputTypeAt(node, 'input', context)
@@ -53,8 +65,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           }
 
           if (inputType.name === 'Object') {
-            return inputType.params[node.params.key.trim()]
-              || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
+            return inputType.params[sanitizeKey(node.params.key)]
+              || context.modules.Core.Type.Unresolved.create()
           }
 
           return context.modules.Core.Type.Mismatch.create(`Expected Object, got ${inputType.name}`)
@@ -62,8 +74,8 @@ export const Node: Engine.ModuleNodes<Nodes> = {
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => Type.Object.create(
-          node.params.key.trim()
-            ? { [node.params.key.trim()]: deliveredType(node, 'output', context) }
+          sanitizeKey(node.params.key)
+            ? { [makeOptional(sanitizeKey(node.params.key))]: deliveredType(node, 'output', context) }
             : {}
         )
       }
@@ -72,27 +84,31 @@ export const Node: Engine.ModuleNodes<Nodes> = {
   Pair: {
     value: (node: Engine.Node, scope: Engine.Scope) => node.params.key.trim()
       ? {
-        [node.params.key.trim()]: inputValueAt(node, 'input', scope)
+        [sanitizeKey(node.params.key)]: inputValueAt(node, 'input', scope)
       } : {},
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
           Type.Object.create(
-            node.params.key.trim()
+            sanitizeKey(node.params.key)
             ? {
-              [node.params.key.trim()]: inputTypeAt(node, 'input', context)
+              [sanitizeKey(node.params.key)]: inputTypeAt(node, 'input', context)
             } : {}
           )
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          return context.modules.Core.Type.Unresolved.create()
-          // const nodeType = deliveredType(node, 'output', context)
-          // if (nodeType.name === 'Unresolved') {
-          //   return nodeType
-          // }
+          if (sanitizeKey(node.params.key)) {
+            const nodeType = deliveredType(node, 'output', context)
+            if (nodeType.name === 'Unresolved') {
+              return nodeType
+            }
 
-          // return deliveredType(node, 'output', context).params.value
+            return nodeType.params[sanitizeKey(node.params.key)]
+              || context.modules.Core.Type.Unresolved.create()
+          }
+
+          return context.modules.Core.Type.Unresolved.create()
         }
       }
     }
@@ -195,13 +211,16 @@ export const Type: Engine.ModuleTypes<Types> = {
       union: (src: Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
         const srcParams = Object.keys(src.params)
         const targetParams = Object.keys(target.params)
-        const keys = unique(srcParams.concat(targetParams))
+        const keys = unique(srcParams.concat(targetParams)
+          .map(key => makeMandatory(key)))
 
         const params = keys.map(key => ({
-          key,
+          key: src.params[key] || target.params[key]
+            ? key
+            : makeOptional(key),
           type: union(
-            src.params[key] || context.modules.Core.Type.Unresolved.create(),
-            target.params[key] || context.modules.Core.Type.Unresolved.create(),
+            src.params[key] || src.params[makeOptional(key)] || context.modules.Core.Type.Unresolved.create(),
+            target.params[key] || target.params[makeOptional(key)] || context.modules.Core.Type.Unresolved.create(),
             context
           )
         })).reduce((obj, { key, type }) => ({
@@ -212,13 +231,19 @@ export const Type: Engine.ModuleTypes<Types> = {
         return context.modules.Object.Type.Object.create(params)        
       },
       intersect: (src: Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
-        const srcParams = Object.keys(src.params)
-        const targetParams = Object.keys(target.params)
+        const srcParams = Object.keys(src.params).map(key => makeMandatory(key))
+        const targetParams = Object.keys(target.params).map(key => makeMandatory(key))
         const keys = srcParams.filter(key => targetParams.includes(key))
 
         const params = keys.map(key => ({
-          key,
-          type: intersect(src.params[key], target.params[key], context)
+          key: src.params[key] || target.params[key]
+            ? key
+            : makeOptional(key),
+          type: intersect(
+            src.params[key] || src.params[makeOptional(key)],
+            target.params[key] || target.params[makeOptional(key)],
+            context
+          )
         })).reduce((obj, { key, type }) => ({
           ...obj,
           [key]: type
@@ -226,22 +251,28 @@ export const Type: Engine.ModuleTypes<Types> = {
 
         return context.modules.Object.Type.Object.create(params)      
       },
-      matchInto: (src:Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
-        const srcParams = Object.keys(src.params)
-        const targetParams = Object.keys(target.params)
+      matchInto: (src: Engine.ValueType, target: Engine.ValueType, context: Engine.Context) => {
+        const srcParams = Object.keys(src.params).map(key => makeMandatory(key))
+        const targetParams = Object.keys(target.params).map(key => makeMandatory(key))
         const keys = unique(srcParams.concat(targetParams))
 
         const params = keys.map(key => ({
-          key,
+          key: src.params[key] || target.params[key]
+            ? key
+            : makeOptional(key),
           type: matchInto(
-            src.params[key] || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${key}`),
-            target.params[key] || context.modules.Core.Type.Unresolved.create(),
+            src.params[key] || (!target.params[key]
+              ? context.modules.Core.Type.Unresolved.create()
+              : context.modules.Core.Type.Mismatch.create(`Expected Object with key ${key}`)),
+            target.params[key] || target.params[makeOptional(key)] || context.modules.Core.Type.Unresolved.create(),
             context
           )
-        })).reduce((obj, { key, type }) => ({
-          ...obj,
-          [key]: type
-        }), {})
+        }))
+          // .filter(({ key }) => !isOptional(key))
+          .reduce((obj, { key, type }) => ({
+            ...obj,
+            [key]: type
+          }), {})
 
         return context.modules.Object.Type.Object.create(params)        
       }
