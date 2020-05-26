@@ -1,7 +1,7 @@
 import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 
-import { value, deliveredType } from '@engine/render'
+import { value, deliveredType, inputValueAt, inputValuesAt, inputTypesAt, inputTypeAt } from '@engine/render'
 import { unique } from '@engine/util'
 import { inputs } from '@engine/tree'
 import { intersectAll, createEmptyValue, testValue, union, intersect, matchInto } from '@engine/type-functions'
@@ -13,33 +13,25 @@ export const name = 'Object'
 export type Nodes = 'Object' | 'Pair' | 'Key'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Object: {
-    value: (node: Engine.Node, scope: Engine.Scope) => inputs(node)
-      .map(port => value(port.node, scope, port.key))
-      .filter(pair => pair.key)
-      .reduce((obj, pair) => ({
-        ...obj,
-        [pair.key.trim()]: pair.value
-      }), {}),
+    value: (node: Engine.Node, scope: Engine.Scope) =>
+      inputValuesAt(node, 'input', scope)
+        .reduce((obj, pair) => ({
+          ...obj,
+          ...pair
+        }), {}),
     type: {
       output: {
-        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(inputs(node)
-          .filter(src => src.node.params.key)
-          .map(src => ({
-            key: src.node.params.key.trim(),
-            type: deliveredType(src.node, src.key, context).params.value
-              || context.modules.Core.Type.Mismatch.create(`Expected Pair, got ${deliveredType(src.node, src.key, context).name}`)
-          }))
-          .filter(pair => pair.key)
-          .reduce((obj, pair) => ({
+        output: (node: Engine.Node, context: Engine.Context) => Type.Object.create(
+          inputTypesAt(node, 'input', context)
+          .reduce((obj, inputType) => ({
             ...obj,
-            [pair.key.trim()]: pair.type
+            ...(inputType.name === 'Object'
+              ? inputType.params
+              : {})
           }), {}))
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => Type.Pair.create(context.modules.Core.Type.Unresolved.create())
-        // input: (node, other) => other && other.params.key
-        // ? Type.Pair(type(node).params[other!.params.key.trim()])
-        // : Type.Pair(Type.Unresolved)
+        input: (node: Engine.Node, context: Engine.Context) => Type.Object.create({})
       }
     }
   },
@@ -51,47 +43,56 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     },
     type: {
       output: {
-        output: (node:Engine. Node, context: Engine.Context) => {
-          if (inputs(node).length > 0 && node.params.key) {
-            const inputType = deliveredType(inputs(node)[0].node, inputs(node)[0].key, context)
-            if (inputType.name !== 'Unresolved') {
-              return inputType.params[node.params.key.trim()]
-                || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
-            }
+        output: (node: Engine.Node, context: Engine.Context) => {
+          if (!node.params.key.trim()) {
+            return context.modules.Core.Type.Null.create()
+          }
+          const inputType = inputTypeAt(node, 'input', context)
+          if (inputType.name === 'Unresolved') {
+            return inputType
           }
 
-          return context.modules.Core.Type.Unresolved.create()
+          if (inputType.name === 'Object') {
+            return inputType.params[node.params.key.trim()]
+              || context.modules.Core.Type.Mismatch.create(`Expected Object with key ${node.params.key.trim()}`)
+          }
+
+          return context.modules.Core.Type.Mismatch.create(`Expected Object, got ${inputType.name}`)
         }
       },
       input: {
-        input: (node: Engine.Node, context: Engine.Context) => node.params.key
-          ? Type.Object.create({ [node.params.key.trim()]: deliveredType(node, 'output', context) })
-          : Type.Object.create({})
+        input: (node: Engine.Node, context: Engine.Context) => Type.Object.create(
+          node.params.key.trim()
+            ? { [node.params.key.trim()]: deliveredType(node, 'output', context) }
+            : {}
+        )
       }
     }
   },
   Pair: {
-    value: (node: Engine.Node, scope: Engine.Scope) => ({
-      key: node.params.key.trim(),
-      value: inputs(node).length > 0
-        ? value(inputs(node)[0].node, scope, inputs(node)[0].key)
-        : createEmptyValue(deliveredType(node, 'output', scope.context).params.value, scope.context)
-    }),
+    value: (node: Engine.Node, scope: Engine.Scope) => node.params.key.trim()
+      ? {
+        [node.params.key.trim()]: inputValueAt(node, 'input', scope)
+      } : {},
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) =>
-          Type.Pair.create(inputs(node).length > 0
-            ? deliveredType(inputs(node)[0].node, inputs(node)[0].key, context)
-            : context.modules.Core.Type.Unresolved.create())
+          Type.Object.create(
+            node.params.key.trim()
+            ? {
+              [node.params.key.trim()]: inputTypeAt(node, 'input', context)
+            } : {}
+          )
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
-          const nodeType = deliveredType(node, 'output', context)
-          if (nodeType.name === 'Unresolved') {
-            return nodeType
-          }
+          return context.modules.Core.Type.Unresolved.create()
+          // const nodeType = deliveredType(node, 'output', context)
+          // if (nodeType.name === 'Unresolved') {
+          //   return nodeType
+          // }
 
-          return deliveredType(node, 'output', context).params.value
+          // return deliveredType(node, 'output', context).params.value
         }
       }
     }
@@ -100,7 +101,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
 export const EditorNode: Editor.ModuleNodes<Nodes> = {
   Object: {
-    name: 'Object',
+    name: 'Merge',
     type: 'Value',
     documentation: {
       explanation: 'This node creates an *Object* value. An *Object* is a collection of key - value *Pairs*. The values can have any type (including *Object*) and may be all different. You can later use a *Key* node, to get access a value inside an object. *Objects* are useful, to bundle many values in a structured way.',
@@ -173,7 +174,7 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
   }
 }
 
-export type Types = 'Object' | 'Pair'
+export type Types = 'Object'
 export const Type: Engine.ModuleTypes<Types> = {
   Object: {
     create: (params: { [key: string]: Engine.ValueType }) => ({
@@ -245,26 +246,5 @@ export const Type: Engine.ModuleTypes<Types> = {
         return context.modules.Object.Type.Object.create(params)        
       }
     },
-  },
-  Pair: {
-    create: (value: Engine.ValueType) => ({
-      display: 'Pair<{value}>',
-      name: 'Pair',
-      module: 'Object',
-      params: {
-        value
-      }
-    }),
-    emptyValue: (type: Engine.ValueType, context: Engine.Context) => {
-      console.warn('empty pair create not implemented yet')
-      return {
-        key: '',
-        value: createEmptyValue(type, context)
-      }
-    },
-    test: (value) => {
-      console.warn('test pair is not implemented yet')
-      return true
-    }
   }
 }
