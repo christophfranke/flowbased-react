@@ -30,7 +30,7 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => 
-          unionAll(inputTypesAt(node, 'input', context), context)
+          unionAll(inputTypesAt(node, 'input', context).concat(Type.Object.create({})), context)
       },
       input: {
         input: (node: Engine.Node, context: Engine.Context) => {
