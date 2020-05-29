@@ -44,6 +44,10 @@ class EditorLoad extends React.Component<Props> {
     graphStorage.documents = await result.json()
   }
 
+  sort<T>(documents: T[]): T[] {
+    return documents.sort((a, b) => this.name(a) > this.name(b) ? 1 : -1)
+  }
+
   componentDidMount() {
     this.fetchData()
   }
@@ -67,7 +71,7 @@ class EditorLoad extends React.Component<Props> {
     return <div style={panelStyle}>
       <h2 style={{ fontSize: '20px' }}>Graphs</h2>
       <div style={{ padding: '10px 0 0 10px' }}>
-        {graphStorage.documents.map(document =>
+        {this.sort(graphStorage.documents).map(document =>
           <Link key={document._id} href='/editor/[id]' as={`/editor/${document._id}`}>
             <div style={this.props.selectedId === document._id ? selectedStyle : linkStyle}>{this.name(document)}</div>
           </Link>)}
