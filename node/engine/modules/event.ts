@@ -10,7 +10,7 @@ import { intersectAll, createEmptyValue, testValue } from '@engine/type-function
 export const Dependencies = ['Core']
 
 export const name = 'Event'
-export type Nodes = 'Listener' | 'TriggerValue' | 'ChangeArgument' | 'UseArgument'
+export type Nodes = 'Listener' | 'TriggerValue' | 'ChangeArgument' | 'UseArgument' | 'CombineTrigger'
 export const Node: Engine.ModuleNodes<Nodes> = {
   Listener: {
     value: (node: Engine.Node, scope: Engine.Scope) => {
@@ -93,6 +93,39 @@ export const Node: Engine.ModuleNodes<Nodes> = {
           const nodeType = deliveredType(node, 'output', context)
           return nodeType.params.argument || context.modules.Core.Type.Unresolved.create()
         }
+      }
+    }
+  },
+  CombineTrigger: {
+    value: (node: Engine.Node, scope: Engine.Scope) => {
+      const inputs = inputValueAt(node, 'input', scope)
+
+      return {
+        subscribe: (fn) => {
+          const unsubscribes = inputs.map(input => input.subscribe(fn))
+          return () => unsubscribes.forEach(fn => fn())
+        }
+      }
+    },
+    type: {
+      output: {
+        output: (node: Engine.Node, context: Engine.Context) => {
+          const inputType = inputTypeAt(node, 'input', context)
+
+          if (inputType.name === 'Unresolved') {
+            return Type.Trigger.create(inputType)
+          }
+
+          if (inputType.name === 'Array') {
+            return inputType.params.items
+          }
+
+          return Type.Trigger.create(context.modules.Core.Type.Mismatch.create(`Invalid input type, expected Array, got ${inputType.name}`))
+        }
+      },
+      input: {
+        input: (node: Engine.Node, context: Engine.Context) =>
+          context.modules.Array.Type.Array.create(deliveredType(node, 'output', context))
       }
     }
   },
@@ -233,6 +266,25 @@ export const EditorNode: Editor.ModuleNodes<Nodes> = {
       type: 'TriggerValue',
       params: [],
     })    
+  },
+  CombineTrigger: {
+    name: 'Combine Trigger',
+    type: 'CombineTrigger',
+    ports: {
+      input: {
+        input: ['side']
+      },
+      output: {
+        output: ['side']
+      }
+    },
+    documentation: {
+      explanation: ''
+    },
+    create: () => ({
+      type: 'CombineTrigger',
+      params: []
+    })
   },
   ChangeArgument: {
     name: 'Change Argument',
