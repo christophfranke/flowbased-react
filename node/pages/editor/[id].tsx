@@ -102,9 +102,11 @@ class EditorLoad extends React.Component<Props> {
       top: '1vw',
       textAlign: 'center',
       fontSize: '24px',
+      lineHeight: '1.4',
       backgroundColor: 'rgba(25, 25, 25, 0.7)',
       borderRadius: '8px',
-      border: '1px solid white'
+      border: '1px solid white',
+      width: '20vw'
     }
 
     return <div>
