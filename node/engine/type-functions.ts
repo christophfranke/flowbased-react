@@ -6,6 +6,15 @@ import { unique } from '@engine/util'
 
 import * as Core from '@engine/modules/core'
 
+export const everyTypeEquals = (a, b) => a.length === b.length && a.every((t, i) => typeEquals(a[i], b[i]))
+export function typeEquals(src: ValueType, target: ValueType): boolean {
+  if (src.name !== target.name) {
+    return false
+  }
+
+  const keys = unique(Object.keys(src.params).concat(Object.keys(target.params)))
+  return keys.every(key => src.params[key] && target.params[key] && typeEquals(src.params[key], target.params[key]))
+}
 
 export function contains(type: ValueType, name: string): boolean {
   if (type.name === name) {

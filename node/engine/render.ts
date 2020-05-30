@@ -3,7 +3,7 @@ import { Node, NodeIdentifier, NodeDefinition, ValueType, ValueTypeDefinition, S
 import { outputs, children, inputAt, inputsAt } from '@engine/tree'
 import { computedFunction } from '@engine/util'
 
-import { matchInto, unionAll, createEmptyValue } from '@engine/type-functions'
+import { matchInto, unionAll, createEmptyValue, typeEquals, everyTypeEquals } from '@engine/type-functions'
 
 export const nodeDefinition = computedFunction(function(node: NodeIdentifier, context: Context): NodeDefinition {
   return context.modules[node.module]
@@ -37,11 +37,11 @@ export const inputTypeAt = computedFunction(function(node: Node, key: string, co
   return input
     ? deliveredType(input.node, input.key, context)
     : context.modules.Core.Type.Unresolved.create()
-})
+}, { equals: typeEquals })
 
 export const inputTypesAt = computedFunction(function(node: Node, key: string, context: Context): any {
   return inputsAt(node, key).map(input => deliveredType(input.node, input.key, context))
-})
+}, { equals: everyTypeEquals })
 
 export const value = computedFunction(function(node: Node, scope: Scope, key: string): any {
   return nodeDefinition(node, scope.context).value(node, scope, key)
@@ -51,6 +51,8 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
   if (context.types[node.id]) {
     return context.types[node.id]
   }
+
+  // console.log('render delivered type for', node.type)
 
   const newContext = {
     ...context,
@@ -68,7 +70,7 @@ export const deliveredType = computedFunction(function(node: Node, key: string, 
     newContext),
     newContext
   )
-})
+}, { equals: typeEquals })
 
 const increasingIterators = ['Items', 'ChangeArgument']
 const decreasingIterators = ['Collect', 'UseArgument']
@@ -94,9 +96,11 @@ export const expectedType = computedFunction(function(target: Node, key: string,
   const definitions = nodeDefinition(target, context)
   const input = definitions.type.input
 
+  // console.log('render expected type for', target.type)
+
   if (input && input[key]) {
     return definitions.type.input![key](target, context)
   }
 
   return context.modules.Core.Type.Mismatch.create(`Connection target ${target.type}.id-${target.id} is missing input key ${key}`)
-})
+}, { equals: typeEquals })
