@@ -4,7 +4,6 @@ import { observable, computed } from 'mobx'
 import { flatten } from '@engine/util'
 import { Module, Context, Scope } from '@engine/types'
 import { module } from '@engine/module'
-import Translator from '@engine/translator'
 
 import * as Editor from '@editor/types'
 import * as EditorModule from '@editor/store/module'

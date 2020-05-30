@@ -5,16 +5,13 @@ import { observer, inject } from 'mobx-react'
 import * as Editor from '@editor/types'
 import * as Engine from '@engine/types'
 import Translator from '@engine/translator'
+import Store from '@editor/store'
 
 import { value } from '@engine/render'
 import graphStorage from '@service/graph-storage'
 
 interface Props {
-  store: {
-    name: string
-    nodes: Editor.Node[]
-    connections: Editor.Connection[]
-  }
+  store: Store
 }
 
 @observer

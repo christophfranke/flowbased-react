@@ -1,6 +1,7 @@
 import { computed, observable } from 'mobx'
 
 import * as Editor from '@editor/types'
+import Store from '@editor/store'
 
 import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
 import { flatten, transformer, unique } from '@engine/util'
@@ -17,17 +18,11 @@ import * as Input from '@engine/modules/input'
 import * as Javascript from '@engine/modules/javascript'
 import * as ErrorModule from '@engine/modules/error'
 
-interface EditorGraph {
-  name: string
-  nodes: Editor.Node[]
-  connections: Editor.Connection[]
-}
-
 class Translator {
-  @observable editor: EditorGraph
+  @observable editor: Store
   @observable name: string
 
-  constructor(editor: EditorGraph) {
+  constructor(editor: Store) {
     this.name = editor.name
     this.editor = editor
   }
@@ -80,7 +75,10 @@ class Translator {
       return {}
     }
 
-    const connections = this.editor.connections.filter(connection => connection.target.nodeId === editorNode.id)
+    const connections = this.editor.connections
+      .filter(connection => connection.target.nodeId === editorNode.id)
+    const getNode = id => this.getNode(id)
+
     return unique(connections.map(con => con.target.key))
       .reduce((obj, key) => ({
         ...obj,
@@ -93,11 +91,15 @@ class Translator {
             id: connection.id,
             src: {
               key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId)!.id)
+              get node() {
+                return getNode(connection.src.nodeId)
+              }
             },
             target: {
               key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId)!.id)
+              get node() {
+                return getNode(connection.target.nodeId)
+              }
             }
           }))
       }), {})
@@ -112,26 +114,30 @@ class Translator {
 
     const connections = this.editor.connections
       .filter(connection => connection.src.nodeId === editorNode.id)
-      .filter(connection =>
-        this.getEditorNode(connection.src.nodeId) &&
-        this.getEditorNode(connection.target.nodeId))
+    const getNode = id => this.getNode(id)
 
     return unique(connections.map(con => con.src.key))
       .reduce((obj, key) => ({
         ...obj,
-        [key]: connections.filter(con => con.src.key === key)
-          .sort((a, b) => a.src.slot - b.src.slot)
-          .map(connection => ({
-            id: connection.id,
-            src: {
-              key: connection.src.key,
-              node: this.getNode(this.getEditorNode(connection.src.nodeId)!.id)
-            },
-            target: {
-              key: connection.target.key,
-              node: this.getNode(this.getEditorNode(connection.target.nodeId)!.id)
-            }
-          }))
+        get [key]() {
+          return connections.filter(con => con.src.key === key)
+            .sort((a, b) => a.src.slot - b.src.slot)
+            .map(connection => ({
+              id: connection.id,
+              src: {
+                key: connection.src.key,
+                get node() {
+                  return getNode(connection.src.nodeId)
+                }
+              },
+              target: {
+                key: connection.target.key,
+                get node() {
+                  return getNode(connection.target.nodeId)
+                }
+              }
+            }))
+        } 
       }), {})
   }
 
@@ -141,7 +147,9 @@ class Translator {
     return editorNode
       ? editorNode.params.reduce((obj, param) => ({
           ...obj,
-          [param.key]: param.value
+          get [param.key]() {
+            return param.value
+          } 
         }), {})
       : {}
   }
