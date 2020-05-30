@@ -74,6 +74,12 @@ class GraphStorage {
     }), defaultModules)
   }
 
+  @observable storeOfNodeCache = {}
+  storeOfNode(id: number): Store | undefined  {
+    return Object.values(this.stores)
+      .find(store => store.nodes.some(node => node.id === id))
+  }
+
   @computed get context(): Context {
     return {
       modules: this.modules,

@@ -33,8 +33,14 @@ class LocalStorageSync {
       return
     }
 
-    try {    
-      const data = JSON.parse(value)
+    let data = null
+    try {
+      data = JSON.parse(value)
+    } catch(e) {
+      // do not care about malformed storage keys
+    }
+
+    if (data) {
       runInAction(() => {
         if (!graphStorage.stores[key]) {
           graphStorage.stores[key] = new Store()
@@ -43,8 +49,6 @@ class LocalStorageSync {
         const store = graphStorage.stores[key]
         store.fillWithData(data)
       })
-    } catch(e) {
-      // do not care about malformed storage keys
     }
   }
 
