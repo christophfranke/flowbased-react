@@ -106,7 +106,8 @@ class EditorLoad extends React.Component<Props> {
       backgroundColor: 'rgba(25, 25, 25, 0.7)',
       borderRadius: '8px',
       border: '1px solid white',
-      width: '20vw'
+      width: '25vw',
+      minWidth: '250px'
     }
 
     return <div>

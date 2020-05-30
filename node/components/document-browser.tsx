@@ -45,7 +45,7 @@ class EditorLoad extends React.Component<Props> {
   }
 
   sort<T>(documents: T[]): T[] {
-    return documents.sort((a, b) => this.name(a) > this.name(b) ? 1 : -1)
+    return documents.slice().sort((a, b) => this.name(a) > this.name(b) ? 1 : -1)
   }
 
   componentDidMount() {
