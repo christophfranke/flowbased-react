@@ -116,7 +116,7 @@ export default class NodeFunctions {
       this.store.deleteNodes(singletonNodes)
     }
 
-    this.store.nodes.push(node)
+    this.store.addNode(node)
 
     return node
   }

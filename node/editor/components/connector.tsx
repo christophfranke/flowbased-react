@@ -149,7 +149,7 @@ class ConnectorView extends React.Component<Props> {
         target: this.store.connector.description<'input'>(to)
       }
 
-      this.store.connections.push(connection)
+      this.store.addConnection(connection)
     }
   }
 
@@ -161,8 +161,7 @@ class ConnectorView extends React.Component<Props> {
         ? this.store.connector.connector(connection.src)
         : this.store.connector.connector(connection.target)
 
-      this.store.connections = this.store.connections.filter(con => con !== connection)
-
+      this.store.deleteConnection(connection)
       return other
     }
 

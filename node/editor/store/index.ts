@@ -17,9 +17,18 @@ class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
 
+  @observable nodeMap: { [id: number]: Node } = {}
+  @observable connectionMap: { [id: number]: Connection } = {}
+
+  @computed get nodes(): Node[] {
+    return Object.values(this.nodeMap)
+  }
+
+  @computed get connections(): Connection[] {
+    return Object.values(this.connectionMap)
+  }
+
   @observable name = ''
-  @observable connections: Connection[] = []
-  @observable nodes: Node[] = []
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
   @observable currentHighZ = 1
@@ -86,8 +95,38 @@ class Store {
     runInAction(() => {    
       if (data.version > this.version) {
         // console.log('filled with data', data.name, data.version)
-        this.nodes = data.nodes || []
-        this.connections = data.connections || []
+        const nodeIds = {}
+        const dataNodes = data.nodes || []
+        dataNodes.forEach(dataNode => {
+          if (!this.nodeMap[dataNode.id]) {
+            this.addNode(dataNode)
+          } else {
+            this.updateNode(dataNode)
+          }
+          nodeIds[dataNode.id] = true
+        })
+        Object.keys(this.nodeMap).forEach(id => {
+          if (!nodeIds[id]) {
+            delete this.nodeMap[id]
+          }
+        })
+
+        const connectionIds = {}
+        const dataConnections = data.connections || []
+        dataConnections.forEach(dataConnection => {
+          if (!this.connectionMap[dataConnection.id]) {
+            this.addConnection(dataConnection)
+          } else {
+            this.updateConnection(dataConnection)
+          }
+          connectionIds[dataConnection.id] = true
+        })
+        Object.keys(this.connectionMap).forEach(id => {
+          if (!connectionIds[id]) {
+            delete this.connectionMap[id]
+          }
+        })
+
         this.currentHighZ = data.currentHighZ || 1
         this.name = data.name || ''   
         this.version = data.version - 1 || -1
@@ -97,6 +136,12 @@ class Store {
 
   uid(): number {
     return Math.random()
+  }
+
+  @transformer
+  connectionsOfNode(id: number): Connection[] {
+    return this.connections.filter(con =>
+      con.src.nodeId === id || con.target.nodeId === id)
   }
 
   @action
@@ -127,7 +172,7 @@ class Store {
     newConnection.src.nodeId = srcId
     newConnection.target.nodeId = targetId
 
-    this.connections.push(newConnection)
+    this.addConnection(newConnection)
     return newConnection
   }
 
@@ -186,6 +231,18 @@ class Store {
     this.selectedNodes = nodes
   }
 
+  @action addConnection(connection: Connection) {
+    this.connectionMap[connection.id] = connection
+  }
+
+  @action updateConnection(newConnection: Connection) {
+    this.connectionMap[newConnection.id] = newConnection
+  }
+
+  @action deleteConnection(connection: Connection) {
+    delete this.connectionMap[connection.id]
+  }
+
   @action
   deleteNodes(nodes: Node[]) {
     nodes.forEach(node => {
@@ -195,17 +252,23 @@ class Store {
 
   @action
   deleteNode(node: Node) {
-    this.connections = this.connections
-      .filter(connection =>
-        this.connector.connector(connection.src) &&
-        this.connector.connector(connection.src)!.group.ports.node !== node &&
-        this.connector.connector(connection.target) &&
-        this.connector.connector(connection.target)!.group.ports.node !== node)
+    this.connectionsOfNode(node.id)
+      .forEach(connection => this.deleteConnection(connection))
     // TODO: Fix this
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
     //   this.pendingConnector = null
     // }
-    this.nodes = this.nodes.filter(other => other !== node)
+    delete this.nodeMap[node.id]
+  }
+
+  @action
+  addNode(node: Node) {
+    this.nodeMap[node.id] = node
+  }
+
+  @action
+  updateNode(newNode: Node) {
+    this.nodeMap[newNode.id] = newNode
   }
 }
 
