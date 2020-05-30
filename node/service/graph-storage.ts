@@ -60,17 +60,29 @@ class GraphStorage {
   }
 
   @computed get editorModules(): { [key: string]: Editor.Module } {
-    return Object.entries(this.stores).reduce((obj, [key, store]) => ({
-      ...obj,
-      [key]: EditorModule.module(store.name, store.translated.defines)
-    }), defaultModules)
+    const modules = { ...defaultModules }
+    Object.entries(this.stores).forEach(([key, store]) => {
+      Object.defineProperty(modules, key, {
+        get: function() {
+          return EditorModule.module(store.name, store.translated.defines)
+        }
+      })
+    })
+
+    return modules
   }
 
   @computed get modules(): { [key: string]: Module } {
-    return Object.entries(this.stores).reduce((obj, [key, store]) => ({
-      ...obj,
-      [key]: store.translated.export
-    }), defaultModules)
+    const modules = { ...defaultModules }
+    Object.entries(this.stores).forEach(([key, store]) => {
+      Object.defineProperty(modules, key, {
+        get: function() {
+          return store.translated.export
+        }
+      })
+    })
+
+    return modules
   }
 
   @observable storeOfNodeCache = {}

@@ -28,6 +28,8 @@ class Store {
     return Object.values(this.connectionMap)
   }
 
+  @observable defines: Node[] = []
+
   @observable name = ''
   @observable pendingConnector: Connector | null = null
   @observable selectedNodes: Node[] = []
@@ -256,19 +258,27 @@ class Store {
   }
 
   @action
-  deleteNode(node: Node) {
-    this.connectionsOfNode(node.id)
-      .forEach(connection => this.deleteConnection(connection))
+  deleteNode(node: Node, withConnections = true) {
+    if (withConnections) {    
+      this.connectionsOfNode(node.id)
+        .forEach(connection => this.deleteConnection(connection))
+    }
     // TODO: Fix this
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
     //   this.pendingConnector = null
     // }
+    if (node.type === 'Define') {
+      this.defines = this.defines.filter(other => other !== node)
+    }
     delete this.nodeMap[node.id]
   }
 
   @action
   addNode(node: Node) {
     this.nodeMap[node.id] = node
+    if (node.type === 'Define') {
+      this.defines.push(node)
+    }
   }
 
   @action

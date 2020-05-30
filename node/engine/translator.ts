@@ -59,8 +59,7 @@ class Translator {
   // }
 
   @computed get defines(): Node[] {
-    return this.editor.nodes.filter(node => node.type === 'Define')
-      .map(node => this.getNode(node.id))
+    return this.editor.defines.map(node => this.getNode(node.id))
   }
 
   @transformer
