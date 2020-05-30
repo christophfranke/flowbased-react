@@ -76,7 +76,7 @@ class GraphStorage {
   @observable storeOfNodeCache = {}
   storeOfNode(id: number): Store | undefined  {
     return Object.values(this.stores)
-      .find(store => store.nodes.some(node => node.id === id))
+      .find(store => !!store.nodeMap[id])
   }
 
   @computed get context(): Context {

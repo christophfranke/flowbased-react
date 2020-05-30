@@ -249,8 +249,8 @@ class EditorView extends React.Component<Props> {
         this.initialSelection = this.store.selectedNodes
       }
       const rectangle: Rectangle = this.windowToViewRectangle(this.drawableSelectionRectangle)
-      const selected = this.store.nodes.filter(node => node.boundingBox)
-        .filter(node => LA.intersects(rectangle, node.boundingBox!))
+      const selected = this.store.nodes
+        .filter(node => node.boundingBox && LA.intersects(rectangle, node.boundingBox!))
 
       if (this.keys.Shift) {
         const stillSelected = this.initialSelection!.filter(node => !selected.includes(node))
