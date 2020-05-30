@@ -160,7 +160,7 @@ export default class ConnectorFunctions {
     }
 
     if (mode === 'duplicate') {
-      const numConnectors = this.store.connections
+      const numConnectors = this.store.connectionsOfNode(ports.node.id)
         .filter(connection =>
           connection.target.key === key &&
           connection.target.nodeId === ports.node.id)
@@ -249,7 +249,7 @@ export default class ConnectorFunctions {
       return true
     }
 
-    return this.store.connections.filter(con => con.src.nodeId === dest.id)
+    return this.store.connectionsOfNode(dest.id).filter(con => con.src.nodeId === dest.id)
       .filter(con => {
         if (this.hasConnectorOption(dest, 'output', con.src.key, 'allow-loops')) {
           return false
@@ -328,6 +328,7 @@ export default class ConnectorFunctions {
 
   @transformer
   getConnections(connector: Connector): Connection[] {
+    // return this.store.connectionsOfNode(connector.group.ports.node.id)
     return this.store.connections
       .filter(connection =>
         this.areSame(connection.src, this.description(connector)) ||

@@ -64,8 +64,9 @@ class GraphStorage {
     Object.entries(this.stores).forEach(([key, store]) => {
       Object.defineProperty(modules, key, {
         get: function() {
-          return EditorModule.module(store.name, store.translated.defines)
-        }
+          return EditorModule.createModule(store.name, store.translated.defines)
+        },
+        enumerable: true
       })
     })
 
@@ -78,7 +79,8 @@ class GraphStorage {
       Object.defineProperty(modules, key, {
         get: function() {
           return store.translated.export
-        }
+        },
+        enumerable: true
       })
     })
 

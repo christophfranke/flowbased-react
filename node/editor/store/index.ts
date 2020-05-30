@@ -1,12 +1,11 @@
-import { observable, computed, autorun, action, reaction, runInAction } from 'mobx'
+import { observable, computed, autorun, action, reaction, runInAction, IObservableArray } from 'mobx'
 import { Connection, Node, Connector, ConnectorState, Module, EditorDefinition, NodeIdentifier } from '@editor/types'
 import Translator from '@engine/translator'
 import { Context } from '@engine/types'
 
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
-import FilteredMap from '@editor/store/filtered-map'
-import { module } from '@editor/store/module'
+import MapStorage from '@editor/store/map-storage'
 
 import { filteredSubForest } from '@engine/tree'
 import { flatten, transformer } from '@engine/util'
@@ -18,11 +17,8 @@ class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
 
-  nodeMap = new FilteredMap<Node>()
-  connectionMap = new FilteredMap<Connection>()
-
-  // @observable nodeMap: { [id: number]: Node } = {}
-  // @observable connectionMap: { [id: number]: Connection } = {}
+  nodeMap = new MapStorage<Node>()
+  connectionMap = new MapStorage<Connection>()
 
   @computed get nodes(): Node[] {
     return this.nodeMap.list
@@ -32,7 +28,7 @@ class Store {
     return this.connectionMap.list
   }
 
-  @observable defines: Node[] = []
+  @observable defines: Node[] = this.nodeMap.filteredList(node => node.type === 'Define')
 
   @observable name = ''
   @observable pendingConnector: Connector | null = null
@@ -144,10 +140,14 @@ class Store {
     return Math.random()
   }
 
+  @observable connectionsOfNodeMap: { [id: number]: IObservableArray<Connection> } = {}
   @transformer
   connectionsOfNode(id: number): Connection[] {
-    return this.connections.filter(con =>
-      con.src.nodeId === id || con.target.nodeId === id)
+    if (!this.connectionsOfNodeMap[id]) {
+      this.connectionsOfNodeMap[id] = observable([])
+    }
+
+    return this.connectionsOfNodeMap[id]
   }
 
   @action
@@ -197,12 +197,12 @@ class Store {
 
   @transformer
   getNodeById(id: number): Node | undefined {
-    return this.nodes.find(node => node.id === id)
+    return this.nodeMap.getItem(id)
   }
 
   @transformer
   getChildren(node: Node): Node[] {
-    return this.connections
+    return this.connectionsOfNode(node.id)
       .filter(connection => this.connector.connector(connection.target))
       .filter(connection => this.connector.connector(connection.target)!.group.ports.node === node)
       .map(connection => this.connector.connector(connection.src)!.group.ports.node)
@@ -239,6 +239,15 @@ class Store {
 
   @action addConnection(connection: Connection) {
     this.connectionMap.add(connection)
+
+    const ids = [connection.src.nodeId, connection.target.nodeId]
+    ids.forEach(id => {
+      if (!this.connectionsOfNodeMap[id]) {
+        this.connectionsOfNodeMap[id] = observable([])
+      }
+
+      this.connectionsOfNodeMap[id].push(connection)
+    })
   }
 
   @action updateConnection(newConnection: Connection) {
@@ -252,6 +261,15 @@ class Store {
 
   @action deleteConnection(connection: Connection) {
     this.connectionMap.remove(connection.id)
+    
+    const ids = [connection.src.nodeId, connection.target.nodeId]
+    ids.forEach(id => {
+      if (this.connectionsOfNodeMap[id]) {
+        this.connectionsOfNodeMap[id].remove(connection)
+      } else {
+        console.warn('removing unregistered connection', id)
+      }
+    })
   }
 
   @action
@@ -271,18 +289,12 @@ class Store {
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {
     //   this.pendingConnector = null
     // }
-    if (node.type === 'Define') {
-      this.defines = this.defines.filter(other => other !== node)
-    }
     this.nodeMap.remove(node.id)
   }
 
   @action
   addNode(node: Node) {
     this.nodeMap.add(node)
-    if (node.type === 'Define') {
-      this.defines.push(node)
-    }
   }
 
   @action

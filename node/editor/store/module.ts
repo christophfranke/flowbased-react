@@ -2,8 +2,9 @@ import * as Engine from '@engine/types'
 import * as Editor from '@editor/types'
 import { filteredSubForest } from '@engine/tree'
 import * as EngineModule from '@engine/module'
+import { computedFunction } from '@engine/util'
 
-export function module(name: string, defines: Engine.Node[]): Editor.Module {
+export const createModule = computedFunction(function (name: string, defines: Engine.Node[]): Editor.Module {
   return {
     ...EngineModule.module(name, defines),
     EditorNode: defines.reduce((obj, define) => {
@@ -11,7 +12,7 @@ export function module(name: string, defines: Engine.Node[]): Editor.Module {
         ...obj,
         [`define-${define.id}`]: {
           get name() {
-            return define.params.name.trim() || 'Anonymous'
+            return (define.params.name && define.params.name.trim()) || 'Anonymous'
           },
           type: 'Local',
           documentation: {
@@ -51,4 +52,4 @@ export function module(name: string, defines: Engine.Node[]): Editor.Module {
       }
     }, {})
   }
-}
+}, { keepAlive: true })

@@ -35,9 +35,8 @@ class Preview extends React.Component<Props> {
 
   componentDidMount() {
     this.dispose = this.store.nodes
-      .filter(node => graphStorage.context.modules[node.module]
-        && graphStorage.editorModules[node.module].EditorNode[node.type].options
-        && graphStorage.editorModules[node.module].EditorNode[node.type].options!.includes('side-effect'))
+      .filter(node => this.store.editorDefinition(node).options
+        && this.store.editorDefinition(node).options!.includes('side-effect'))
       .map(node => autorun(() => value(this.translator.getNode(node.id), graphStorage.scope, 'output')))
 
     autorun(() => {
