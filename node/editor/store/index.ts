@@ -5,6 +5,7 @@ import { Context } from '@engine/types'
 
 import ConnectorFunctions from '@editor/store/connector'
 import NodeFunctions from '@editor/store/node'
+import FilteredMap from '@editor/store/filtered-map'
 import { module } from '@editor/store/module'
 
 import { filteredSubForest } from '@engine/tree'
@@ -17,15 +18,18 @@ class Store {
   connector: ConnectorFunctions
   node: NodeFunctions
 
-  @observable nodeMap: { [id: number]: Node } = {}
-  @observable connectionMap: { [id: number]: Connection } = {}
+  nodeMap = new FilteredMap<Node>()
+  connectionMap = new FilteredMap<Connection>()
+
+  // @observable nodeMap: { [id: number]: Node } = {}
+  // @observable connectionMap: { [id: number]: Connection } = {}
 
   @computed get nodes(): Node[] {
-    return Object.values(this.nodeMap)
+    return this.nodeMap.list
   }
 
   @computed get connections(): Connection[] {
-    return Object.values(this.connectionMap)
+    return this.connectionMap.list
   }
 
   @observable defines: Node[] = []
@@ -100,7 +104,7 @@ class Store {
         const nodeIds = {}
         const dataNodes = data.nodes || []
         dataNodes.forEach(dataNode => {
-          if (!this.nodeMap[dataNode.id]) {
+          if (!this.nodeMap.hasItem(dataNode.id)) {
             this.addNode(dataNode)
           } else {
             this.updateNode(dataNode)
@@ -109,14 +113,14 @@ class Store {
         })
         Object.keys(this.nodeMap).forEach(id => {
           if (!nodeIds[id]) {
-            delete this.nodeMap[id]
+            this.nodeMap.remove(id)
           }
         })
 
         const connectionIds = {}
         const dataConnections = data.connections || []
         dataConnections.forEach(dataConnection => {
-          if (!this.connectionMap[dataConnection.id]) {
+          if (!this.connectionMap.hasItem(dataConnection.id)) {
             this.addConnection(dataConnection)
           } else {
             this.updateConnection(dataConnection)
@@ -125,7 +129,7 @@ class Store {
         })
         Object.keys(this.connectionMap).forEach(id => {
           if (!connectionIds[id]) {
-            delete this.connectionMap[id]
+            this.connectionMap.remove(id)
           }
         })
 
@@ -234,11 +238,11 @@ class Store {
   }
 
   @action addConnection(connection: Connection) {
-    this.connectionMap[connection.id] = connection
+    this.connectionMap.add(connection)
   }
 
   @action updateConnection(newConnection: Connection) {
-    const oldConnection = this.connectionMap[newConnection.id]
+    const oldConnection = this.connectionMap.getItem(newConnection.id)
     Object.keys(newConnection).forEach(key => {
       if (oldConnection[key] !== newConnection[key]) {
         oldConnection[key] = newConnection[key]
@@ -247,7 +251,7 @@ class Store {
   }
 
   @action deleteConnection(connection: Connection) {
-    delete this.connectionMap[connection.id]
+    this.connectionMap.remove(connection.id)
   }
 
   @action
@@ -270,12 +274,12 @@ class Store {
     if (node.type === 'Define') {
       this.defines = this.defines.filter(other => other !== node)
     }
-    delete this.nodeMap[node.id]
+    this.nodeMap.remove(node.id)
   }
 
   @action
   addNode(node: Node) {
-    this.nodeMap[node.id] = node
+    this.nodeMap.add(node)
     if (node.type === 'Define') {
       this.defines.push(node)
     }
@@ -283,7 +287,7 @@ class Store {
 
   @action
   updateNode(newNode: Node) {
-    const oldNode = this.nodeMap[newNode.id]
+    const oldNode = this.nodeMap.getItem(newNode.id)
     Object.keys(newNode).forEach(key => {
       if (oldNode[key] !== newNode[key]) {
         oldNode[key] = newNode[key]
