@@ -236,7 +236,12 @@ class Store {
   }
 
   @action updateConnection(newConnection: Connection) {
-    this.connectionMap[newConnection.id] = newConnection
+    const oldConnection = this.connectionMap[newConnection.id]
+    Object.keys(newConnection).forEach(key => {
+      if (oldConnection[key] !== newConnection[key]) {
+        oldConnection[key] = newConnection[key]
+      }
+    })
   }
 
   @action deleteConnection(connection: Connection) {
@@ -268,7 +273,12 @@ class Store {
 
   @action
   updateNode(newNode: Node) {
-    this.nodeMap[newNode.id] = newNode
+    const oldNode = this.nodeMap[newNode.id]
+    Object.keys(newNode).forEach(key => {
+      if (oldNode[key] !== newNode[key]) {
+        oldNode[key] = newNode[key]
+      }
+    })
   }
 }
 
