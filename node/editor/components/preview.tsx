@@ -17,7 +17,6 @@ interface Props {
 @observer
 class Preview extends React.Component<Props> {
   store = this.props.store
-  ref = React.createRef<HTMLDivElement>()
   dispose: IReactionDisposer[] = []
   translator = new Translator(this.store)
   @observable value: any
@@ -32,12 +31,20 @@ class Preview extends React.Component<Props> {
     return this.store.nodes.find(node => node.type === 'Preview')
   }
 
-
-  componentDidMount() {
-    this.dispose = this.store.nodes
+  @computed get sideEffectNodes(): Editor.Node[] {
+    return this.store.nodes
       .filter(node => this.store.editorDefinition(node).options
         && this.store.editorDefinition(node).options!.includes('side-effect'))
-      .map(node => autorun(() => value(this.translator.getNode(node.id), graphStorage.scope, 'output')))
+  }
+
+
+  componentDidMount() {
+    autorun(() => {
+      this.dispose.forEach(fn => fn())
+      this.dispose = this.sideEffectNodes
+        .map(node => autorun(() =>
+          value(this.translator.getNode(node.id), graphStorage.scope, 'output')))
+    })
 
     autorun(() => {
       this.value = this.root
@@ -57,7 +64,7 @@ class Preview extends React.Component<Props> {
       </React.Fragment>
     }
 
-    return <div ref={this.ref}>
+    return <div>
       Create a Preview node to see a preview
     </div>
   }

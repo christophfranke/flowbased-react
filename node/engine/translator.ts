@@ -1,4 +1,4 @@
-import { computed, observable } from 'mobx'
+import { computed, observable, toJS } from 'mobx'
 
 import * as Editor from '@editor/types'
 import Store from '@editor/store'

@@ -1,6 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { computed, observable, autorun } from 'mobx'
+import { computed, observable, autorun, runInAction, toJS } from 'mobx'
 import { Node, Scope, Port, Connection } from '@engine/types'
 import { RenderProps, NodeProps, TagLocals, Func } from './types'
 
@@ -28,7 +28,7 @@ const HOC = (Component, scope: Scope, node: Node) => {
       autorun(() => {
         this.children = node.connections.input.input
           ? node.connections.input.input
-            .map(input => this.getChild(input.src))
+              .map(input => this.getChild(input.src))
           : []
       })
 
@@ -63,7 +63,7 @@ const HOC = (Component, scope: Scope, node: Node) => {
     getChild(input: Port) {
       const result = value(input.node, scope, input.key)
       const nodeType = deliveredType(input.node, 'output', scope.context)
-      if (contains(nodeType, 'Object') || contains(nodeType, 'Pair') || nodeType.name === 'Boolean') {
+      if (contains(nodeType, 'Object') || nodeType.name === 'Boolean') {
         if (contains(deliveredType(input.node, 'output', scope.context), 'Element')) {
           return '{ Complex Object }'
         }

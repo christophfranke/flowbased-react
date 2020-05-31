@@ -107,7 +107,8 @@ class Store {
           }
           nodeIds[dataNode.id] = true
         })
-        Object.keys(this.nodeMap).forEach(id => {
+        this.nodeMap.list.forEach(node => {
+          const id = node.id
           if (!nodeIds[id]) {
             this.nodeMap.remove(id)
           }
@@ -123,9 +124,10 @@ class Store {
           }
           connectionIds[dataConnection.id] = true
         })
-        Object.keys(this.connectionMap).forEach(id => {
+        this.connectionMap.list.forEach(connection => {
+          const id = connection.id
           if (!connectionIds[id]) {
-            this.connectionMap.remove(id)
+            this.deleteConnection(connection)
           }
         })
 
@@ -285,7 +287,7 @@ class Store {
   }
 
   @action
-  deleteNode(node: Node, withConnections = true) {
+  deleteNode(node: Node, { withConnections } = { withConnections: true }) {
     console.log('delete node', node.id)
     if (withConnections) {
       this.connectionsOfNode(node.id).slice()
