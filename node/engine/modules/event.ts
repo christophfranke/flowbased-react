@@ -76,6 +76,9 @@ export const Node: Engine.ModuleNodes<Nodes> = {
 
       return {
         subscribe: (fn) => triggerValue.subscribe(
+          // getting the input value here will trigger a warning
+          // as we actually do want to recompute here out of a reactive context
+          // we can safely ignore this warning.
           () => fn(inputValueAt(node, 'value', scope))
         )
       }
