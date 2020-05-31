@@ -1,4 +1,4 @@
-import { observable, computed, autorun, action, reaction, runInAction, IObservableArray } from 'mobx'
+import { toJS, observable, computed, autorun, action, reaction, runInAction, IObservableArray } from 'mobx'
 import { Connection, Node, Connector, ConnectorState, Module, EditorDefinition, NodeIdentifier } from '@editor/types'
 import Translator from '@engine/translator'
 import { Context } from '@engine/types'
@@ -246,7 +246,7 @@ class Store {
         this.connectionsOfNodeMap[id] = observable([])
       }
 
-      this.connectionsOfNodeMap[id].push(connection)
+      this.connectionsOfNodeMap[id].push(observable(connection))
     })
   }
 
@@ -260,16 +260,21 @@ class Store {
   }
 
   @action deleteConnection(connection: Connection) {
-    this.connectionMap.remove(connection.id)
-    
     const ids = [connection.src.nodeId, connection.target.nodeId]
     ids.forEach(id => {
       if (this.connectionsOfNodeMap[id]) {
-        this.connectionsOfNodeMap[id].remove(connection)
+        const savedConnection = this.connectionsOfNodeMap[id].find(con => con.id === connection.id)
+        if (savedConnection) {
+          this.connectionsOfNodeMap[id].remove(savedConnection)
+        } else {
+          console.warn('could not find saved connection', id)
+        }
       } else {
         console.warn('removing unregistered connection', id)
       }
     })
+
+    this.connectionMap.remove(connection.id)
   }
 
   @action
@@ -281,9 +286,13 @@ class Store {
 
   @action
   deleteNode(node: Node, withConnections = true) {
-    if (withConnections) {    
-      this.connectionsOfNode(node.id)
-        .forEach(connection => this.deleteConnection(connection))
+    console.log('delete node', node.id)
+    if (withConnections) {
+      this.connectionsOfNode(node.id).slice()
+        .forEach(connection => {
+          console.log('delete connection', connection.id)
+          this.deleteConnection(connection)
+        })
     }
     // TODO: Fix this
     // if (this.pendingConnector && this.nodeOfConnector(this.pendingConnector) === node) {

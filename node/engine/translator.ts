@@ -4,7 +4,7 @@ import * as Editor from '@editor/types'
 import Store from '@editor/store'
 
 import { Node, NodeIdentifier, Connection, Scope, Context, Module, NodeDefinition } from '@engine/types'
-import { flatten, transformer, unique } from '@engine/util'
+import { flatten, transformer, unique, computedFunction } from '@engine/util'
 import { filteredSubForest } from '@engine/tree'
 import { intersectAll } from '@engine/type-functions'
 import { module } from '@engine/module'
@@ -27,36 +27,10 @@ class Translator {
     this.editor = editor
   }
 
-  // @observable modules: { [key: string]: Module } = {
-  //   Core,
-  //   React,
-  //   Array: ArrayModule,
-  //   Object: ObjectModule,
-  //   Define,
-  //   Input,
-  //   Javascript,
-  //   Error: ErrorModule
-  // }
 
   @computed get export(): Module {
     return module(this.name, this.defines)
   }
-
-  // @computed get context(): Context {
-  //   return {
-  //     modules: this.modules,
-  //     types: {},
-  //     defines: this.defines
-  //   }
-  // }
-
-  // @computed get scope(): Scope {
-  //   return {
-  //     locals: {},
-  //     context: this.context,
-  //     parent: null
-  //   }
-  // }
 
   @computed get defines(): Node[] {
     return this.editor.defines.map(node => this.getNode(node.id))
@@ -64,7 +38,7 @@ class Translator {
 
   @transformer
   getEditorNode(id: number): Editor.Node | undefined {
-    return this.editor.nodes.find(node => node.id === id)
+    return this.editor.nodeMap.getItem(id)
   }
 
   @transformer
@@ -74,53 +48,18 @@ class Translator {
       return {}
     }
 
-    const connections = this.editor.connections
+    const connections = this.editor.connectionsOfNode(editorNodeId)
       .filter(connection => connection.target.nodeId === editorNode.id)
     const getNode = id => this.getNode(id)
 
-    return unique(connections.map(con => con.target.key))
-      .reduce((obj, key) => ({
-        ...obj,
-        [key]: connections.filter(con => con.target.key === key)
-          .sort((a, b) => a.target.slot - b.target.slot)
-          .filter(connection =>
-            this.getEditorNode(connection.src.nodeId) &&
-            this.getEditorNode(connection.target.nodeId))
-          .map(connection => ({
-            id: connection.id,
-            src: {
-              key: connection.src.key,
-              get node() {
-                return getNode(connection.src.nodeId)
-              }
-            },
-            target: {
-              key: connection.target.key,
-              get node() {
-                return getNode(connection.target.nodeId)
-              }
-            }
-          }))
-      }), {})
-  }
-
-  @transformer
-  getOutputs(editorNodeId: number): { [key: string]: Connection[] } {
-    const editorNode = this.getEditorNode(editorNodeId)
-    if (!editorNode) {
-      return {}
-    }
-
-    const connections = this.editor.connections
-      .filter(connection => connection.src.nodeId === editorNode.id)
-    const getNode = id => this.getNode(id)
-
-    return unique(connections.map(con => con.src.key))
-      .reduce((obj, key) => ({
-        ...obj,
-        get [key]() {
-          return connections.filter(con => con.src.key === key)
-            .sort((a, b) => a.src.slot - b.src.slot)
+    const keys = unique(connections.map(con => con.target.key))
+    const result = {}
+    keys.forEach(key => {
+      const connectionsOfKey = connections.filter(con => con.target.key === key)
+      Object.defineProperty(result, key, {
+        get: computedFunction(function() {
+          return connectionsOfKey
+            .sort((a, b) => a.target.slot - b.target.slot)
             .map(connection => ({
               id: connection.id,
               src: {
@@ -136,8 +75,54 @@ class Translator {
                 }
               }
             }))
-        } 
-      }), {})
+          }),
+        enumerable: true
+      })
+    })
+
+    return result
+  }
+
+  @transformer
+  getOutputs(editorNodeId: number): { [key: string]: Connection[] } {
+    const editorNode = this.getEditorNode(editorNodeId)
+    if (!editorNode) {
+      return {}
+    }
+
+    const connections = this.editor.connectionsOfNode(editorNodeId)
+      .filter(connection => connection.src.nodeId === editorNode.id)
+    const getNode = id => this.getNode(id)
+
+    const keys = unique(connections.map(con => con.src.key))
+    const result = {}
+    keys.forEach(key => {
+      const connectionsOfKey = connections.filter(con => con.src.key === key)
+      Object.defineProperty(result, key, {
+        get: computedFunction(function() {
+          return connectionsOfKey
+            .sort((a, b) => a.target.slot - b.target.slot)
+            .map(connection => ({
+              id: connection.id,
+              src: {
+                key: connection.src.key,
+                get node() {
+                  return getNode(connection.src.nodeId)
+                }
+              },
+              target: {
+                key: connection.target.key,
+                get node() {
+                  return getNode(connection.target.nodeId)
+                }
+              }
+            }))
+          }),
+        enumerable: true
+      })
+    })
+
+    return result
   }
 
   @transformer
@@ -146,9 +131,7 @@ class Translator {
     return editorNode
       ? editorNode.params.reduce((obj, param) => ({
           ...obj,
-          get [param.key]() {
-            return param.value
-          } 
+          [param.key]: param.value
         }), {})
       : {}
   }

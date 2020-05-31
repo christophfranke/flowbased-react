@@ -328,8 +328,7 @@ export default class ConnectorFunctions {
 
   @transformer
   getConnections(connector: Connector): Connection[] {
-    // return this.store.connectionsOfNode(connector.group.ports.node.id)
-    return this.store.connections
+    return this.store.connectionsOfNode(connector.group.ports.node.id)
       .filter(connection =>
         this.areSame(connection.src, this.description(connector)) ||
         this.areSame(connection.target, this.description(connector)))
