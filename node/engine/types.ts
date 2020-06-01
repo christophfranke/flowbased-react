@@ -91,7 +91,9 @@ export interface Context {
     [key: string]: Module
   }
   types: {
-    [key: number]: ValueType
+    [id: number]: {
+      [key: string]: ValueType
+    }
     [key: string]: any
   }
   defines: Node[]

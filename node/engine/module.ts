@@ -8,7 +8,12 @@ const outputTypes = (define: Node, input: NodeTree, forest: NodeForest) => (node
   const newContext = subContext(context)
   setType(newContext, define, 'output', deliveredType(node, 'output', context))
   forest.filter(tree => tree !== input).forEach(tree => {
-    setType(newContext, tree.node, 'output', inputTypeAt(node, tree.node.params.name, context))
+    if (node.connections.input[tree.node.params.name]) {
+      if (!newContext.types.input) {
+        newContext.types.input = {}
+      }
+      newContext.types.input[tree.node.params.name] = inputTypeAt(node, tree.node.params.name, context)
+    }
   })
 
   const expectedType = deliveredType(input.node, 'output', newContext)
@@ -20,7 +25,7 @@ const outputTypes = (define: Node, input: NodeTree, forest: NodeForest) => (node
     return expectedType.params.items
   }
 
-  return expectedType  
+  return expectedType
 }
 
 export function module(name: string, defines: Node[]): Module {
