@@ -1,29 +1,15 @@
 import { Module, Context, Node, Scope, ModuleNodes, Port } from '@engine/types'
 import { filteredSubForest, NodeForest, NodeTree } from '@engine/tree'
-import { deliveredType } from '@engine/render'
+import { deliveredType, inputTypeAt } from '@engine/render'
 import { computedFunction } from '@engine/util'
+import { setType, subContext } from '@engine/context'
 
 const outputTypes = (define: Node, input: NodeTree, forest: NodeForest) => (node: Node, context: Context) => {
-  const newContext = {
-    ...context,
-    types: {
-      ...context.types,
-      [define.id]: deliveredType(node, 'output', context),
-      ...forest.filter(tree => tree !== input)
-        .reduce((obj, tree) => ({
-          ...obj,
-          input: {
-            [tree.node.params.name]: node.connections.input[tree.node.params.name]
-              ? deliveredType(
-                node.connections.input[tree.node.params.name][0].src.node,
-                node.connections.input[tree.node.params.name][0].src.key,
-                context
-              ) // this context might need the define type in some edge cases.
-              : undefined
-            }
-        }), {})
-    }
-  }
+  const newContext = subContext(context)
+  setType(newContext, define, 'output', deliveredType(node, 'output', context))
+  forest.filter(tree => tree !== input).forEach(tree => {
+    setType(newContext, tree.node, 'output', inputTypeAt(node, tree.node.params.name, context))
+  })
 
   const expectedType = deliveredType(input.node, 'output', newContext)
   if (input.node.params.duplicate) {

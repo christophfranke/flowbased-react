@@ -2,6 +2,7 @@ import React from 'react'
 import { Node, NodeIdentifier, NodeDefinition, ValueType, ValueTypeDefinition, Scope, Context, Connection } from '@engine/types'
 import { outputs, children, inputAt, inputsAt } from '@engine/tree'
 import { computedFunction } from '@engine/util'
+import { subContext, setType } from '@engine/context'
 
 import { matchInto, unionAll, createEmptyValue, typeEquals, everyTypeEquals } from '@engine/type-functions'
 
@@ -48,19 +49,13 @@ export const value = computedFunction(function(node: Node, scope: Scope, key: st
 })
 
 export const deliveredType = computedFunction(function(node: Node, key: string, context: Context): ValueType {
-  if (context.types[node.id]) {
-    return context.types[node.id]
+  if (context.types[node.id] && context.types[node.id][key]) {
+    return context.types[node.id][key]
   }
 
   // console.log('render delivered type for', node.type)
-
-  const newContext = {
-    ...context,
-    types: {
-      ...context.types,
-      [node.id]: context.modules.Core.Type.Unresolved.create()
-    }
-  }
+  const newContext = subContext(context)
+  setType(newContext, node, key, context.modules.Core.Type.Unresolved.create())
 
   const definitions = nodeDefinition(node, context)
   return matchInto(

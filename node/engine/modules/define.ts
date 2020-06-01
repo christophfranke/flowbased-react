@@ -4,6 +4,7 @@ import * as Editor from '@editor/types'
 import { value, deliveredType, inputValueAt, inputTypeAt } from '@engine/render'
 import { inputs, findChild } from '@engine/tree'
 import { intersectAll, createEmptyValue } from '@engine/type-functions'
+import { subContext }  from '@engine/context'
 
 export const Dependencies = ['Core', 'Array']
 
@@ -119,19 +120,14 @@ export const Node: Engine.ModuleNodes<Nodes> = {
     type: {
       output: {
         output: (node: Engine.Node, context: Engine.Context) => {
-          const newContext = {
-            ...context,
-            types: {
-              ...context.types,
-              input: Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
-                ...obj,
-                [key]: intersectAll(
-                  group.map(con => deliveredType(con.src.node, con.src.key, context)),
-                  context
-                )
-              }), {})
-            }
-          }
+          const newContext = subContext(context)
+          newContext.types.input = Object.entries(node.connections.input).reduce((obj, [key, group]) => ({
+            ...obj,
+            [key]: intersectAll(
+              group.map(con => deliveredType(con.src.node, con.src.key, context)),
+              context
+            )
+          }), {})
 
           const define = context.defines
             .find(other => other.id === Number(node.params.define))
