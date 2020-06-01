@@ -20,11 +20,11 @@ class Store {
   nodeMap = new MapStorage<Node>()
   connectionMap = new MapStorage<Connection>()
 
-  @computed get nodes(): Node[] {
+  @computed get nodes(): IObservableArray<Node> {
     return this.nodeMap.list
   }
 
-  @computed get connections(): Connection[] {
+  @computed get connections(): IObservableArray<Connection> {
     return this.connectionMap.list
   }
 
@@ -288,11 +288,9 @@ class Store {
 
   @action
   deleteNode(node: Node, { withConnections } = { withConnections: true }) {
-    console.log('delete node', node.id)
     if (withConnections) {
       this.connectionsOfNode(node.id).slice()
         .forEach(connection => {
-          console.log('delete connection', connection.id)
           this.deleteConnection(connection)
         })
     }

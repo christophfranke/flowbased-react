@@ -1,11 +1,11 @@
-import { observable, computed, toJS } from 'mobx'
+import { observable, computed, IObservableArray, toJS } from 'mobx'
 
 type Filter<T> = (element: T) => boolean
 export default class MapStorage<T extends { id: number }> {
   @observable map: { [id: number]: T } = {}
 
-  @computed get list() {
-    return Object.values(this.map)
+  @computed get list(): IObservableArray<T> {
+    return observable(Object.values(this.map))
   }
 
   filters: { [key: number]: Filter<T> } = {}

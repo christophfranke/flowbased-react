@@ -1,9 +1,11 @@
 import Store from '@editor/store'
-import { observable, computed } from 'mobx'
+import { observable, computed, IObservableArray } from 'mobx'
 
 import { flatten } from '@engine/util'
 import { Module, Context, Scope } from '@engine/types'
 import { module } from '@engine/module'
+import { ReactiveContext } from '@engine/context'
+import { transformer } from '@engine/util'
 
 import * as Editor from '@editor/types'
 import * as EditorModule from '@editor/store/module'
@@ -42,9 +44,13 @@ interface DocumentHead {
 interface Document extends DocumentHead {
 }
 
-class GraphStorage {
+export class GraphStorage {
   @observable stores: { [key: string]: Store } = {}
   @observable documents: DocumentHead[] = []
+
+  @computed get storeList(): IObservableArray<Store> {
+    return observable(Object.values(this.stores))
+  }
 
   defaultContext: Context = {
     modules: defaultModules,
@@ -87,19 +93,14 @@ class GraphStorage {
     return modules
   }
 
-  @observable storeOfNodeCache = {}
+  // @observable storeOfNodeCache = {}
+  @transformer
   storeOfNode(id: number): Store | undefined  {
-    return Object.values(this.stores)
-      .find(store => !!store.nodeMap[id])
+    return this.storeList
+      .find(store => !!store.nodeMap.hasItem(id))
   }
 
-  @computed get context(): Context {
-    return {
-      modules: this.modules,
-      types: {},
-      defines: flatten(Object.values(this.stores).map(store => store.translated.defines))
-    }
-  }
+  @observable context = new ReactiveContext(this)
 
   @computed get scope(): Scope {    
     return {
